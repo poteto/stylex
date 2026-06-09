@@ -88,31 +88,50 @@ function isClose(type: string): boolean {
   );
 }
 
+/** A depth-0 component's token range: [start, end) indices into the input. */
+export type ComponentRange = Readonly<{ start: number, end: number }>;
+
 /**
- * Counts maximal runs of non-whitespace tokens at nesting depth 0: the
- * cheap pre-parse that lets minimal output short-circuit the dominant
- * already-valid single-component case before any grammar runs. A calc() is
- * countable as one component; a var() counts as one too, but only as a
- * documented trust -- the substituted value may hold several components
- * (calc is countable; var is not).
+ * Splits the token array into its top-level components: maximal runs of
+ * non-whitespace tokens at nesting depth 0, with a top-level '/' delimiter
+ * acting as a boundary AND a single-token component of its own (so
+ * '10px/20px' is three components even without whitespace). Comments
+ * behave like whitespace; EOF tokens are never components. Tokens at
+ * depth > 0 (function arguments, brackets) stay inside their component's
+ * range -- the same balanced-depth walk varFunction uses.
  */
-export function countTopLevelComponents(
+export function splitTopLevelComponents(
   tokens: ReadonlyArray<CSSToken>,
-): number {
+): ReadonlyArray<ComponentRange> {
+  const ranges: Array<ComponentRange> = [];
   let depth = 0;
-  let count = 0;
-  let inRun = false;
-  for (const token of tokens) {
-    const type = token[0];
-    if (type === TokenType.Whitespace || type === TokenType.Comment) {
-      if (depth === 0) {
-        inRun = false;
-      }
-      continue;
+  let runStart = -1;
+  const endRun = (end: number): void => {
+    if (runStart >= 0) {
+      ranges.push({ start: runStart, end });
+      runStart = -1;
     }
-    if (depth === 0 && !inRun) {
-      count++;
-      inRun = true;
+  };
+  for (let index = 0; index < tokens.length; index++) {
+    const token = tokens[index];
+    const type = token[0];
+    if (depth === 0) {
+      if (
+        type === TokenType.Whitespace ||
+        type === TokenType.Comment ||
+        type === TokenType.EOF
+      ) {
+        endRun(index);
+        continue;
+      }
+      if (type === TokenType.Delim && token[1] === '/') {
+        endRun(index);
+        ranges.push({ start: index, end: index + 1 });
+        continue;
+      }
+      if (runStart < 0) {
+        runStart = index;
+      }
     }
     if (isOpen(type)) {
       depth++;
@@ -120,7 +139,22 @@ export function countTopLevelComponents(
       depth = Math.max(0, depth - 1);
     }
   }
-  return count;
+  endRun(tokens.length);
+  return ranges;
+}
+
+/**
+ * The number of top-level components: the cheap pre-parse that lets
+ * minimal output short-circuit the dominant already-valid single-component
+ * case before any grammar runs. A calc() is countable as one component; a
+ * var() counts as one too, but only as a documented trust -- the
+ * substituted value may hold several components (calc is countable; var
+ * is not).
+ */
+export function countTopLevelComponents(
+  tokens: ReadonlyArray<CSSToken>,
+): number {
+  return splitTopLevelComponents(tokens).length;
 }
 
 /** True when a `var()` appears at nesting depth 0 (nested vars are inert). */

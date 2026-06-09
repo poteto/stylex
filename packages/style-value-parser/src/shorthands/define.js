@@ -55,6 +55,15 @@ export type ShorthandDef = Readonly<{
    * meaningful single-number form.
    */
   runNumber: ?(value: number, options: EmitOptions) => ExpandResult,
+  /**
+   * Minimal-mode fast-path gate. True (the default) means a
+   * single-component value already IS its own minimal form, so the
+   * boundary may no-op before any grammar runs (quads, pairs, corners).
+   * Slot-elimination grammars set false: 'border: solid' is one component
+   * but its minimal form is a different key (borderStyle), so it must
+   * reach def.run even in minimal output.
+   */
+  singleComponentIsIdentity: boolean,
 }>;
 
 /**
@@ -92,6 +101,8 @@ export function defineShorthand<T, K: string>(
     ) => ?ReadonlyArray<Declaration>,
     /** Spec-output cells for a single numeric component. */
     expandNumber?: (value: number) => Readonly<{ [_k in K]: Cell }>,
+    /** See ShorthandDef.singleComponentIsIdentity; defaults to true. */
+    singleComponentIsIdentity?: boolean,
   }>,
 ): ShorthandDef {
   const { canonical, longhands, parse, expand, condense, expandNumber } =
@@ -168,5 +179,6 @@ export function defineShorthand<T, K: string>(
     dialectMap: config.dialectMap ?? {},
     run,
     runNumber,
+    singleComponentIsIdentity: config.singleComponentIsIdentity !== false,
   };
 }

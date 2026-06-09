@@ -121,7 +121,11 @@ export function expandShorthand(
   const source = typeof value === 'number' ? String(value) : value;
   const all = new TokenList(source).getAllTokens();
 
-  if (output === 'minimal' && countTopLevelComponents(all) <= 1) {
+  if (
+    output === 'minimal' &&
+    def.singleComponentIsIdentity &&
+    countTopLevelComponents(all) <= 1
+  ) {
     return { type: 'no-op' };
   }
 
