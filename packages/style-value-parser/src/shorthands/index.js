@@ -35,6 +35,7 @@ export { defineShorthand } from './define';
 export { axisPair } from './families/axis-pair';
 export { corners } from './families/corners';
 export { fourSides } from './families/four-sides';
+export { lineTrio } from './families/line-trio';
 export {
   isShorthand,
   lookupShorthand,

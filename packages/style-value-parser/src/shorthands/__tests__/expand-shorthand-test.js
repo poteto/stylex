@@ -45,9 +45,12 @@ describe('expandShorthand', () => {
       expect(lookupShorthand('nope')).toBe(null);
     });
 
-    it('defaults singleComponentIsIdentity to true on every def', () => {
+    it('defaults singleComponentIsIdentity to true outside line-trio defs', () => {
+      const escapees = new Set(['border']);
       for (const key of Object.keys(registry)) {
-        expect(registry[key].singleComponentIsIdentity).toBe(true);
+        expect(registry[key].singleComponentIsIdentity).toBe(
+          !escapees.has(key),
+        );
       }
     });
 

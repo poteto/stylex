@@ -10,6 +10,7 @@
 import type { ShorthandDef } from './define';
 
 import { camelize } from './define';
+import { borderDef } from '../properties/border';
 import { borderColorDef } from '../properties/border-color';
 import { borderRadiusDef } from '../properties/border-radius';
 import { borderStyleDef } from '../properties/border-style';
@@ -38,6 +39,7 @@ import { scrollPaddingDef } from '../properties/scroll-padding';
  * derives from this object at module init and is never synced by hand.
  */
 export const registry: Readonly<{ +[string]: ShorthandDef }> = Object.freeze({
+  border: borderDef,
   borderColor: borderColorDef,
   borderRadius: borderRadiusDef,
   borderStyle: borderStyleDef,
