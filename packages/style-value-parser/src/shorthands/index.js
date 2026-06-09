@@ -33,6 +33,7 @@ export type { ShorthandDef } from './define';
 
 export { defineShorthand } from './define';
 export { axisPair } from './families/axis-pair';
+export { corners } from './families/corners';
 export { fourSides } from './families/four-sides';
 export {
   isShorthand,
