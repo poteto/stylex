@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "target": "ESNext",
+    "moduleDetection": "force",
+    "types": [],
+    "skipLibCheck": false,
+    "strict": true,
+    "noEmit": true
+  },
+  "include": ["stress.ts"]
+}

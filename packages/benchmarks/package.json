@@ -5,6 +5,7 @@
   "scripts": {
     "perf": "node ./perf/run.js",
     "size": "NODE_ENV=production rollup --config ./size/rollup.config.mjs && node ./size/run.js",
+    "ts-compile": "node ./ts-compile/run.js",
     "compare": "node ./compare.js"
   },
   "license": "MIT",
