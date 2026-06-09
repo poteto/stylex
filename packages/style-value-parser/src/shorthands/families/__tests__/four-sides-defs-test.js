@@ -402,6 +402,83 @@ describe('four-sides defs', () => {
       });
     });
 
+    it('classifies modern color functions by name, arguments verbatim', () => {
+      // The color slot accepts any color-named function as one balanced
+      // component (rgb/oklch/... -> color), so syntaxes the typed Color
+      // parser does not model still relocate verbatim.
+      expect(
+        run(borderColorDef, 'hsl(220 3% 15%) hsl(240 3% 20%)', {
+          output: 'minimal',
+        }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'borderBlockColor',
+            value: 'hsl(220 3% 15%)',
+            origin: 'explicit',
+          },
+          {
+            property: 'borderInlineColor',
+            value: 'hsl(240 3% 20%)',
+            origin: 'explicit',
+          },
+        ],
+      });
+      expect(
+        run(borderColorDef, 'oklch(0.7 0.15 180) rgb(255 0 0)', {
+          output: 'minimal',
+        }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'borderBlockColor',
+            value: 'oklch(0.7 0.15 180)',
+            origin: 'explicit',
+          },
+          {
+            property: 'borderInlineColor',
+            value: 'rgb(255 0 0)',
+            origin: 'explicit',
+          },
+        ],
+      });
+      for (const value of [
+        'oklch(0.928 0.006 264.531)',
+        'oklab(0.9 -0.003 -0.003)',
+        'lab(50% -20 -20)',
+        'hwb(240 100% 50%)',
+        'color(display-p3 1 0.5 0)',
+        'hsl(220 3% 15% / 10%)',
+        'oklch(0.7 0.15 180 / 0.8)',
+      ]) {
+        expect(run(borderColorDef, value, { output: 'spec' })).toEqual({
+          type: 'ok',
+          important: false,
+          assignments: [
+            { property: 'borderTopColor', value, origin: 'explicit' },
+            { property: 'borderRightColor', value, origin: 'replicated' },
+            { property: 'borderBottomColor', value, origin: 'replicated' },
+            { property: 'borderLeftColor', value, origin: 'replicated' },
+          ],
+        });
+      }
+    });
+
+    it('still refuses non-color functions and unknown keywords', () => {
+      for (const value of [
+        'linear-gradient(to right, red, blue) red',
+        'hsb(220 3% 15%) red',
+        'notacolor red',
+      ]) {
+        const result = run(borderColorDef, value, { output: 'spec' });
+        expect(result.type).toEqual('cannot-expand');
+      }
+    });
+
     it('has no number fast path', () => {
       expect(borderColorDef.runNumber).toBe(null);
     });

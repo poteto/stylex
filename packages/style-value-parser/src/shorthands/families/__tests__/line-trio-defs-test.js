@@ -117,6 +117,26 @@ describe('border def (line-trio family)', () => {
       });
     });
 
+    it('classifies modern color functions to the color slot by name', () => {
+      for (const color of [
+        'oklch(0.6 0.1 240)',
+        'hwb(120 20% 30%)',
+        'lab(52% 40 59)',
+        'color(display-p3 1 0.5 0)',
+        'hsl(220 3% 15% / 10%)',
+      ]) {
+        expect(run(`1px solid ${color}`, { output: 'minimal' })).toEqual({
+          type: 'ok',
+          important: false,
+          assignments: [
+            { property: 'borderWidth', value: '1px', origin: 'explicit' },
+            { property: 'borderStyle', value: 'solid', origin: 'explicit' },
+            { property: 'borderColor', value: color, origin: 'explicit' },
+          ],
+        });
+      }
+    });
+
     it('accepts unitless zero as a width', () => {
       expect(run('0 solid', { output: 'minimal' })).toEqual({
         type: 'ok',

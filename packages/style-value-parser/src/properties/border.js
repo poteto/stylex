@@ -10,20 +10,28 @@
 import type { ShorthandDef } from '../shorthands/define';
 
 import { TokenParser } from '../token-parser';
-import { Color } from '../css-types/color';
+import { Color, colorFunctionNames } from '../css-types/color';
 import { lineStyle } from '../css-types/line-style';
 import { lineWidth } from '../css-types/line-width';
 import { mathFunction } from '../css-types/math-function';
+import { balancedFunction } from '../shorthands/families/slots';
 import { lineTrio } from '../shorthands/families/line-trio';
 
 // Slot grammars; var() is handled at the matcher level, not per slot.
-// The width and color slots are exported for the outline def, whose
-// outline-width and outline-color embed the same productions.
+// The width and color slots are exported for the other defs embedding
+// the same productions (outline, border-color, background's color).
+// The color slot backstops the typed Color parser with name-classified
+// balanced capture: any <color-function> name is a color component even
+// where the typed parser does not model its argument syntax (modern
+// space-separated forms, color()) -- arguments relocate verbatim.
 export const lineWidthSlot: TokenParser<unknown> = TokenParser.oneOf(
   lineWidth,
   mathFunction,
 );
-export const colorSlot: TokenParser<unknown> = Color.parser;
+export const colorSlot: TokenParser<unknown> = TokenParser.oneOf(
+  Color.parser,
+  balancedFunction(colorFunctionNames),
+);
 
 /**
  * border expands ONE level, to borderWidth/borderStyle/borderColor --
