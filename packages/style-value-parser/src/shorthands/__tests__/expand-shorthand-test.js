@@ -668,19 +668,11 @@ describe('expandShorthand', () => {
           },
         ],
       });
+      // The minimal collapse reproduces the authored declaration exactly,
+      // so the boundary reports identity (see 'identity collapses').
       expect(
         expandShorthand('borderRadius', '10px / 20px', { output: 'minimal' }),
-      ).toEqual({
-        type: 'ok',
-        important: false,
-        assignments: [
-          {
-            property: 'borderRadius',
-            value: '10px / 20px',
-            origin: 'explicit',
-          },
-        ],
-      });
+      ).toEqual({ type: 'no-op' });
     });
 
     it('emits all four corners for a 2-value borderRadius in minimal output', () => {
@@ -1619,6 +1611,65 @@ describe('expandShorthand', () => {
         assignments: [
           { property: 'gridRowStart', value: '2', origin: 'explicit' },
           { property: 'gridRowEnd', value: 'auto', origin: 'defaulted' },
+        ],
+      });
+    });
+  });
+
+  describe('identity collapses', () => {
+    it('reports a collapse that reproduces the authored declaration as no-op', () => {
+      // The slash form's canonical minimal collapse lands back on the
+      // shorthand's own key; when it ALSO reproduces the authored text
+      // exactly, expansion is identity and must say so.
+      expect(
+        expandShorthand('borderRadius', '10px / 20px', { output: 'minimal' }),
+      ).toEqual({ type: 'no-op' });
+      expect(
+        expandShorthand('borderRadius', '10px / 20px !important', {
+          output: 'minimal',
+          allowImportant: true,
+        }),
+      ).toEqual({ type: 'no-op' });
+    });
+
+    it('keeps collapses that change the declaration as ok rewrites', () => {
+      // Whitespace canonicalization is a real rewrite...
+      expect(
+        expandShorthand('borderRadius', '10px/20px', { output: 'minimal' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'borderRadius',
+            value: '10px / 20px',
+            origin: 'explicit',
+          },
+        ],
+      });
+      // ...as are shorter collapses and alias-key renames.
+      expect(
+        expandShorthand('borderRadius', '10px 10px / 20px', {
+          output: 'minimal',
+        }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'borderRadius',
+            value: '10px / 20px',
+            origin: 'explicit',
+          },
+        ],
+      });
+      expect(
+        expandShorthand('margin', '10px 10px', { output: 'minimal' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'margin', value: '10px', origin: 'explicit' },
         ],
       });
     });
