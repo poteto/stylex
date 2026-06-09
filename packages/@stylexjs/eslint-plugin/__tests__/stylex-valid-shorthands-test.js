@@ -582,6 +582,74 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
       })
     `,
     },
+    // inset: single value passes through
+    {
+      code: `
+      import * as stylex from '@stylexjs/stylex';
+      const styles = stylex.create({
+        main: {
+          inset: '10px',
+        },
+      })
+    `,
+    },
+    // inset: single numeric value passes through
+    {
+      code: `
+      import * as stylex from '@stylexjs/stylex';
+      const styles = stylex.create({
+        main: {
+          inset: 0,
+        },
+      })
+    `,
+    },
+    // insetBlock / insetInline: single values pass through
+    {
+      code: `
+      import * as stylex from '@stylexjs/stylex';
+      const styles = stylex.create({
+        main: {
+          insetBlock: '5px',
+          insetInline: 0,
+        },
+      })
+    `,
+    },
+    // overflow: single value passes through
+    {
+      code: `
+      import * as stylex from '@stylexjs/stylex';
+      const styles = stylex.create({
+        main: {
+          overflow: 'hidden',
+        },
+      })
+    `,
+    },
+    // overscroll-behavior: single value passes through
+    {
+      code: `
+      import * as stylex from '@stylexjs/stylex';
+      const styles = stylex.create({
+        main: {
+          overscrollBehavior: 'contain',
+        },
+      })
+    `,
+    },
+    // scroll-margin / scroll-padding: single values pass through
+    {
+      code: `
+      import * as stylex from '@stylexjs/stylex';
+      const styles = stylex.create({
+        main: {
+          scrollMargin: '10px',
+          scrollPadding: '10%',
+        },
+      })
+    `,
+    },
   ],
   invalid: [
     {
@@ -2852,6 +2920,372 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
         {
           message:
             'Property shorthands using multiple values like "border: 1px solid red !important" are not supported in StyleX. Separate into individual properties.',
+        },
+      ],
+    },
+    // inset / insetBlock / scrollMargin / overflow: repeated identical
+    // values collapse onto the shorthand itself
+    {
+      code: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            inset: '10px 10px 10px',
+            insetBlock: '15px 15px',
+            scrollMargin: '20px 20px 20px 20px',
+            overflow: 'hidden hidden',
+          },
+        });
+      `,
+      output: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            inset: '10px',
+            insetBlock: '15px',
+            scrollMargin: '20px',
+            overflow: 'hidden',
+          },
+        });
+      `,
+      errors: [
+        {
+          message:
+            'Property shorthands using multiple values like "inset: 10px 10px 10px" are not supported in StyleX. Separate into individual properties.',
+        },
+        {
+          message:
+            'Property shorthands using multiple values like "insetBlock: 15px 15px" are not supported in StyleX. Separate into individual properties.',
+        },
+        {
+          message:
+            'Property shorthands using multiple values like "scrollMargin: 20px 20px 20px 20px" are not supported in StyleX. Separate into individual properties.',
+        },
+        {
+          message:
+            'Property shorthands using multiple values like "overflow: hidden hidden" are not supported in StyleX. Separate into individual properties.',
+        },
+      ],
+    },
+    // inset: two values splits to the block/inline pair
+    {
+      code: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            inset: '0 20px',
+          },
+        });
+      `,
+      output: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            insetBlock: '0',
+            insetInline: '20px',
+          },
+        });
+      `,
+      errors: [
+        {
+          message:
+            'Property shorthands using multiple values like "inset: 0 20px" are not supported in StyleX. Separate into individual properties.',
+        },
+      ],
+    },
+    // inset: four values splits to the physical longhands (which for
+    // inset are top/right/bottom/left themselves)
+    {
+      code: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            inset: '10px 20px 30px 40px',
+          },
+        });
+      `,
+      output: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            top: '10px',
+            right: '20px',
+            bottom: '30px',
+            left: '40px',
+          },
+        });
+      `,
+      errors: [
+        {
+          message:
+            'Property shorthands using multiple values like "inset: 10px 20px 30px 40px" are not supported in StyleX. Separate into individual properties.',
+        },
+      ],
+    },
+    // inset: four values with preferInline uses the logical inline keys
+    {
+      options: [{ preferInline: true }],
+      code: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            inset: '10px 20px 30px 40px',
+          },
+        });
+      `,
+      output: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            top: '10px',
+            insetInlineEnd: '20px',
+            bottom: '30px',
+            insetInlineStart: '40px',
+          },
+        });
+      `,
+      errors: [
+        {
+          message:
+            'Property shorthands using multiple values like "inset: 10px 20px 30px 40px" are not supported in StyleX. Separate into individual properties.',
+        },
+      ],
+    },
+    // inset: with !important and allowImportant
+    {
+      options: [{ allowImportant: true }],
+      code: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            inset: '10px 20px !important',
+          },
+        });
+      `,
+      output: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            insetBlock: '10px !important',
+            insetInline: '20px !important',
+          },
+        });
+      `,
+      errors: [
+        {
+          message:
+            'Property shorthands using multiple values like "inset: 10px 20px !important" are not supported in StyleX. Separate into individual properties.',
+        },
+      ],
+    },
+    // insetBlock: two values splits to start/end
+    {
+      code: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            insetBlock: '5px 10px',
+          },
+        });
+      `,
+      output: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            insetBlockStart: '5px',
+            insetBlockEnd: '10px',
+          },
+        });
+      `,
+      errors: [
+        {
+          message:
+            'Property shorthands using multiple values like "insetBlock: 5px 10px" are not supported in StyleX. Separate into individual properties.',
+        },
+      ],
+    },
+    // insetInline: two values splits to start/end
+    {
+      code: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            insetInline: '5px 10px',
+          },
+        });
+      `,
+      output: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            insetInlineStart: '5px',
+            insetInlineEnd: '10px',
+          },
+        });
+      `,
+      errors: [
+        {
+          message:
+            'Property shorthands using multiple values like "insetInline: 5px 10px" are not supported in StyleX. Separate into individual properties.',
+        },
+      ],
+    },
+    // overflow: two values splits to overflowX/overflowY
+    {
+      code: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            overflow: 'hidden scroll',
+          },
+        });
+      `,
+      output: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            overflowX: 'hidden',
+            overflowY: 'scroll',
+          },
+        });
+      `,
+      errors: [
+        {
+          message:
+            'Property shorthands using multiple values like "overflow: hidden scroll" are not supported in StyleX. Separate into individual properties.',
+        },
+      ],
+    },
+    // overscroll-behavior: two values splits to the X/Y pair
+    {
+      code: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            overscrollBehavior: 'contain none',
+          },
+        });
+      `,
+      output: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            overscrollBehaviorX: 'contain',
+            overscrollBehaviorY: 'none',
+          },
+        });
+      `,
+      errors: [
+        {
+          message:
+            'Property shorthands using multiple values like "overscrollBehavior: contain none" are not supported in StyleX. Separate into individual properties.',
+        },
+      ],
+    },
+    // scroll-margin: four values splits to the four longhands
+    {
+      code: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            scrollMargin: '10px 20px 30px 40px',
+          },
+        });
+      `,
+      output: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            scrollMarginTop: '10px',
+            scrollMarginRight: '20px',
+            scrollMarginBottom: '30px',
+            scrollMarginLeft: '40px',
+          },
+        });
+      `,
+      errors: [
+        {
+          message:
+            'Property shorthands using multiple values like "scrollMargin: 10px 20px 30px 40px" are not supported in StyleX. Separate into individual properties.',
+        },
+      ],
+    },
+    // scroll-margin: two values splits to the block/inline pair
+    {
+      code: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            scrollMargin: '10px 20px',
+          },
+        });
+      `,
+      output: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            scrollMarginBlock: '10px',
+            scrollMarginInline: '20px',
+          },
+        });
+      `,
+      errors: [
+        {
+          message:
+            'Property shorthands using multiple values like "scrollMargin: 10px 20px" are not supported in StyleX. Separate into individual properties.',
+        },
+      ],
+    },
+    // scroll-margin: percentages are invalid per spec (length only), so
+    // the report has no autofix
+    {
+      code: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            scrollMargin: '10% 20%',
+          },
+        });
+      `,
+      output: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            scrollMargin: '10% 20%',
+          },
+        });
+      `,
+      errors: [
+        {
+          message:
+            'Property shorthands using multiple values like "scrollMargin: 10% 20%" are not supported in StyleX. Separate into individual properties.',
+        },
+      ],
+    },
+    // scroll-padding: two values (percentages allowed) splits to the
+    // block/inline pair
+    {
+      code: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            scrollPadding: '10% 20%',
+          },
+        });
+      `,
+      output: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            scrollPaddingBlock: '10%',
+            scrollPaddingInline: '20%',
+          },
+        });
+      `,
+      errors: [
+        {
+          message:
+            'Property shorthands using multiple values like "scrollPadding: 10% 20%" are not supported in StyleX. Separate into individual properties.',
         },
       ],
     },

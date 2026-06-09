@@ -74,7 +74,9 @@ properties follow spec longhand order. Values the parser cannot soundly split
 positions, and similar) are reported without a fix, as is `!important` unless
 `allowImportant` is enabled. `cornerShape` expands to the physical
 `corner*Shape` keys by default, and to the logical keys when `preferInline` is
-enabled.
+enabled. The rule also covers the `inset`, `insetBlock`/`insetInline`,
+`overflow`, `overscrollBehavior`, `scrollMargin`, and `scrollPadding`
+shorthands.
 
 #### Disallowed: `margin`, `padding` with multiple values
 
