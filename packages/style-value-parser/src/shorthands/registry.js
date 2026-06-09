@@ -22,6 +22,7 @@ import { borderRadiusDef } from '../properties/border-radius';
 import { borderStyleDef } from '../properties/border-style';
 import { borderWidthDef } from '../properties/border-width';
 import { cornerShapeDef } from '../properties/corner-shape';
+import { flexDef } from '../properties/flex';
 import { gapDef } from '../properties/gap';
 import { insetBlockDef, insetDef, insetInlineDef } from '../properties/inset';
 import {
@@ -56,6 +57,7 @@ export const registry: Readonly<{ +[string]: ShorthandDef }> = Object.freeze({
   borderTop: borderTopDef,
   borderWidth: borderWidthDef,
   cornerShape: cornerShapeDef,
+  flex: flexDef,
   gap: gapDef,
   inset: insetDef,
   insetBlock: insetBlockDef,
