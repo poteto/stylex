@@ -13,7 +13,7 @@ import type { TokenList } from '../../token-types';
 import type { ComponentRange } from '../css-wide';
 
 import { TokenType } from '@csstools/css-tokenizer';
-import { TokenParser, parseError } from '../../token-parser';
+import { TokenParser, lazyParseError, parseError } from '../../token-parser';
 import { splitTopLevelComponents } from '../css-wide';
 
 /**
@@ -204,28 +204,35 @@ export function balancedFunction(
 ): TokenParser<void> {
   const set = new Set(names);
   const label = `Function<${names.join('|')}>`;
+  // Probed per component (now per component per layer) during slot
+  // elimination; failures are hot and almost never read. The fixed
+  // message is one shared instance, the dynamic ones build lazily.
+  const expectedError = parseError(`Expected a ${label}`);
   return new TokenParser((input): void | Error => {
     const startIndex = input.currentIndex;
-    // Probed per component during slot elimination; failures are hot.
-    const fail = (message: string): Error => {
+    const fail = (error: Error): Error => {
       input.setCurrentIndex(startIndex);
-      return parseError(message);
+      return error;
     };
 
     const fn = input.consumeNextToken();
     if (fn == null || fn[0] !== TokenType.Function) {
-      return fail(`Expected a ${label}`);
+      return fail(expectedError);
     }
     const name = fn[4].value.toLowerCase();
     if (!set.has(name)) {
-      return fail(`Expected a ${label}, got ${fn[4].value}()`);
+      return fail(
+        lazyParseError(() => `Expected a ${label}, got ${fn[4].value}()`),
+      );
     }
 
     let depth = 1;
     while (depth > 0) {
       const next = input.consumeNextToken();
       if (next == null) {
-        return fail(`Unbalanced parentheses in ${name}()`);
+        return fail(
+          lazyParseError(() => `Unbalanced parentheses in ${name}()`),
+        );
       }
       if (next[0] === TokenType.Function || next[0] === TokenType.OpenParen) {
         depth++;

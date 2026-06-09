@@ -93,11 +93,65 @@ export function parseError(message: string): Error {
 }
 
 /**
+ * A parse failure whose message is built only if it is ever read.
+ *
+ * Most failures are swallowed: a oneOf alternative that loses to a later
+ * one, a probe over a component range whose Error is discarded entirely.
+ * Building their message strings (template literals, joins over child
+ * failures) is pure waste, so this failure carries the *recipe* instead
+ * and `message` forces it on first read -- a terminal refusal surfacing
+ * to a consumer -- then caches. The build runs exactly once; reading
+ * `message` again (or `toString()`) returns the cached string.
+ *
+ * Debugging note: `message` is an accessor, so console.log/util.inspect
+ * shows it as [Getter] (and the suppressed-capture `stack` header omits
+ * the message, which does not exist when the stack is captured). Read
+ * `error.message` explicitly when inspecting failures.
+ */
+class LazyParseError extends Error {
+  _buildMessage: ?() => string;
+  _message: ?string;
+
+  constructor(buildMessage: () => string) {
+    const limit = Error.stackTraceLimit;
+    Error.stackTraceLimit = 0;
+    super();
+    Error.stackTraceLimit = limit;
+    this._buildMessage = buildMessage;
+    this._message = null;
+  }
+
+  get message(): string {
+    const buildMessage = this._buildMessage;
+    if (buildMessage != null) {
+      this._buildMessage = null;
+      this._message = buildMessage();
+    }
+    return this._message ?? '';
+  }
+
+  set message(message: string) {
+    this._buildMessage = null;
+    this._message = message;
+  }
+}
+
+/**
+ * A stackless failure (see parseError) whose message string is built
+ * lazily (see LazyParseError). For failure paths hot enough that even
+ * composing the message is measurable; `buildMessage` must be pure.
+ */
+export function lazyParseError(buildMessage: () => string): Error {
+  return new LazyParseError(buildMessage);
+}
+
+/**
  * Shared fixed-message failures. Callers only instanceof-check and read
  * messages, so reusing one instance per message is safe.
  */
 const NEVER_ERROR: Error = parseError('Never');
 const ALREADY_FAILED_ERROR: Error = parseError('already failed');
+const EXPECTED_TOKEN_ERROR: Error = parseError('Expected token');
 
 export class TokenParser<+T> {
   +run: (input: TokenList) => T | Error;
@@ -262,11 +316,15 @@ export class TokenParser<+T> {
       const token = input.consumeNextToken();
       if (token == null) {
         input.setCurrentIndex(currentIndex);
-        return parseError('Expected token');
+        return EXPECTED_TOKEN_ERROR;
       }
       if (token[0] !== tokenType) {
         input.setCurrentIndex(currentIndex);
-        return parseError(`Expected token type ${tokenType}, got ${token[0]}`);
+        // The single hottest failure: every probe of every alternative
+        // bottoms out here, and almost none of them are ever read.
+        return lazyParseError(
+          () => `Expected token type ${tokenType}, got ${token[0]}`,
+        );
       }
       // $FlowFixMe[incompatible-type]
       return token as TT;
@@ -380,8 +438,12 @@ export class TokenParser<+T> {
         input.setCurrentIndex(index);
         errors.push(output);
       }
-      return parseError(
-        'No parser matched\n' +
+      // The join recursively forces the child failures' messages, so it
+      // must stay behind the thunk: a oneOf that loses inside an outer
+      // oneOf never builds any of it.
+      return lazyParseError(
+        () =>
+          'No parser matched\n' +
           errors.map((err) => '- ' + err.toString()).join('\n'),
       );
     });
@@ -665,12 +727,13 @@ class TokenParserSet<
         if (found) {
           continue;
         } else {
-          failed = parseError(
-            `Expected one of ${parsers
-              .map((parser) => parser.toString())
-              .join(', ')} but got ${errors
-              .map((error) => error.message)
-              .join(', ')}`,
+          failed = lazyParseError(
+            () =>
+              `Expected one of ${parsers
+                .map((parser) => parser.toString())
+                .join(', ')} but got ${errors
+                .map((error) => error.message)
+                .join(', ')}`,
           );
           break;
         }

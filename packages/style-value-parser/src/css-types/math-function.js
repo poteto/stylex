@@ -7,7 +7,7 @@
  * @flow strict
  */
 
-import { TokenParser, parseError } from '../token-parser';
+import { TokenParser, lazyParseError, parseError } from '../token-parser';
 import { TokenType } from '@csstools/css-tokenizer';
 
 const MATH_FUNCTION_NAMES: ReadonlySet<string> = new Set([
@@ -38,6 +38,13 @@ const MATH_FUNCTION_NAMES: ReadonlySet<string> = new Set([
   'atan2',
 ]);
 
+// Probed against every length-ish slot component; failures are hot and
+// almost never read. The fixed message is one shared instance, the
+// dynamic ones build lazily.
+const EXPECTED_MATH_FUNCTION_ERROR: Error = parseError(
+  'Expected a math function',
+);
+
 /**
  * A math function -- calc | min | max | clamp plus the CSS Values 4
  * names above, ASCII case-insensitive -- consumed as exactly ONE
@@ -53,26 +60,29 @@ const MATH_FUNCTION_NAMES: ReadonlySet<string> = new Set([
 export const mathFunction: TokenParser<void> = new TokenParser(
   (input): void | Error => {
     const startIndex = input.currentIndex;
-    // Probed against every length-ish slot component; failures are hot.
-    const fail = (message: string): Error => {
+    const fail = (error: Error): Error => {
       input.setCurrentIndex(startIndex);
-      return parseError(message);
+      return error;
     };
 
     const fn = input.consumeNextToken();
     if (fn == null || fn[0] !== TokenType.Function) {
-      return fail('Expected a math function');
+      return fail(EXPECTED_MATH_FUNCTION_ERROR);
     }
     const name = fn[4].value.toLowerCase();
     if (!MATH_FUNCTION_NAMES.has(name)) {
-      return fail(`Expected a math function, got ${fn[4].value}()`);
+      return fail(
+        lazyParseError(() => `Expected a math function, got ${fn[4].value}()`),
+      );
     }
 
     let depth = 1;
     while (depth > 0) {
       const next = input.consumeNextToken();
       if (next == null) {
-        return fail(`Unbalanced parentheses in ${name}()`);
+        return fail(
+          lazyParseError(() => `Unbalanced parentheses in ${name}()`),
+        );
       }
       if (next[0] === TokenType.Function || next[0] === TokenType.OpenParen) {
         depth++;

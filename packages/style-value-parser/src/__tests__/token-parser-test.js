@@ -7,9 +7,85 @@
  * @flow strict
  */
 
-import { TokenParser } from '../token-parser';
+import { TokenParser, lazyParseError } from '../token-parser';
 
 describe('TokenParser', () => {
+  describe('lazy failure messages', () => {
+    it('does not build messages for failures a later alternative recovers from', () => {
+      let builds = 0;
+      const failing = new TokenParser((): string | Error =>
+        lazyParseError(() => {
+          builds++;
+          return 'expensive failure';
+        }),
+      );
+      const parser = TokenParser.oneOf(
+        failing,
+        TokenParser.string('foo' as 'foo'),
+      );
+      expect(parser.parseToEnd('foo')).toEqual('foo');
+      expect(builds).toBe(0);
+    });
+
+    it('does not build inner messages when a failed oneOf is itself swallowed', () => {
+      let builds = 0;
+      const failing = new TokenParser((): string | Error =>
+        lazyParseError(() => {
+          builds++;
+          return 'expensive failure';
+        }),
+      );
+      const parser = TokenParser.oneOf(
+        TokenParser.oneOf(failing),
+        TokenParser.string('foo' as 'foo'),
+      );
+      expect(parser.parseToEnd('foo')).toEqual('foo');
+      expect(builds).toBe(0);
+    });
+
+    it('builds the message exactly once when surfaced, then reuses it', () => {
+      let builds = 0;
+      const failing = new TokenParser((): string | Error =>
+        lazyParseError(() => {
+          builds++;
+          return 'expensive failure';
+        }),
+      );
+      const result = failing.parse('foo');
+      expect(result instanceof Error).toBe(true);
+      expect(builds).toBe(0);
+      if (result instanceof Error) {
+        expect(result.message).toBe('expensive failure');
+        expect(result.message).toBe('expensive failure');
+        expect(result.toString()).toBe('Error: expensive failure');
+      }
+      expect(builds).toBe(1);
+    });
+
+    it('composes a surfaced oneOf message from its alternatives unchanged', () => {
+      let builds = 0;
+      const failing = new TokenParser((): string | Error =>
+        lazyParseError(() => {
+          builds++;
+          return 'expensive failure';
+        }),
+      );
+      const parser = TokenParser.oneOf(
+        failing,
+        TokenParser.string('foo' as 'foo'),
+      );
+      const result = parser.parse('baz');
+      expect(result instanceof Error).toBe(true);
+      expect(builds).toBe(0);
+      if (result instanceof Error) {
+        expect(result.message).toBe(
+          'No parser matched\n- Error: expensive failure\n- Error: Never',
+        );
+      }
+      expect(builds).toBe(1);
+    });
+  });
+
   describe('oneOf', () => {
     it('parses the first parser', () => {
       const parser = TokenParser.oneOf(

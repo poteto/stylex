@@ -175,6 +175,17 @@ export function hasTopLevelVar(tokens: ReadonlyArray<CSSToken>): boolean {
   return false;
 }
 
+// This parser is probed against every component in slot grammars, so
+// its failures are hot: parseError keeps them stackless, and the fixed
+// messages are shared instances so a probe allocates nothing.
+const EXPECTED_VAR_ERROR: Error = parseError('Expected var()');
+const EXPECTED_CUSTOM_PROPERTY_ERROR: Error = parseError(
+  'Expected a custom property name in var()',
+);
+const UNBALANCED_VAR_ERROR: Error = parseError(
+  'Unbalanced parentheses in var()',
+);
+
 /**
  * A top-level `var()` consumed as exactly ONE component, fallback included,
  * balanced through the matching close paren. A var holding multiple
@@ -186,11 +197,9 @@ export function hasTopLevelVar(tokens: ReadonlyArray<CSSToken>): boolean {
 export const varFunction: TokenParser<void> = new TokenParser(
   (input): void | Error => {
     const startIndex = input.currentIndex;
-    // This parser is probed against every component in slot grammars,
-    // so its failures are hot: parseError keeps them stackless.
-    const fail = (message: string): Error => {
+    const fail = (error: Error): Error => {
       input.setCurrentIndex(startIndex);
-      return parseError(message);
+      return error;
     };
 
     const fn = input.consumeNextToken();
@@ -199,7 +208,7 @@ export const varFunction: TokenParser<void> = new TokenParser(
       fn[0] !== TokenType.Function ||
       fn[4].value.toLowerCase() !== 'var'
     ) {
-      return fail('Expected var()');
+      return fail(EXPECTED_VAR_ERROR);
     }
 
     let token = input.consumeNextToken();
@@ -211,14 +220,14 @@ export const varFunction: TokenParser<void> = new TokenParser(
       token[0] !== TokenType.Ident ||
       !token[4].value.startsWith('--')
     ) {
-      return fail('Expected a custom property name in var()');
+      return fail(EXPECTED_CUSTOM_PROPERTY_ERROR);
     }
 
     let depth = 1;
     while (depth > 0) {
       const next = input.consumeNextToken();
       if (next == null) {
-        return fail('Unbalanced parentheses in var()');
+        return fail(UNBALANCED_VAR_ERROR);
       }
       if (next[0] === TokenType.Function || next[0] === TokenType.OpenParen) {
         depth++;
