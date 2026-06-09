@@ -11,6 +11,7 @@ import type { ShorthandDef } from './define';
 
 import { camelize } from './define';
 import { borderColorDef } from '../properties/border-color';
+import { borderRadiusDef } from '../properties/border-radius';
 import { borderStyleDef } from '../properties/border-style';
 import { borderWidthDef } from '../properties/border-width';
 import { gapDef } from '../properties/gap';
@@ -37,6 +38,7 @@ import { scrollPaddingDef } from '../properties/scroll-padding';
  */
 export const registry: Readonly<{ +[string]: ShorthandDef }> = Object.freeze({
   borderColor: borderColorDef,
+  borderRadius: borderRadiusDef,
   borderStyle: borderStyleDef,
   borderWidth: borderWidthDef,
   gap: gapDef,

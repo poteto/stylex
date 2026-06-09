@@ -8,9 +8,44 @@
  */
 
 import type { LengthPercentage } from '../css-types/length-percentage';
+import type { ShorthandDef } from '../shorthands/define';
 
 import { TokenParser } from '../token-parser';
+import { Calc } from '../css-types/calc';
 import { lengthPercentage } from '../css-types/length-percentage';
+import { varFunction } from '../shorthands/css-wide';
+import { corners } from '../shorthands/families/corners';
+
+const radiusComponent: TokenParser<unknown> = TokenParser.oneOf(
+  lengthPercentage,
+  Calc.parser,
+  varFunction,
+);
+
+/**
+ * The shorthand-engine def. It parses independently of the
+ * BorderRadiusShorthand class below: the class's constructor defaults
+ * omitted corners and the whole vertical list, while the engine's presence
+ * model needs the authored counts of BOTH lists to compute origins and the
+ * minimal collapse.
+ */
+export const borderRadiusDef: ShorthandDef = corners({
+  canonical: 'border-radius',
+  component: radiusComponent,
+  slash: true,
+  corners: {
+    topLeft: 'borderTopLeftRadius',
+    topRight: 'borderTopRightRadius',
+    bottomRight: 'borderBottomRightRadius',
+    bottomLeft: 'borderBottomLeftRadius',
+  },
+  dialectMap: {
+    borderTopLeftRadius: 'borderStartStartRadius',
+    borderTopRightRadius: 'borderStartEndRadius',
+    borderBottomLeftRadius: 'borderEndStartRadius',
+    borderBottomRightRadius: 'borderEndEndRadius',
+  },
+});
 
 export class BorderRadiusIndividual {
   horizontal: LengthPercentage;
