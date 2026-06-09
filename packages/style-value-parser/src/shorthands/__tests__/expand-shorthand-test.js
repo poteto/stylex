@@ -223,6 +223,18 @@ describe('expandShorthand', () => {
         type: 'no-op',
       });
     });
+
+    it('falls back to the stringified grammar when a def has no number path', () => {
+      expect(lookupShorthand('borderStyle')?.runNumber).toBe(null);
+      const spec = expandShorthand('borderStyle', 5, { output: 'spec' });
+      expect(spec.type).toEqual('cannot-expand');
+      if (spec.type === 'cannot-expand') {
+        expect(spec.reason.kind).toEqual('parse-error');
+      }
+      expect(expandShorthand('borderStyle', 5, { output: 'minimal' })).toEqual({
+        type: 'no-op',
+      });
+    });
   });
 
   describe('!important', () => {

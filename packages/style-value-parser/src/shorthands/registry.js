@@ -10,7 +10,14 @@
 import type { ShorthandDef } from './define';
 
 import { camelize } from './define';
+import { borderColorDef } from '../properties/border-color';
+import { borderStyleDef } from '../properties/border-style';
+import { borderWidthDef } from '../properties/border-width';
+import { insetDef } from '../properties/inset';
 import { marginDef } from '../properties/margin';
+import { paddingDef } from '../properties/padding';
+import { scrollMarginDef } from '../properties/scroll-margin';
+import { scrollPaddingDef } from '../properties/scroll-padding';
 
 /**
  * THE registry: one frozen object keyed by stylex camelCase key. Adding
@@ -18,7 +25,14 @@ import { marginDef } from '../properties/margin';
  * derives from this object at module init and is never synced by hand.
  */
 export const registry: Readonly<{ +[string]: ShorthandDef }> = Object.freeze({
+  borderColor: borderColorDef,
+  borderStyle: borderStyleDef,
+  borderWidth: borderWidthDef,
+  inset: insetDef,
   margin: marginDef,
+  padding: paddingDef,
+  scrollMargin: scrollMarginDef,
+  scrollPadding: scrollPaddingDef,
 });
 
 const byAlias: Map<string, ShorthandDef> = new Map();
