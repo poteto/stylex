@@ -52,7 +52,6 @@ export type EmitOptions = Readonly<{
 export type CannotExpandReason =
   | Readonly<{ kind: 'parse-error', message: string }>
   | Readonly<{ kind: 'contains-variable' }>
-  | Readonly<{ kind: 'multiple-layers' }>
   | Readonly<{ kind: 'important-disallowed' }>
   | Readonly<{ kind: 'unsupported-feature', feature: string }>;
 

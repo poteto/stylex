@@ -176,28 +176,6 @@ export function hasTopLevelVar(tokens: ReadonlyArray<CSSToken>): boolean {
 }
 
 /**
- * True when a comma appears at nesting depth 0 (`rgb(0, 0, 0)` stays
- * inert). Applied PER-DEF, never boundary-global: a top-level comma is a
- * layer separator only where the grammar says so (background, animation),
- * while font's comma-bearing family lists must keep passing through
- * verbatim.
- */
-export function hasTopLevelComma(tokens: ReadonlyArray<CSSToken>): boolean {
-  let depth = 0;
-  for (const token of tokens) {
-    if (depth === 0 && token[0] === TokenType.Comma) {
-      return true;
-    }
-    if (isOpen(token[0])) {
-      depth++;
-    } else if (isClose(token[0])) {
-      depth = Math.max(0, depth - 1);
-    }
-  }
-  return false;
-}
-
-/**
  * A top-level `var()` consumed as exactly ONE component, fallback included,
  * balanced through the matching close paren. A var holding multiple
  * components (`--x: 1px 2px`) would make this a wrong guess; we accept that

@@ -10,11 +10,7 @@
 import type { CSSToken } from '@csstools/css-tokenizer';
 
 import { TokenList } from '../../token-types';
-import {
-  countTopLevelComponents,
-  hasTopLevelComma,
-  splitTopLevelComponents,
-} from '../css-wide';
+import { countTopLevelComponents, splitTopLevelComponents } from '../css-wide';
 
 function tokensOf(css: string): ReadonlyArray<CSSToken> {
   return new TokenList(css).getAllTokens();
@@ -68,27 +64,6 @@ describe('splitTopLevelComponents', () => {
   it('returns no components for empty or whitespace-only input', () => {
     expect(componentTexts('')).toEqual([]);
     expect(componentTexts('   ')).toEqual([]);
-  });
-});
-
-describe('hasTopLevelComma', () => {
-  it('detects a comma at nesting depth 0', () => {
-    expect(hasTopLevelComma(tokensOf('url(a.png), url(b.png)'))).toBe(true);
-    expect(hasTopLevelComma(tokensOf('a,b'))).toBe(true);
-    expect(hasTopLevelComma(tokensOf('slidein, 3s'))).toBe(true);
-  });
-
-  it('ignores commas nested inside functions', () => {
-    expect(hasTopLevelComma(tokensOf('rgb(0, 0, 0)'))).toBe(false);
-    expect(hasTopLevelComma(tokensOf('var(--a, red)'))).toBe(false);
-    expect(hasTopLevelComma(tokensOf('cubic-bezier(0.1, 0.7, 1, 0.1)'))).toBe(
-      false,
-    );
-  });
-
-  it('returns false when there is no comma at all', () => {
-    expect(hasTopLevelComma(tokensOf('url(a.png) no-repeat'))).toBe(false);
-    expect(hasTopLevelComma(tokensOf(''))).toBe(false);
   });
 });
 

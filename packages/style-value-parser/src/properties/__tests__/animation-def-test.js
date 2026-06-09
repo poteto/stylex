@@ -457,17 +457,179 @@ describe('animation def', () => {
   });
 
   describe('multiple layers', () => {
-    it('refuses top-level commas as multiple-layers', () => {
-      for (const value of ['1s slidein, 2s fadeout', 'slidein,fadeout']) {
-        expect(run(value, { output: 'spec' })).toEqual({
-          type: 'cannot-expand',
-          reason: { kind: 'multiple-layers' },
-        });
-        expect(run(value, { output: 'minimal' })).toEqual({
-          type: 'cannot-expand',
-          reason: { kind: 'multiple-layers' },
+    it('comma-joins every longhand across two layers in spec output', () => {
+      expect(run('slidein 3s, fadeout 2s', { output: 'spec' })).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'animationDuration',
+            value: '3s, 2s',
+            origin: 'explicit',
+          },
+          {
+            property: 'animationTimingFunction',
+            value: 'ease, ease',
+            origin: 'defaulted',
+          },
+          { property: 'animationDelay', value: '0s, 0s', origin: 'defaulted' },
+          {
+            property: 'animationIterationCount',
+            value: '1, 1',
+            origin: 'defaulted',
+          },
+          {
+            property: 'animationDirection',
+            value: 'normal, normal',
+            origin: 'defaulted',
+          },
+          {
+            property: 'animationFillMode',
+            value: 'none, none',
+            origin: 'defaulted',
+          },
+          {
+            property: 'animationPlayState',
+            value: 'running, running',
+            origin: 'defaulted',
+          },
+          {
+            property: 'animationName',
+            value: 'slidein, fadeout',
+            origin: 'explicit',
+          },
+        ],
+      });
+    });
+
+    it('emits symmetric authored slots joined verbatim in minimal output', () => {
+      expect(run('slidein 3s, fadeout 2s', { output: 'minimal' })).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'animationDuration',
+            value: '3s, 2s',
+            origin: 'explicit',
+          },
+          {
+            property: 'animationName',
+            value: 'slidein, fadeout',
+            origin: 'explicit',
+          },
+        ],
+      });
+      expect(
+        run('spin 1s linear infinite, pulse 2s ease-in 3', {
+          output: 'minimal',
+        }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'animationDuration',
+            value: '1s, 2s',
+            origin: 'explicit',
+          },
+          {
+            property: 'animationTimingFunction',
+            value: 'linear, ease-in',
+            origin: 'explicit',
+          },
+          {
+            property: 'animationIterationCount',
+            value: 'infinite, 3',
+            origin: 'explicit',
+          },
+          {
+            property: 'animationName',
+            value: 'spin, pulse',
+            origin: 'explicit',
+          },
+        ],
+      });
+    });
+
+    it('splits layers on glued commas (no whitespace)', () => {
+      expect(run('slidein,fadeout', { output: 'minimal' })).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'animationName',
+            value: 'slidein, fadeout',
+            origin: 'explicit',
+          },
+        ],
+      });
+    });
+
+    it('refuses asymmetric authorship in minimal output only', () => {
+      // The MDN two-animation example: only the second layer has a delay.
+      const value = '3s linear slidein, 3s ease-out 5s slideout';
+      expect(run(value, { output: 'minimal' })).toEqual({
+        type: 'cannot-expand',
+        reason: { kind: 'unsupported-feature', feature: 'asymmetric-layers' },
+      });
+      const spec = run(value, { output: 'spec' });
+      expect(spec.type).toEqual('ok');
+      if (spec.type === 'ok') {
+        expect(spec.assignments[2]).toEqual({
+          property: 'animationDelay',
+          value: '0s, 5s',
+          origin: 'explicit',
         });
       }
+    });
+
+    it('applies the none-name rule per layer', () => {
+      // Each layer's bare 'none' relocates to that layer's name slot.
+      expect(run('1s none, 2s NONE', { output: 'minimal' })).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'animationDuration',
+            value: '1s, 2s',
+            origin: 'explicit',
+          },
+          {
+            property: 'animationName',
+            value: 'none, NONE',
+            origin: 'explicit',
+          },
+        ],
+      });
+      // A layer whose name is already taken keeps its 'none' on
+      // fill-mode, exactly like the single-layer rule -- here making
+      // fill-mode asymmetric with the second layer, which omits it.
+      expect(run('1s none slidein, 2s fadeout', { output: 'minimal' })).toEqual(
+        {
+          type: 'cannot-expand',
+          reason: {
+            kind: 'unsupported-feature',
+            feature: 'asymmetric-layers',
+          },
+        },
+      );
+    });
+
+    it('refuses empty layers (leading, trailing, doubled commas)', () => {
+      for (const value of [', slidein 1s', 'slidein 1s,', '1s, , 2s']) {
+        expectParseError(run(value, { output: 'spec' }), /Empty animation/);
+      }
+    });
+
+    it('reports per-layer slot errors', () => {
+      expectParseError(
+        run('1s 2s 3s, fadeout', { output: 'spec' }),
+        /[Tt]oo many time/,
+      );
+      expectParseError(
+        run('slidein 1s, fadeout inherit', { output: 'spec' }),
+        /Unexpected component/,
+      );
     });
 
     it('keeps function-nested commas inert', () => {

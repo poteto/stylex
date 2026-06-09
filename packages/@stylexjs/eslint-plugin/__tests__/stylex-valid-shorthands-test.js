@@ -2145,13 +2145,23 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
         },
       ],
     },
-    // animation: comma-separated multi-animation is CANNOT_FIX
+    // animation: comma-separated layers autofix when every layer authors
+    // the same slots; each longhand gets one value per layer
     {
       code: `
         import * as stylex from '@stylexjs/stylex';
         const styles = stylex.create({
           main: {
             animation: 'slidein 3s, fadeout 2s',
+          },
+        });
+      `,
+      output: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            animationDuration: '3s, 2s',
+            animationName: 'slidein, fadeout',
           },
         });
       `,

@@ -84,6 +84,21 @@ describe('spec-expand-shorthands style resolution', () => {
         ['overflowY', 'inherit'],
       ]);
     });
+
+    test('comma-joins multi-layer animation values, one entry per layer', () => {
+      expect(
+        flatMapExpandedShorthands(['animation', 'spin 1s, fade 2s'], options),
+      ).toEqual([
+        ['animationDuration', '1s, 2s'],
+        ['animationTimingFunction', 'ease, ease'],
+        ['animationDelay', '0s, 0s'],
+        ['animationIterationCount', '1, 1'],
+        ['animationDirection', 'normal, normal'],
+        ['animationFillMode', 'none, none'],
+        ['animationPlayState', 'running, running'],
+        ['animationName', 'spin, fade'],
+      ]);
+    });
   });
 
   describe('values that pass through unchanged', () => {
@@ -131,10 +146,11 @@ describe('spec-expand-shorthands style resolution', () => {
       ).toThrow(
         "Cannot expand the shorthand property 'margin' with value '1px 2px 3px 4px 5px': Unexpected trailing input: 5px",
       );
+      // A color in a non-final background layer is invalid CSS.
       expect(() =>
-        flatMapExpandedShorthands(['animation', 'spin 1s, fade 2s'], options),
+        flatMapExpandedShorthands(['background', 'red, blue'], options),
       ).toThrow(
-        "Cannot expand the shorthand property 'animation' with value 'spin 1s, fade 2s': comma-separated layers cannot be expanded to single longhand values",
+        "Cannot expand the shorthand property 'background' with value 'red, blue': A background color outside the final layer: red",
       );
     });
 

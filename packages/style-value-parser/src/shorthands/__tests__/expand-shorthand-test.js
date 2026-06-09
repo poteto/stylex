@@ -1644,6 +1644,58 @@ describe('expandShorthand', () => {
         });
       }
     });
+
+    it('expands comma-separated layers per output mode', () => {
+      expect(
+        expandShorthand('animation', 'slidein 3s, fadeout 2s', {
+          output: 'minimal',
+        }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'animationDuration',
+            value: '3s, 2s',
+            origin: 'explicit',
+          },
+          {
+            property: 'animationName',
+            value: 'slidein, fadeout',
+            origin: 'explicit',
+          },
+        ],
+      });
+      const spec = expandShorthand('animation', 'slidein 3s, fadeout 2s', {
+        output: 'spec',
+      });
+      expect(spec.type).toEqual('ok');
+      if (spec.type === 'ok') {
+        expect(spec.assignments.map((d) => [d.property, d.value])).toEqual([
+          ['animationDuration', '3s, 2s'],
+          ['animationTimingFunction', 'ease, ease'],
+          ['animationDelay', '0s, 0s'],
+          ['animationIterationCount', '1, 1'],
+          ['animationDirection', 'normal, normal'],
+          ['animationFillMode', 'none, none'],
+          ['animationPlayState', 'running, running'],
+          ['animationName', 'slidein, fadeout'],
+        ]);
+      }
+    });
+
+    it('refuses asymmetric layers in minimal output only', () => {
+      const value = '3s linear slidein, 3s ease-out 5s slideout';
+      expect(
+        expandShorthand('animation', value, { output: 'minimal' }),
+      ).toEqual({
+        type: 'cannot-expand',
+        reason: { kind: 'unsupported-feature', feature: 'asymmetric-layers' },
+      });
+      expect(
+        expandShorthand('animation', value, { output: 'spec' }).type,
+      ).toEqual('ok');
+    });
   });
 
   describe('grid boundary vectors', () => {

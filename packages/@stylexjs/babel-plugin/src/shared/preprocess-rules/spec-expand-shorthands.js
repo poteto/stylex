@@ -37,8 +37,10 @@ import propertySpecificity from './property-specificity';
 ///    `calc(var(--x) + 2px)` also opts out of expansion rather than risk
 ///    rewriting a declaration we cannot fully see.
 ///  - A genuine shorthand value the grammar refuses (extra components,
-///    comma-separated layers) is an error, routed through the same
-///    propertyValidationMode channel the other modes use.
+///    unsupported features) is an error, routed through the same
+///    propertyValidationMode channel the other modes use. Comma-separated
+///    background/animation layers expand: each longhand gets one value per
+///    layer, comma-joined.
 
 type TReturn = $ReadOnlyArray<[string, TStyleValue]>;
 
@@ -53,12 +55,12 @@ function reasonMessage(
       return reason.message.split('\n')[0];
     case 'contains-variable':
       return 'the value references a CSS variable';
-    case 'multiple-layers':
-      return 'comma-separated layers cannot be expanded to single longhand values';
     case 'important-disallowed':
       return '"!important" is not allowed';
     case 'unsupported-feature':
-      return `${reason.feature} is not supported`;
+      return reason.feature === 'asymmetric-layers'
+        ? 'the comma-separated layers author different longhands, so the value cannot be expanded without inventing defaults'
+        : `${reason.feature} is not supported`;
     default:
       return `the value '${String(value)}' could not be parsed`;
   }

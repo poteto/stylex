@@ -249,6 +249,74 @@ describe('@stylexjs/babel-plugin', () => {
       `);
     });
 
+    test('multi-layer background expands to comma-joined longhand lists', () => {
+      const { metadata } = transform(
+        `
+        import * as stylex from '@stylexjs/stylex';
+        export const styles = stylex.create({
+          root: {
+            background: 'url(x.png) no-repeat, url(y.png) repeat-x',
+          },
+        });
+      `,
+        options,
+      );
+      expect(metadata).toMatchInlineSnapshot(`
+        {
+          "stylex": [
+            [
+              "xjbqb8w",
+              {
+                "ltr": ".xjbqb8w{background-color:transparent}",
+                "rtl": null,
+              },
+              3000,
+            ],
+            [
+              "x7ftcbx",
+              {
+                "ltr": ".x7ftcbx{background-image:url(x.png),url(y.png)}",
+                "rtl": null,
+              },
+              3000,
+            ],
+            [
+              "x1jxiarb",
+              {
+                "ltr": ".x1jxiarb{background-repeat:no-repeat,repeat-x}",
+                "rtl": null,
+              },
+              3000,
+            ],
+            [
+              "xarlo0q",
+              {
+                "ltr": ".xarlo0q{background-attachment:scroll,scroll}",
+                "rtl": null,
+              },
+              3000,
+            ],
+            [
+              "xbdzhie",
+              {
+                "ltr": ".xbdzhie{background-position:0% 0%,0% 0%}",
+                "rtl": null,
+              },
+              2000,
+            ],
+            [
+              "xnep120",
+              {
+                "ltr": ".xnep120{background-size:auto,auto}",
+                "rtl": null,
+              },
+              3000,
+            ],
+          ],
+        }
+      `);
+    });
+
     test('border expands with the defaulted currentcolor', () => {
       const { metadata } = transform(
         `
