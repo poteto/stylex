@@ -20,7 +20,10 @@ import { expandShorthand } from '../lib/shorthands/index.js';
  *   yarn workspace @stylexjs/eslint-plugin build
  *
  * When the eslint-plugin lib is missing the old-engine suites are
- * skipped with a notice and only the new engine is measured.
+ * skipped with a notice and only the new engine is measured. Cases
+ * marked `oldRefuses` (comma-separated layers, which the old splitter
+ * answered with its cannot-fix sentinel instead of expanding) never run
+ * the old engine and show 'refused' in its column.
  */
 
 const CASES = [
@@ -54,6 +57,20 @@ const CASES = [
     name: 'animation full form',
     property: 'animation',
     value: '3s ease-in 1s 2 reverse both paused slidein',
+  },
+  {
+    name: 'background 2-layer',
+    property: 'background',
+    value:
+      'url("a.png") left top / 32px 32px no-repeat, url("b.png") center / cover no-repeat',
+    oldRefuses: true,
+  },
+  {
+    name: 'animation 2-layer',
+    property: 'animation',
+    value:
+      '3s ease-in 1s 2 reverse both paused slidein, 1.5s linear 0.5s infinite alternate forwards running fadeout',
+    oldRefuses: true,
   },
   { name: 'gridArea 4-group', property: 'gridArea', value: '1 / 2 / 3 / 4' },
   { name: 'flex 3-value', property: 'flex', value: '2 2 10%' },
@@ -98,9 +115,9 @@ async function main() {
   console.log('\n\n<shorthands>\n');
 
   const results = [];
-  for (const { name, property, value } of CASES) {
+  for (const { name, property, value, oldRefuses } of CASES) {
     const suite = new Benchmark.Suite(name);
-    if (oldTransformers != null) {
+    if (oldTransformers != null && oldRefuses !== true) {
       const transformer = oldTransformers[property];
       suite.add('Old splitter        ', () => {
         transformer(value, false, false);
@@ -125,6 +142,7 @@ async function main() {
       suite.filter((bench) => bench.name === label)[0]?.hz ?? null;
     results.push({
       name,
+      oldRefuses: oldRefuses === true,
       old: hzOf('Old splitter        '),
       minimal: hzOf('New engine (minimal)'),
       spec: hzOf('New engine (spec)   '),
@@ -137,7 +155,7 @@ async function main() {
   console.log('| --- | --- | --- | --- | --- | --- |');
   const minimalRatios = [];
   const specRatios = [];
-  for (const { name, old, minimal, spec } of results) {
+  for (const { name, oldRefuses, old, minimal, spec } of results) {
     const minimalRatio = old != null ? minimal / old : null;
     const specRatio = old != null ? spec / old : null;
     if (minimalRatio != null) {
@@ -147,10 +165,10 @@ async function main() {
       specRatios.push(specRatio);
     }
     console.log(
-      `| ${name} | ${formatOps(old)} | ${formatOps(minimal)} ` +
+      `| ${name} | ${oldRefuses ? 'refused' : formatOps(old)} | ${formatOps(minimal)} ` +
         `| ${formatOps(spec)} ` +
-        `| ${minimalRatio == null ? 'n/a' : minimalRatio.toFixed(2)}x ` +
-        `| ${specRatio == null ? 'n/a' : specRatio.toFixed(2)}x |`,
+        `| ${minimalRatio == null ? 'n/a' : `${minimalRatio.toFixed(2)}x`} ` +
+        `| ${specRatio == null ? 'n/a' : `${specRatio.toFixed(2)}x`} |`,
     );
   }
 
