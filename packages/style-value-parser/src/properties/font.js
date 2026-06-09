@@ -7,18 +7,15 @@
  * @flow strict
  */
 
-import type { ComponentRange } from '../shorthands/css-wide';
-import type { Sourced } from '../token-parser';
 import type { ShorthandDef } from '../shorthands/define';
 import type { Cell } from '../shorthands/types';
 
-import { TokenType } from '@csstools/css-tokenizer';
 import { TokenParser } from '../token-parser';
 import { Angle } from '../css-types/angle';
 import { lengthPercentage } from '../css-types/length-percentage';
 import { mathFunction } from '../css-types/math-function';
-import { splitTopLevelComponents } from '../shorthands/css-wide';
 import { defineShorthand } from '../shorthands/define';
+import { walkComponents } from '../shorthands/families/slots';
 
 /**
  * One parse, tagged by form. 'system' (a sole system-font keyword) and
@@ -121,59 +118,14 @@ const sourcedAngle = TokenParser.sourced(Angle.parser);
  */
 const parse: TokenParser<FontParsed> = new TokenParser(
   (input): FontParsed | Error => {
-    const startIndex = input.currentIndex;
-    const fail = (message: string): Error => {
-      input.setCurrentIndex(startIndex);
-      return new Error(message);
-    };
-
-    // Materialize the rest of the input so components can be sliced by
-    // range; production parsers then re-run over exact [start, end)
-    // windows.
-    let drained = input.consumeNextToken();
-    while (drained != null) {
-      drained = input.consumeNextToken();
-    }
-    const endIndex = input.currentIndex;
-    const tokens = input.slice(startIndex, endIndex);
-    const components = splitTopLevelComponents(tokens);
+    const { components, matchRange, sliceOf, isSlash, fail, finish } =
+      walkComponents(input);
     if (components.length === 0) {
       return fail('Expected at least one component');
     }
 
-    /** The parser's match when it consumes EXACTLY the component range. */
-    const matchRange = <T>(
-      parser: TokenParser<Sourced<T>>,
-      component: ComponentRange,
-    ): Sourced<T> | null => {
-      input.setCurrentIndex(startIndex + component.start);
-      const result = parser.run(input);
-      if (
-        result instanceof Error ||
-        input.currentIndex !== startIndex + component.end
-      ) {
-        return null;
-      }
-      return result;
-    };
-
-    const sliceOf = (component: ComponentRange): string =>
-      tokens
-        .slice(component.start, component.end)
-        .map((token) => token[1])
-        .join('');
-
-    const isSlash = (component: ComponentRange): boolean => {
-      const token = tokens[component.start];
-      return (
-        component.end - component.start === 1 &&
-        token[0] === TokenType.Delim &&
-        token[1] === '/'
-      );
-    };
-
     const done = (parsed: FontParsed): FontParsed => {
-      input.setCurrentIndex(endIndex);
+      finish();
       return parsed;
     };
 
