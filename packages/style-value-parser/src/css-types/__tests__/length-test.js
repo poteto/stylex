@@ -47,6 +47,14 @@ describe('Test CSS Type: <length>', () => {
     expect(Length.parser.parse('12pt')).toEqual(new Length(12, 'pt'));
   });
 
+  test('matches units case-insensitively and stores them lowercased', () => {
+    expect(Length.parser.parse('10PX')).toEqual(new Length(10, 'px'));
+    expect(Length.parser.parse('5Em')).toEqual(new Length(5, 'em'));
+    expect(Length.parser.parse('2REM')).toEqual(new Length(2, 'rem'));
+    expect(Length.parser.parse('1.5Vh')).toEqual(new Length(1.5, 'vh'));
+    expect(Length.parser.parseToEnd('10PX').toString()).toEqual('10px');
+  });
+
   test('rejects invalid units', () => {
     expect(() => Length.parser.parseToEnd('10abc')).toThrow();
     expect(() => Length.parser.parseToEnd('20pc')).toThrow();
