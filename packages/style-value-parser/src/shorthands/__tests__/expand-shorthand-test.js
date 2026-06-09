@@ -45,13 +45,17 @@ describe('expandShorthand', () => {
       expect(lookupShorthand('nope')).toBe(null);
     });
 
-    it('defaults singleComponentIsIdentity to true outside line-trio defs', () => {
+    it('gates the single-component fast path per def', () => {
+      // Escapees are defs whose one-component values still need the
+      // grammar in minimal output: line trios ('border: solid' lives on
+      // borderStyle) and grid-area ('header' lives on four line keys).
       const escapees = new Set([
         'border',
         'borderTop',
         'borderRight',
         'borderBottom',
         'borderLeft',
+        'gridArea',
         'outline',
       ]);
       for (const key of Object.keys(registry)) {
