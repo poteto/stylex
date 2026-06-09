@@ -700,6 +700,21 @@ describe('background def', () => {
         });
       }
     });
+
+    it('routes the newer border-area and text clip keywords there too', () => {
+      // WPT marks `background: border-area` / `border-area text` valid
+      // (CSS Backgrounds 4 clip values); Chromium rejects them and so do
+      // we, but as the typed box-values refusal, not a stray parse error.
+      for (const value of ['border-area', 'border-area text', 'red text']) {
+        expect(run(value, { output: 'spec' })).toEqual({
+          type: 'cannot-expand',
+          reason: {
+            kind: 'unsupported-feature',
+            feature: 'background-box-values',
+          },
+        });
+      }
+    });
   });
 
   describe('var() placement', () => {

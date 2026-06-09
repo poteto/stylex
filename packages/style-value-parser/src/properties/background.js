@@ -93,10 +93,17 @@ const sizeComponent: TokenParser<unknown> = TokenParser.oneOf(
   mathFunction,
 );
 
+// The origin/clip <box> keywords, including the newer CSS Backgrounds 4
+// clip values `border-area` and `text`. Recognizing the full set keeps a
+// box value routed through the typed background-box-values refusal (the
+// def emits no origin/clip longhand) instead of falling through to a
+// stray "unexpected component" parse error.
 const boxComponent: TokenParser<string> = identKeyword([
   'border-box',
   'padding-box',
   'content-box',
+  'border-area',
+  'text',
 ]);
 
 const sourcedImage = TokenParser.sourced(imageComponent);
