@@ -139,22 +139,22 @@ describe('corner-shape def', () => {
         important: false,
         assignments: [
           {
-            property: 'cornerStartStartShape',
+            property: 'cornerTopLeftShape',
             value: 'superellipse(1.5)',
             origin: 'explicit',
           },
           {
-            property: 'cornerStartEndShape',
+            property: 'cornerTopRightShape',
             value: 'bevel',
             origin: 'explicit',
           },
           {
-            property: 'cornerEndStartShape',
+            property: 'cornerBottomRightShape',
             value: 'superellipse(1.5)',
             origin: 'replicated',
           },
           {
-            property: 'cornerEndEndShape',
+            property: 'cornerBottomLeftShape',
             value: 'bevel',
             origin: 'replicated',
           },
@@ -168,22 +168,22 @@ describe('corner-shape def', () => {
         important: false,
         assignments: [
           {
-            property: 'cornerStartStartShape',
+            property: 'cornerTopLeftShape',
             value: 'SuperEllipse( -1.5 )',
             origin: 'explicit',
           },
           {
-            property: 'cornerStartEndShape',
+            property: 'cornerTopRightShape',
             value: 'round',
             origin: 'explicit',
           },
           {
-            property: 'cornerEndStartShape',
+            property: 'cornerBottomRightShape',
             value: 'SuperEllipse( -1.5 )',
             origin: 'replicated',
           },
           {
-            property: 'cornerEndEndShape',
+            property: 'cornerBottomLeftShape',
             value: 'round',
             origin: 'replicated',
           },
@@ -205,7 +205,7 @@ describe('corner-shape def', () => {
     });
   });
 
-  describe('minimal output: old-splitter key parity', () => {
+  describe('minimal output: physical corner keys', () => {
     it('collapses all-identical corner values onto the shorthand key', () => {
       expect(run('bevel bevel', { output: 'minimal' })).toEqual({
         type: 'ok',
@@ -216,31 +216,31 @@ describe('corner-shape def', () => {
       });
     });
 
-    it('emits the logical key list in quad order when corners differ', () => {
-      // Key pairing reproduces splitShorthands.js: the BR quad slot lands
-      // on cornerEndStartShape and BL on cornerEndEndShape, the reverse of
-      // this def's dialectMap pairing. See the def for the parity note.
+    it('emits the physical key list in quad order when corners differ', () => {
+      // Deliberate divergence from splitShorthands.js, which emitted
+      // logical keys by default (with a mirrored BR/BL pairing). See the
+      // def's doc comment; preferInline mapping is boundary data.
       expect(run('round scoop bevel notch', { output: 'minimal' })).toEqual({
         type: 'ok',
         important: false,
         assignments: [
           {
-            property: 'cornerStartStartShape',
+            property: 'cornerTopLeftShape',
             value: 'round',
             origin: 'explicit',
           },
           {
-            property: 'cornerStartEndShape',
+            property: 'cornerTopRightShape',
             value: 'scoop',
             origin: 'explicit',
           },
           {
-            property: 'cornerEndStartShape',
+            property: 'cornerBottomRightShape',
             value: 'bevel',
             origin: 'explicit',
           },
           {
-            property: 'cornerEndEndShape',
+            property: 'cornerBottomLeftShape',
             value: 'notch',
             origin: 'explicit',
           },
@@ -248,28 +248,28 @@ describe('corner-shape def', () => {
       });
     });
 
-    it('replicates the two-value form onto the logical keys', () => {
+    it('replicates the two-value form onto the physical keys', () => {
       expect(run('round scoop', { output: 'minimal' })).toEqual({
         type: 'ok',
         important: false,
         assignments: [
           {
-            property: 'cornerStartStartShape',
+            property: 'cornerTopLeftShape',
             value: 'round',
             origin: 'explicit',
           },
           {
-            property: 'cornerStartEndShape',
+            property: 'cornerTopRightShape',
             value: 'scoop',
             origin: 'explicit',
           },
           {
-            property: 'cornerEndStartShape',
+            property: 'cornerBottomRightShape',
             value: 'round',
             origin: 'replicated',
           },
           {
-            property: 'cornerEndEndShape',
+            property: 'cornerBottomLeftShape',
             value: 'scoop',
             origin: 'replicated',
           },
@@ -283,22 +283,22 @@ describe('corner-shape def', () => {
         important: false,
         assignments: [
           {
-            property: 'cornerStartStartShape',
+            property: 'cornerTopLeftShape',
             value: 'var(--shape)',
             origin: 'explicit',
           },
           {
-            property: 'cornerStartEndShape',
+            property: 'cornerTopRightShape',
             value: 'bevel',
             origin: 'explicit',
           },
           {
-            property: 'cornerEndStartShape',
+            property: 'cornerBottomRightShape',
             value: 'var(--shape)',
             origin: 'replicated',
           },
           {
-            property: 'cornerEndEndShape',
+            property: 'cornerBottomLeftShape',
             value: 'bevel',
             origin: 'replicated',
           },

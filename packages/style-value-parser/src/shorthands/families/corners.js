@@ -61,12 +61,6 @@ export function corners<T>(
     component: TokenParser<T>,
     /** Physical longhand keys, in spec order TL, TR, BR, BL. */
     corners: CornerKeys,
-    /**
-     * Keys minimal output emits when the corners differ. Defaults to
-     * `corners`; corner-shape overrides this with the key list the old
-     * splitter emits (see the def for the parity note).
-     */
-    minimalCorners?: CornerKeys,
     /** Physical-to-logical mapping the boundary applies for preferInline. */
     dialectMap: Readonly<{ +[string]: string }>,
     /** True enables the '/ <vertical radii>' two-axis form (border-radius). */
@@ -80,7 +74,6 @@ export function corners<T>(
   }>,
 ): ShorthandDef {
   const physical = config.corners;
-  const minimal = config.minimalCorners ?? physical;
 
   const component = TokenParser.sourced(config.component);
   const list: TokenParser<ReadonlyArray<Sourced<T>>> = TokenParser.sequence(
@@ -201,15 +194,15 @@ export function corners<T>(
     }
     const origins = cornerOrigins(lists);
     return [
-      { property: minimal.topLeft, value: values[0], origin: origins[0] },
-      { property: minimal.topRight, value: values[1], origin: origins[1] },
+      { property: physical.topLeft, value: values[0], origin: origins[0] },
+      { property: physical.topRight, value: values[1], origin: origins[1] },
       {
-        property: minimal.bottomRight,
+        property: physical.bottomRight,
         value: values[2],
         origin: origins[2],
       },
       {
-        property: minimal.bottomLeft,
+        property: physical.bottomLeft,
         value: values[3],
         origin: origins[3],
       },

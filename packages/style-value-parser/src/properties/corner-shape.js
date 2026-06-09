@@ -58,15 +58,16 @@ const cornerShapeComponent: TokenParser<unknown> = TokenParser.oneOf(
 /**
  * corner-shape has no two-axis '/' form, hence no `slash` here.
  *
- * Key-list parity note: when minimal output cannot collapse, it emits the
- * LOGICAL corner-*-shape keys in quad order -- exactly what
- * splitShorthands.js emits for corner-shape. That table pairs the BR quad
- * slot with cornerEndStartShape and the BL slot with cornerEndEndShape,
- * which is the REVERSE of CORNER_SHAPE_MAP (and of this def's dialectMap,
- * which follows it: bottom-left -> end-start under the LTR/horizontal-tb
- * assumption). The disagreement is reproduced rather than resolved so the
- * splitter swap stays byte-compatible; reconciling the two pairings is a
- * deliberate follow-up.
+ * Old-splitter divergence, fixed deliberately: splitShorthands.js emitted
+ * the LOGICAL corner-*-shape keys even without preferInline, with a
+ * pairing MIRRORED from its own CORNER_SHAPE_MAP (the BR quad slot landed
+ * on cornerEndStartShape and BL on cornerEndEndShape), and under
+ * preferInline it always returned CANNOT_FIX because it fed those logical
+ * keys back into the physical-to-logical map. This def emits the PHYSICAL
+ * keys in minimal output like every other corner def; the dialectMap
+ * below (the CORNER_SHAPE_MAP pairing: bottom-left -> end-start,
+ * bottom-right -> end-end, LTR/horizontal-tb assumption) applies at the
+ * boundary when the caller asks for preferInline.
  */
 export const cornerShapeDef: ShorthandDef = corners({
   canonical: 'corner-shape',
@@ -76,12 +77,6 @@ export const cornerShapeDef: ShorthandDef = corners({
     topRight: 'cornerTopRightShape',
     bottomRight: 'cornerBottomRightShape',
     bottomLeft: 'cornerBottomLeftShape',
-  },
-  minimalCorners: {
-    topLeft: 'cornerStartStartShape',
-    topRight: 'cornerStartEndShape',
-    bottomRight: 'cornerEndStartShape',
-    bottomLeft: 'cornerEndEndShape',
   },
   dialectMap: {
     cornerTopLeftShape: 'cornerStartStartShape',
