@@ -95,6 +95,15 @@ export function defineShorthand<T, K: string>(
      */
     unsupported?: (parsed: T) => ?string,
     /**
+     * Typed refusal for comma-separated layer lists (background,
+     * animation): the grammar tags the multi-layer form on a per-def
+     * top-level comma scan -- never boundary-global, since font's
+     * comma-bearing family lists are not layers. Per-layer distribution
+     * cannot merge atomically, so a true here becomes a cannot-expand
+     * result with reason multiple-layers. Checked before `unsupported`.
+     */
+    multipleLayers?: (parsed: T) => boolean,
+    /**
      * Optional minimal-output override where the smallest representation
      * uses intermediate stylex keys the plain origin-filter cannot produce
      * (marginBlock/marginInline pairing; grid-area's single custom-ident;
@@ -121,6 +130,7 @@ export function defineShorthand<T, K: string>(
     condense,
     expandNumber,
     unsupported,
+    multipleLayers,
   } = config;
   const key = camelize(canonical);
 
@@ -152,6 +162,13 @@ export function defineShorthand<T, K: string>(
           kind: 'parse-error',
           message: `Unexpected trailing input: ${trailing[1]}`,
         },
+      };
+    }
+
+    if (multipleLayers != null && multipleLayers(parsed)) {
+      return {
+        type: 'cannot-expand',
+        reason: { kind: 'multiple-layers' },
       };
     }
 

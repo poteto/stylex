@@ -8,11 +8,12 @@
  */
 
 import type { CSSToken } from '@csstools/css-tokenizer';
-import type { Sourced, TokenParser } from '../../token-parser';
+import type { Sourced } from '../../token-parser';
 import type { TokenList } from '../../token-types';
 import type { ComponentRange } from '../css-wide';
 
 import { TokenType } from '@csstools/css-tokenizer';
+import { TokenParser } from '../../token-parser';
 import { splitTopLevelComponents } from '../css-wide';
 
 /**
@@ -102,4 +103,64 @@ export function walkComponents(input: TokenList): ComponentWalk {
   };
 
   return { tokens, components, matchRange, sliceOf, isSlash, fail, finish };
+}
+
+/**
+ * One keyword out of `keywords`, ASCII case-insensitive. The parsed value
+ * is the lowercased keyword for grammar-level decisions; emitted slices
+ * stay verbatim (via TokenParser.sourced).
+ */
+export function identKeyword(
+  keywords: ReadonlyArray<string>,
+): TokenParser<string> {
+  const set = new Set(keywords);
+  return TokenParser.tokens.Ident.map((token): string =>
+    token[4].value.toLowerCase(),
+  ).where((str): implies str is string => set.has(str));
+}
+
+/**
+ * A function whose name is in `names` (ASCII case-insensitive), consumed
+ * as exactly ONE component, balanced through the matching close paren --
+ * the mathFunction idiom generalized to a caller-supplied name set.
+ * Arguments are NOT validated: slot grammars relocate the author's text
+ * verbatim, never interpret it, so nested commas and var() stay inert.
+ * The parsed value is void on purpose: callers only ever emit the
+ * verbatim slice (via TokenParser.sourced).
+ */
+export function balancedFunction(
+  names: ReadonlyArray<string>,
+): TokenParser<void> {
+  const set = new Set(names);
+  const label = `Function<${names.join('|')}>`;
+  return new TokenParser((input): void | Error => {
+    const startIndex = input.currentIndex;
+    const fail = (message: string): Error => {
+      input.setCurrentIndex(startIndex);
+      return new Error(message);
+    };
+
+    const fn = input.consumeNextToken();
+    if (fn == null || fn[0] !== TokenType.Function) {
+      return fail(`Expected a ${label}`);
+    }
+    const name = fn[4].value.toLowerCase();
+    if (!set.has(name)) {
+      return fail(`Expected a ${label}, got ${fn[4].value}()`);
+    }
+
+    let depth = 1;
+    while (depth > 0) {
+      const next = input.consumeNextToken();
+      if (next == null) {
+        return fail(`Unbalanced parentheses in ${name}()`);
+      }
+      if (next[0] === TokenType.Function || next[0] === TokenType.OpenParen) {
+        depth++;
+      } else if (next[0] === TokenType.CloseParen) {
+        depth--;
+      }
+    }
+    return undefined;
+  }, label);
 }

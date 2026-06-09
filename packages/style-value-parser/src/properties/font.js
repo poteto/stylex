@@ -15,7 +15,7 @@ import { Angle } from '../css-types/angle';
 import { lengthPercentage } from '../css-types/length-percentage';
 import { mathFunction } from '../css-types/math-function';
 import { defineShorthand } from '../shorthands/define';
-import { walkComponents } from '../shorthands/families/slots';
+import { identKeyword, walkComponents } from '../shorthands/families/slots';
 
 /**
  * One parse, tagged by form. 'system' (a sole system-font keyword) and
@@ -37,14 +37,6 @@ type FontParsed =
       lineHeight: string | null,
       family: string,
     }>;
-
-// Keyword matching is ASCII case-insensitive; emitted slices stay verbatim.
-function identKeyword(keywords: ReadonlyArray<string>): TokenParser<string> {
-  const set = new Set(keywords);
-  return TokenParser.tokens.Ident.map((token): string =>
-    token[4].value.toLowerCase(),
-  ).where((str): implies str is string => set.has(str));
-}
 
 const systemKeyword: TokenParser<string> = identKeyword([
   'caption',
