@@ -74,6 +74,31 @@ type TokenNameToTokenType = {
 /** A parsed value plus the exact source text it consumed. */
 export type Sourced<+T> = $ReadOnly<{ value: T, raw: string }>;
 
+/**
+ * Parse failures are CONTROL FLOW: every failed alternative along a
+ * combinator walk constructs one, they are returned (never thrown), and
+ * only their messages are ever read. V8 captures a stack trace per
+ * `new Error` at a cost proportional to stack depth -- and combinator
+ * stacks run deep -- which made failure allocation dominate parse
+ * profiles by ~6x. Suppressing capture while constructing them keeps
+ * the same Error API at a fraction of the cost. Exported for parsers
+ * written outside the combinator core whose failure paths are hot.
+ */
+export function parseError(message: string): Error {
+  const limit = Error.stackTraceLimit;
+  Error.stackTraceLimit = 0;
+  const error = new Error(message);
+  Error.stackTraceLimit = limit;
+  return error;
+}
+
+/**
+ * Shared fixed-message failures. Callers only instanceof-check and read
+ * messages, so reusing one instance per message is safe.
+ */
+const NEVER_ERROR: Error = parseError('Never');
+const ALREADY_FAILED_ERROR: Error = parseError('already failed');
+
 export class TokenParser<+T> {
   +run: (input: TokenList) => T | Error;
   +label: string;
@@ -218,7 +243,7 @@ export class TokenParser<+T> {
   }
 
   static never<T>(): TokenParser<T> {
-    return new TokenParser(() => new Error('Never'), 'Never');
+    return new TokenParser(() => NEVER_ERROR, 'Never');
   }
 
   static always<T>(output: T): TokenParser<T> {
@@ -237,11 +262,11 @@ export class TokenParser<+T> {
       const token = input.consumeNextToken();
       if (token == null) {
         input.setCurrentIndex(currentIndex);
-        return new Error('Expected token');
+        return parseError('Expected token');
       }
       if (token[0] !== tokenType) {
         input.setCurrentIndex(currentIndex);
-        return new Error(`Expected token type ${tokenType}, got ${token[0]}`);
+        return parseError(`Expected token type ${tokenType}, got ${token[0]}`);
       }
       // $FlowFixMe[incompatible-type]
       return token as TT;
@@ -355,7 +380,7 @@ export class TokenParser<+T> {
         input.setCurrentIndex(index);
         errors.push(output);
       }
-      return new Error(
+      return parseError(
         'No parser matched\n' +
           errors.map((err) => '- ' + err.toString()).join('\n'),
       );
@@ -494,6 +519,22 @@ class TokenParserSequence<
 
   constructor(parsers: T, _separator?: TokenParser<mixed>) {
     const separator = _separator?.map(() => undefined);
+    // Separator-prefixed variants are a pure function of (separator,
+    // parser): build the graphs ONCE here, never inside `run` (a parse
+    // must never construct parsers).
+    const separated: ?$ReadOnlyArray<TokenParser<mixed>> =
+      separator == null
+        ? null
+        : parsers.map((parser: TokenParser<mixed>): TokenParser<mixed> => {
+            if (parser instanceof TokenOptionalParser) {
+              return TokenParser.sequence(separator, parser.parser).map(
+                ([_separator, value]) => value,
+              ).optional;
+            }
+            return TokenParser.sequence(separator, parser).map(
+              ([_separator, value]) => value,
+            );
+          });
     super(
       (input: TokenList): ValuesFromParserTuple<T> | Error => {
         const currentIndex = input.currentIndex;
@@ -501,25 +542,18 @@ class TokenParserSequence<
 
         // $FlowFixMe[incompatible-type]
         const output: ValuesFromParserTuple<T> | Error = parsers.map(
-          <X>(_parser: TokenParser<X>): X | Error => {
+          <X>(_parser: TokenParser<X>, index: number): X | Error => {
             if (failed) {
-              return new Error('already failed');
+              return ALREADY_FAILED_ERROR;
             }
-            let parser = _parser;
-
-            if (separator != null && input.currentIndex > currentIndex) {
-              if (parser instanceof TokenOptionalParser) {
-                // X === void | X
-                // $FlowFixMe[incompatible-type]
-                parser = TokenParser.sequence(separator, parser.parser).map(
-                  ([_separator, value]) => value,
-                ).optional;
-              } else {
-                parser = TokenParser.sequence(separator, parser).map(
-                  ([_separator, value]) => value,
-                );
-              }
-            }
+            // The separator applies only once something was consumed (an
+            // optional first slot that matched nothing takes no
+            // separator), so the choice is per-run state.
+            const parser =
+              separated != null && input.currentIndex > currentIndex
+                ? // $FlowFixMe[incompatible-type]
+                  (separated[index] as TokenParser<X>)
+                : _parser;
 
             const result = parser.run(input);
             if (result instanceof Error) {
@@ -631,7 +665,7 @@ class TokenParserSet<
         if (found) {
           continue;
         } else {
-          failed = new Error(
+          failed = parseError(
             `Expected one of ${parsers
               .map((parser) => parser.toString())
               .join(', ')} but got ${errors
