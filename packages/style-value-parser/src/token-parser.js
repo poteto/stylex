@@ -71,6 +71,9 @@ type TokenNameToTokenType = {
   UnicodeRange: TokenUnicodeRange,
 };
 
+/** A parsed value plus the exact source text it consumed. */
+export type Sourced<+T> = $ReadOnly<{ value: T, raw: string }>;
+
 export class TokenParser<+T> {
   +run: (input: TokenList) => T | Error;
   +label: string;
@@ -377,6 +380,24 @@ export class TokenParser<+T> {
 
   static oneOrMore<T>(parser: TokenParser<T>): TokenOneOrMoreParsers<T> {
     return new TokenOneOrMoreParsers(parser);
+  }
+
+  // Wraps a parser to also report the verbatim source text of the tokens it
+  // consumed, by joining the raw text (token[1]) of the consumed span.
+  static sourced<T>(parser: TokenParser<T>): TokenParser<Sourced<T>> {
+    return new TokenParser((input): Sourced<T> | Error => {
+      const startIndex = input.currentIndex;
+      const result = parser.run(input);
+      if (result instanceof Error) {
+        input.setCurrentIndex(startIndex);
+        return result;
+      }
+      const raw = input
+        .slice(startIndex, input.currentIndex)
+        .map((token) => token[1])
+        .join('');
+      return { value: result, raw };
+    }, `Sourced<${parser.label}>`);
   }
 }
 

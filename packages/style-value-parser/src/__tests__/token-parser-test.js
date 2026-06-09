@@ -190,4 +190,69 @@ describe('TokenParser', () => {
       expect(parser.parse('foo foo foo for')).toEqual(['foo', 'foo', 'foo']);
     });
   });
+
+  describe('sourced', () => {
+    it('captures the verbatim source text of a single token', () => {
+      const parser = TokenParser.sourced(
+        TokenParser.tokens.Ident.map((token) => token[4].value),
+      );
+      expect(parser.parseToEnd('foo')).toEqual({ value: 'foo', raw: 'foo' });
+    });
+
+    it('preserves the authored casing of the consumed text', () => {
+      const parser = TokenParser.sourced(
+        TokenParser.tokens.Dimension.map((token) => token[4].value),
+      );
+      expect(parser.parseToEnd('10PX')).toEqual({ value: 10, raw: '10PX' });
+    });
+
+    it('captures multi-token spans including interior whitespace verbatim', () => {
+      const parser = TokenParser.sourced(
+        TokenParser.sequence(
+          TokenParser.string('foo' as 'foo'),
+          TokenParser.string('bar' as 'bar'),
+        ).separatedBy(TokenParser.tokens.Whitespace),
+      );
+      expect(parser.parseToEnd('foo   bar')).toEqual({
+        value: ['foo', 'bar'],
+        raw: 'foo   bar',
+      });
+    });
+
+    it('captures only its own span when composed in a sequence', () => {
+      const parser = TokenParser.sequence(
+        TokenParser.sourced(TokenParser.tokens.Dimension.map(() => undefined)),
+        TokenParser.sourced(TokenParser.tokens.Dimension.map(() => undefined)),
+      ).separatedBy(TokenParser.tokens.Whitespace);
+      expect(parser.parseToEnd('10px   20px').map((s) => s.raw)).toEqual([
+        '10px',
+        '20px',
+      ]);
+    });
+
+    it('captures only the winning alternative after backtracking', () => {
+      const parser = TokenParser.sourced(
+        TokenParser.oneOf(
+          TokenParser.sequence(
+            TokenParser.string('foo' as 'foo'),
+            TokenParser.string('bar' as 'bar'),
+          ).separatedBy(TokenParser.tokens.Whitespace),
+          TokenParser.string('foo' as 'foo'),
+        ),
+      );
+      expect(parser.parseToEnd('foo')).toEqual({ value: 'foo', raw: 'foo' });
+    });
+
+    it('propagates failure and restores the input position', () => {
+      const sourcedFoo = TokenParser.sourced(
+        TokenParser.string('foo' as 'foo'),
+      );
+      expect(sourcedFoo.parse('baz') instanceof Error).toBe(true);
+
+      const fallback = sourcedFoo.or(
+        TokenParser.sourced(TokenParser.string('baz' as 'baz')),
+      );
+      expect(fallback.parseToEnd('baz')).toEqual({ value: 'baz', raw: 'baz' });
+    });
+  });
 });
