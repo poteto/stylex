@@ -25,8 +25,11 @@ export class Time {
   }
   static UNITS: $ReadOnlyArray<'s' | 'ms'> = ['s', 'ms'];
   static get parser(): TokenParser<Time> {
+    // Unit matching is ASCII case-insensitive like every CSS dimension
+    // unit; the parsed value is normalized to lowercase (the Length
+    // precedent). Shorthand slots emit verbatim slices regardless.
     return TokenParser.tokens.Dimension.map((v) => {
-      const unit = v[4].unit;
+      const unit = v[4].unit.toLowerCase();
       return unit === 's' || unit === 'ms' ? [v[4].value, unit] : null;
     })
       .where((v) => v != null)
