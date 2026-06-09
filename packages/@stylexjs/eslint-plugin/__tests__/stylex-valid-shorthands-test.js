@@ -43,57 +43,6 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
       })
     `,
     },
-    // border: single value passes through
-    {
-      code: `
-      import * as stylex from '@stylexjs/stylex';
-      const styles = stylex.create({
-        main: {
-          border: 'none',
-        },
-      })
-    `,
-    },
-    {
-      code: `
-      import * as stylex from '@stylexjs/stylex';
-      const styles = stylex.create({
-        main: {
-          border: 'solid',
-        },
-      })
-    `,
-    },
-    {
-      code: `
-      import * as stylex from '@stylexjs/stylex';
-      const styles = stylex.create({
-        main: {
-          border: 0,
-        },
-      })
-    `,
-    },
-    {
-      code: `
-      import * as stylex from '@stylexjs/stylex';
-      const styles = stylex.create({
-        main: {
-          border: 'solid',
-        },
-      })
-    `,
-    },
-    {
-      code: `
-      import * as stylex from '@stylexjs/stylex';
-      const styles = stylex.create({
-        main: {
-          border: 0,
-        },
-      })
-    `,
-    },
     {
       code: `
       import * as stylex from '@stylexjs/stylex';
@@ -725,10 +674,10 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
         import * as stylex from '@stylexjs/stylex';
         const styles = stylex.create({
           main: {
-            cornerStartStartShape: 'scoop',
-            cornerStartEndShape: 'notch',
-            cornerEndStartShape: 'scoop',
-            cornerEndEndShape: 'notch',
+            cornerTopLeftShape: 'scoop',
+            cornerTopRightShape: 'notch',
+            cornerBottomRightShape: 'scoop',
+            cornerBottomLeftShape: 'notch',
           },
         });
       `,
@@ -859,8 +808,7 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
           main: {
             borderBlockWidth: 'calc(100% - 20px)',
             borderInlineWidth: 'calc(90% - 20px)',
-            borderBlockColor: 'var(--test-color, #ccc)',
-            borderInlineColor: 'linear-gradient(to right, #ff7e5f, #feb47b)',
+            borderColor: 'var(--test-color, #ccc) linear-gradient(to right, #ff7e5f, #feb47b)',
             background: 'no-repeat center/cover, linear-gradient(to right, #ff7e5f, #feb47b)'
           },
         });
@@ -993,6 +941,8 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
         },
       ],
     },
+    // background: !important without allowImportant is reported without a
+    // fix (the old splitter silently stripped the !important)
     {
       code: `
           import * as stylex from '@stylexjs/stylex';
@@ -1006,12 +956,7 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
           import * as stylex from '@stylexjs/stylex';
           const styles = stylex.create({
             main: {
-              backgroundColor: '#ff0',
-              backgroundImage: 'url("image.jpg")',
-              backgroundRepeat: 'no-repeat',
-              backgroundAttachment: 'fixed',
-              backgroundPosition: 'center',
-              backgroundSize: 'cover',
+              background: '#ff0 url("image.jpg") no-repeat fixed center / cover !important',
             },
           });
         `,
@@ -1068,12 +1013,12 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
           const styles = stylex.create({
             main: {
               margin: '0px',
-              fontFamily: '"Helvetica Neue"',
               fontStyle: 'italic',
               fontVariant: 'small-caps',
               fontWeight: 'bold',
               fontSize: '16px',
               lineHeight: '1.5',
+              fontFamily: '"Helvetica Neue"',
               color: 'white',
             },
           });
@@ -1113,6 +1058,8 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
         },
       ],
     },
+    // margin: !important without allowImportant is reported without a fix
+    // (the old splitter silently stripped the !important)
     {
       code: `
           import * as stylex from '@stylexjs/stylex';
@@ -1126,10 +1073,7 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
           import * as stylex from '@stylexjs/stylex';
           const styles = stylex.create({
             main: {
-              marginTop: '10px',
-              marginRight: '12px',
-              marginBottom: '13px',
-              marginLeft: '14px',
+              margin: '10px 12px 13px 14px !important',
             },
           });
         `,
@@ -1546,10 +1490,10 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
         import * as stylex from '@stylexjs/stylex';
         const styles = stylex.create({
           main: {
-            gridColumnEnd: 'header',
+            gridRowStart: 'header',
             gridColumnStart: 'header',
             gridRowEnd: 'header',
-            gridRowStart: 'header',
+            gridColumnEnd: 'header',
           },
         });
       `,
@@ -1574,10 +1518,10 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
         import * as stylex from '@stylexjs/stylex';
         const styles = stylex.create({
           main: {
-            gridColumnEnd: 'sidebar',
+            gridRowStart: 'header',
             gridColumnStart: 'sidebar',
             gridRowEnd: 'header',
-            gridRowStart: 'header',
+            gridColumnEnd: 'sidebar',
           },
         });
       `,
@@ -1602,8 +1546,8 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
         import * as stylex from '@stylexjs/stylex';
         const styles = stylex.create({
           main: {
-            gridColumnStart: 'span 3',
             gridRowStart: 'span 2',
+            gridColumnStart: 'span 3',
           },
         });
       `,
@@ -1628,9 +1572,9 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
         import * as stylex from '@stylexjs/stylex';
         const styles = stylex.create({
           main: {
+            gridRowStart: '1',
             gridColumnStart: '2',
             gridRowEnd: '3',
-            gridRowStart: '1',
           },
         });
       `,
@@ -1655,10 +1599,10 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
         import * as stylex from '@stylexjs/stylex';
         const styles = stylex.create({
           main: {
-            gridColumnEnd: '4',
+            gridRowStart: '1',
             gridColumnStart: '2',
             gridRowEnd: '3',
-            gridRowStart: '1',
+            gridColumnEnd: '4',
           },
         });
       `,
@@ -1683,9 +1627,9 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
         import * as stylex from '@stylexjs/stylex';
         const styles = stylex.create({
           main: {
+            gridRowStart: 'header',
             gridColumnStart: '2',
             gridRowEnd: 'header',
-            gridRowStart: 'header',
           },
         });
       `,
@@ -1710,9 +1654,9 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
         import * as stylex from '@stylexjs/stylex';
         const styles = stylex.create({
           main: {
-            gridColumnEnd: 'sidebar',
-            gridColumnStart: 'sidebar',
             gridRowStart: '1',
+            gridColumnStart: 'sidebar',
+            gridColumnEnd: 'sidebar',
           },
         });
       `,
@@ -1737,10 +1681,10 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
         import * as stylex from '@stylexjs/stylex';
         const styles = stylex.create({
           main: {
-            gridColumnEnd: 'sidebar',
+            gridRowStart: '1',
             gridColumnStart: 'sidebar',
             gridRowEnd: '3',
-            gridRowStart: '1',
+            gridColumnEnd: 'sidebar',
           },
         });
       `,
@@ -1765,8 +1709,8 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
         import * as stylex from '@stylexjs/stylex';
         const styles = stylex.create({
           main: {
-            gridRowEnd: '3',
             gridRowStart: '1',
+            gridRowEnd: '3',
           },
         });
       `,
@@ -1791,8 +1735,8 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
         import * as stylex from '@stylexjs/stylex';
         const styles = stylex.create({
           main: {
-            gridRowEnd: 'content-end',
             gridRowStart: 'header-start',
+            gridRowEnd: 'content-end',
           },
         });
       `,
@@ -1817,8 +1761,8 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
         import * as stylex from '@stylexjs/stylex';
         const styles = stylex.create({
           main: {
-            gridRowEnd: 'span 2',
             gridRowStart: '1',
+            gridRowEnd: 'span 2',
           },
         });
       `,
@@ -1843,8 +1787,8 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
         import * as stylex from '@stylexjs/stylex';
         const styles = stylex.create({
           main: {
-            gridColumnEnd: '4',
             gridColumnStart: '2',
+            gridColumnEnd: '4',
           },
         });
       `,
@@ -1869,8 +1813,8 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
         import * as stylex from '@stylexjs/stylex';
         const styles = stylex.create({
           main: {
-            gridTemplateColumns: '100px 1fr',
             gridTemplateRows: '1fr 2fr',
+            gridTemplateColumns: '100px 1fr',
           },
         });
       `,
@@ -1895,8 +1839,8 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
         import * as stylex from '@stylexjs/stylex';
         const styles = stylex.create({
           main: {
-            gridTemplateColumns: 'repeat(3, 1fr)',
             gridTemplateRows: 'auto auto',
+            gridTemplateColumns: 'repeat(3, 1fr)',
           },
         });
       `,
@@ -2722,6 +2666,80 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
         },
       ],
     },
+    // border: single keyword/number values autofix to the one longhand
+    // they set
+    {
+      code: `
+      import * as stylex from '@stylexjs/stylex';
+      const styles = stylex.create({
+        main: {
+          border: 'none',
+        },
+      })
+    `,
+      output: `
+      import * as stylex from '@stylexjs/stylex';
+      const styles = stylex.create({
+        main: {
+          borderStyle: 'none',
+        },
+      })
+    `,
+      errors: [
+        {
+          message:
+            'Property shorthands using multiple values like "border: none" are not supported in StyleX. Separate into individual properties.',
+        },
+      ],
+    },
+    {
+      code: `
+      import * as stylex from '@stylexjs/stylex';
+      const styles = stylex.create({
+        main: {
+          border: 'solid',
+        },
+      })
+    `,
+      output: `
+      import * as stylex from '@stylexjs/stylex';
+      const styles = stylex.create({
+        main: {
+          borderStyle: 'solid',
+        },
+      })
+    `,
+      errors: [
+        {
+          message:
+            'Property shorthands using multiple values like "border: solid" are not supported in StyleX. Separate into individual properties.',
+        },
+      ],
+    },
+    {
+      code: `
+      import * as stylex from '@stylexjs/stylex';
+      const styles = stylex.create({
+        main: {
+          border: 0,
+        },
+      })
+    `,
+      output: `
+      import * as stylex from '@stylexjs/stylex';
+      const styles = stylex.create({
+        main: {
+          borderWidth: '0',
+        },
+      })
+    `,
+      errors: [
+        {
+          message:
+            'Property shorthands using multiple values like "border: 0" are not supported in StyleX. Separate into individual properties.',
+        },
+      ],
+    },
     {
       code: `
           import * as stylex from '@stylexjs/stylex';
@@ -2800,6 +2818,8 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
         },
       ],
     },
+    // border: width+style without a color autofixes to the two longhands
+    // it sets (previously reported without a fix)
     {
       code: `
       import * as stylex from '@stylexjs/stylex';
@@ -2813,7 +2833,8 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
       import * as stylex from '@stylexjs/stylex';
       const styles = stylex.create({
         main: {
-          border: '1px solid'
+          borderWidth: '1px',
+          borderStyle: 'solid'
         },
       })
     `,

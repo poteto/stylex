@@ -2815,10 +2815,10 @@ eslintTester.run('stylex-valid-styles [autofixers]', rule.default, {
         import * as stylex from '@stylexjs/stylex';
         const styles = stylex.create({
           default: {
-            gridColumnEnd: '4',
+            gridRowStart: '1',
             gridColumnStart: '2',
             gridRowEnd: '3',
-            gridRowStart: '1',
+            gridColumnEnd: '4',
           }
         });
       `,
@@ -2833,10 +2833,10 @@ eslintTester.run('stylex-valid-styles [autofixers]', rule.default, {
         import * as stylex from '@stylexjs/stylex';
         const styles = stylex.create({
           default: {
-            gridColumnEnd: '4',
+            gridRowStart: '1',
             gridColumnStart: '2',
             gridRowEnd: '3',
-            gridRowStart: '1',
+            gridColumnEnd: '4',
           }
         });
       `,
@@ -2860,8 +2860,8 @@ eslintTester.run('stylex-valid-styles [autofixers]', rule.default, {
         import * as stylex from '@stylexjs/stylex';
         const styles = stylex.create({
           default: {
-            gridColumnEnd: '3',
             gridColumnStart: '1',
+            gridColumnEnd: '3',
           }
         });
       `,
@@ -2887,8 +2887,8 @@ eslintTester.run('stylex-valid-styles [autofixers]', rule.default, {
         import * as stylex from '@stylexjs/stylex';
         const styles = stylex.create({
           default: {
-            gridRowEnd: '3',
             gridRowStart: '1',
+            gridRowEnd: '3',
           }
         });
       `,
@@ -2914,8 +2914,8 @@ eslintTester.run('stylex-valid-styles [autofixers]', rule.default, {
         import * as stylex from '@stylexjs/stylex';
         const styles = stylex.create({
           default: {
-            gridTemplateColumns: '120px 1fr',
             gridTemplateRows: 'auto 1fr',
+            gridTemplateColumns: '120px 1fr',
           }
         });
       `,
@@ -3013,10 +3013,10 @@ eslintTester.run('stylex-valid-styles [autofixers]', rule.default, {
         import * as stylex from '@stylexjs/stylex';
         const styles = stylex.create({
           default: {
-            gridColumnEnd: 'header',
+            gridRowStart: 'header',
             gridColumnStart: 'header',
             gridRowEnd: 'header',
-            gridRowStart: 'header',
+            gridColumnEnd: 'header',
           }
         });
       `,
@@ -3076,10 +3076,10 @@ eslintTester.run('stylex-valid-styles [autofixers]', rule.default, {
         import * as stylex from '@stylexjs/stylex';
         const styles = stylex.create({
           default: {
-            fontFamily: 'Arial',
             fontWeight: 'bold',
             fontSize: '16px',
             lineHeight: 1.5,
+            fontFamily: 'Arial',
           }
         });
       `,
@@ -3104,9 +3104,9 @@ eslintTester.run('stylex-valid-styles [autofixers]', rule.default, {
         import * as stylex from '@stylexjs/stylex';
         const styles = stylex.create({
           default: {
-            fontFamily: 'Arial',
             fontWeight: 700,
             fontSize: '16px',
+            fontFamily: 'Arial',
           }
         });
       `,
@@ -3276,8 +3276,8 @@ eslintTester.run('stylex-valid-styles [autofixers]', rule.default, {
         import * as stylex from '@stylexjs/stylex';
         const styles = stylex.create({
           default: {
-            gridColumnStart: '2',
             gridRowStart: '1',
+            gridColumnStart: '2',
           }
         });
       `,
