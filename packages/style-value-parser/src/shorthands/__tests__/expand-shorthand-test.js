@@ -563,6 +563,206 @@ describe('expandShorthand', () => {
     });
   });
 
+  describe('corner shorthand boundary vectors', () => {
+    it('projects a two-axis borderRadius per output mode', () => {
+      expect(
+        expandShorthand('borderRadius', '10px / 20px', { output: 'spec' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'borderTopLeftRadius',
+            value: '10px 20px',
+            origin: 'explicit',
+          },
+          {
+            property: 'borderTopRightRadius',
+            value: '10px 20px',
+            origin: 'replicated',
+          },
+          {
+            property: 'borderBottomRightRadius',
+            value: '10px 20px',
+            origin: 'replicated',
+          },
+          {
+            property: 'borderBottomLeftRadius',
+            value: '10px 20px',
+            origin: 'replicated',
+          },
+        ],
+      });
+      expect(
+        expandShorthand('borderRadius', '10px / 20px', { output: 'minimal' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'borderRadius',
+            value: '10px / 20px',
+            origin: 'explicit',
+          },
+        ],
+      });
+    });
+
+    it('emits all four corners for a 2-value borderRadius in minimal output', () => {
+      expect(
+        expandShorthand('borderRadius', '10px 20px', { output: 'minimal' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'borderTopLeftRadius',
+            value: '10px',
+            origin: 'explicit',
+          },
+          {
+            property: 'borderTopRightRadius',
+            value: '20px',
+            origin: 'explicit',
+          },
+          {
+            property: 'borderBottomRightRadius',
+            value: '10px',
+            origin: 'replicated',
+          },
+          {
+            property: 'borderBottomLeftRadius',
+            value: '20px',
+            origin: 'replicated',
+          },
+        ],
+      });
+    });
+
+    it('expands a borderRadius number in spec output and no-ops in minimal', () => {
+      expect(expandShorthand('borderRadius', 8, { output: 'spec' })).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'borderTopLeftRadius', value: 8, origin: 'explicit' },
+          { property: 'borderTopRightRadius', value: 8, origin: 'replicated' },
+          {
+            property: 'borderBottomRightRadius',
+            value: 8,
+            origin: 'replicated',
+          },
+          {
+            property: 'borderBottomLeftRadius',
+            value: 8,
+            origin: 'replicated',
+          },
+        ],
+      });
+      expect(expandShorthand('borderRadius', 8, { output: 'minimal' })).toEqual(
+        { type: 'no-op' },
+      );
+    });
+
+    it('maps all four corners to logical keys for preferInline', () => {
+      expect(
+        expandShorthand('borderRadius', '1px 2px 3px 4px', {
+          output: 'minimal',
+          preferInline: true,
+        }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'borderStartStartRadius',
+            value: '1px',
+            origin: 'explicit',
+          },
+          {
+            property: 'borderStartEndRadius',
+            value: '2px',
+            origin: 'explicit',
+          },
+          { property: 'borderEndEndRadius', value: '3px', origin: 'explicit' },
+          {
+            property: 'borderEndStartRadius',
+            value: '4px',
+            origin: 'explicit',
+          },
+        ],
+      });
+    });
+
+    it('no-ops a single cornerShape keyword and splits a pair', () => {
+      expect(
+        expandShorthand('cornerShape', 'squircle', { output: 'minimal' }),
+      ).toEqual({ type: 'no-op' });
+      expect(
+        expandShorthand('cornerShape', 'round squircle', {
+          output: 'minimal',
+        }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'cornerStartStartShape',
+            value: 'round',
+            origin: 'explicit',
+          },
+          {
+            property: 'cornerStartEndShape',
+            value: 'squircle',
+            origin: 'explicit',
+          },
+          {
+            property: 'cornerEndStartShape',
+            value: 'round',
+            origin: 'replicated',
+          },
+          {
+            property: 'cornerEndEndShape',
+            value: 'squircle',
+            origin: 'replicated',
+          },
+        ],
+      });
+    });
+
+    it('joins a slash form with a var() in the horizontal list', () => {
+      expect(
+        expandShorthand('borderRadius', '10px var(--r) / 20px', {
+          output: 'minimal',
+        }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'borderTopLeftRadius',
+            value: '10px 20px',
+            origin: 'explicit',
+          },
+          {
+            property: 'borderTopRightRadius',
+            value: 'var(--r) 20px',
+            origin: 'explicit',
+          },
+          {
+            property: 'borderBottomRightRadius',
+            value: '10px 20px',
+            origin: 'replicated',
+          },
+          {
+            property: 'borderBottomLeftRadius',
+            value: 'var(--r) 20px',
+            origin: 'replicated',
+          },
+        ],
+      });
+    });
+  });
+
   describe('refusals', () => {
     it('refuses values the grammar cannot parse', () => {
       const result = expandShorthand('margin', 'red green', {
