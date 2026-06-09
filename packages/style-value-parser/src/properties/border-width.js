@@ -10,14 +10,14 @@
 import type { ShorthandDef } from '../shorthands/define';
 
 import { TokenParser } from '../token-parser';
-import { Calc } from '../css-types/calc';
 import { lineWidth } from '../css-types/line-width';
+import { mathFunction } from '../css-types/math-function';
 import { varFunction } from '../shorthands/css-wide';
 import { fourSides } from '../shorthands/families/four-sides';
 
 const borderWidthComponent: TokenParser<unknown> = TokenParser.oneOf(
   lineWidth,
-  Calc.parser,
+  mathFunction,
   varFunction,
 );
 

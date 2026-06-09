@@ -11,14 +11,14 @@ import type { LengthPercentage } from '../css-types/length-percentage';
 import type { ShorthandDef } from '../shorthands/define';
 
 import { TokenParser } from '../token-parser';
-import { Calc } from '../css-types/calc';
 import { lengthPercentage } from '../css-types/length-percentage';
+import { mathFunction } from '../css-types/math-function';
 import { varFunction } from '../shorthands/css-wide';
 import { corners } from '../shorthands/families/corners';
 
 const radiusComponent: TokenParser<unknown> = TokenParser.oneOf(
   lengthPercentage,
-  Calc.parser,
+  mathFunction,
   varFunction,
 );
 
