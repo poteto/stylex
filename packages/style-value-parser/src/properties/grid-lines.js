@@ -7,6 +7,7 @@
  * @flow strict
  */
 
+import type { Sourced } from '../token-parser';
 import type { ComponentRange } from '../shorthands/css-wide';
 import type { ShorthandDef } from '../shorthands/define';
 import type { Cell, Declaration, EmitOptions } from '../shorthands/types';
@@ -14,6 +15,7 @@ import type { ComponentWalk } from '../shorthands/families/slots';
 
 import { NumberType, TokenType } from '@csstools/css-tokenizer';
 import { TokenParser } from '../token-parser';
+import { varFunction } from '../shorthands/css-wide';
 import { defineShorthand } from '../shorthands/define';
 import { splitOnSlashes, walkComponents } from '../shorthands/families/slots';
 
@@ -32,22 +34,28 @@ const GRID_NON_CUSTOM_IDENT_KEYWORDS: ReadonlySet<string> = new Set([
   'revert-layer',
 ]);
 
-type LineComponent = 'auto' | 'span' | 'integer' | 'ident';
+type LineComponent = 'auto' | 'span' | 'integer' | 'ident' | 'var';
+
+const variable: TokenParser<Sourced<void>> = TokenParser.sourced(varFunction);
 
 /**
  * Shallow classification of ONE grid-line component. Acceptable
- * components are all single tokens: the 'auto' and 'span' keywords, an
- * <integer> (the tokenizer's integer flag, so '1.5' refuses), or a
- * <custom-ident> that is none of the excluded keywords and not
- * span-prefixed (the old splitter's isCustomIdent rules). Anything else
- * -- functions, strings, var() -- is unclassifiable and refuses.
+ * components are the single-token forms -- the 'auto' and 'span'
+ * keywords, an <integer> (the tokenizer's integer flag, so '1.5'
+ * refuses), a <custom-ident> that is none of the excluded keywords and
+ * not span-prefixed (the old splitter's isCustomIdent rules) -- plus a
+ * top-level var(): slash groups are positionally unambiguous (the quad
+ * rule's trust), so a variable is accepted as one group component. A
+ * var() is NOT a <custom-ident>, so it never drives replication.
+ * Anything else -- other functions, strings -- is unclassifiable and
+ * refuses.
  */
 function classifyLineComponent(
   walk: ComponentWalk,
   component: ComponentRange,
 ): LineComponent | null {
   if (component.end - component.start !== 1) {
-    return null;
+    return walk.matchRange(variable, component) != null ? 'var' : null;
   }
   const token = walk.tokens[component.start];
   if (token[0] === TokenType.Ident) {
@@ -73,11 +81,12 @@ function classifyLineComponent(
 /**
  * Shallow <grid-line> group validation, deliberately: every component
  * must classify, and a 'span' must combine with a FOLLOWING integer or
- * name in the same group. Deep <grid-line> grammar (span/auto
- * exclusivity, integer-zero refusal, component ordering) is NOT
- * enforced -- verbatim relocation is the job, so the def only refuses
- * components that cannot be part of any grid line. Returns the parse
- * problem, or null when the group is acceptable.
+ * name (or a var() that could substitute either) in the same group.
+ * Deep <grid-line> grammar (span/auto exclusivity, integer-zero
+ * refusal, component ordering) is NOT enforced -- verbatim relocation
+ * is the job, so the def only refuses components that cannot be part of
+ * any grid line. Returns the parse problem, or null when the group is
+ * acceptable.
  */
 function lineGroupProblem(
   walk: ComponentWalk,
@@ -96,7 +105,7 @@ function lineGroupProblem(
         index + 1 < group.length
           ? classifyLineComponent(walk, group[index + 1])
           : null;
-      if (next !== 'integer' && next !== 'ident') {
+      if (next !== 'integer' && next !== 'ident' && next !== 'var') {
         return "Expected an integer or line name after 'span'";
       }
     }
@@ -173,8 +182,11 @@ const copyOrAuto = (start: string, startIsLoneIdent: boolean): Cell =>
  * One group is its own minimal form REGARDLESS of component count (the
  * old splitter never reported slashless values, 'span 2' included), so
  * condense returns null for it; spec output applies the copy-or-auto
- * rule. Validation is the shallow walk above. No number fast path: the
- * stringified fallback parses a bare '2' as one integer group.
+ * rule. Validation is the shallow walk above; var() is a valid group
+ * component ('var(--line) / 2' splits), and a lone var() group is a
+ * non-ident, so its omitted end defaults to 'auto' in spec output. No
+ * number fast path: the stringified fallback parses a bare '2' as one
+ * integer group.
  */
 function gridLineDef(
   config: Readonly<{
@@ -303,7 +315,9 @@ const gridAreaCondense = (
  *
  * Replication per spec matches the old splitter's ident logic: each
  * omitted line copies its counterpart start when that start is a lone
- * <custom-ident>, else 'auto'. singleComponentIsIdentity is false: a
+ * <custom-ident>, else 'auto'. A var() group is accepted (positionally
+ * unambiguous) but is never a custom-ident, so it neither replicates
+ * nor blocks the split. singleComponentIsIdentity is false: a
  * one-component 'grid-area: header' must reach def.run because its
  * minimal form lives on four different keys.
  */

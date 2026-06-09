@@ -145,10 +145,69 @@ describe('grid-row and grid-column defs', () => {
       expectParseError(run('span / 2', { output: 'spec' }), /span/);
       expectParseError(run('2 span / 3', { output: 'spec' }), /span/);
       expect(run('span foo / 3', { output: 'spec' }).type).toEqual('ok');
+      // A var() may substitute the integer or name a span needs.
+      expect(run('span var(--n) / 3', { output: 'spec' }).type).toEqual('ok');
+    });
+  });
+
+  describe('var() group components (positionally unambiguous)', () => {
+    it('relocates a var() group verbatim next to its slash sibling', () => {
+      expect(run('var(--line) / 2', { output: 'minimal' })).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'gridRowStart',
+            value: 'var(--line)',
+            origin: 'explicit',
+          },
+          { property: 'gridRowEnd', value: '2', origin: 'explicit' },
+        ],
+      });
     });
 
-    it('refuses var() components (the boundary reports contains-variable)', () => {
-      expectParseError(run('var(--line) / 2', { output: 'spec' }));
+    it('is identity for a lone var() group in minimal output', () => {
+      expect(run('var(--line)', { output: 'minimal' })).toEqual({
+        type: 'no-op',
+      });
+    });
+
+    it('defaults the end to auto for a lone var() group in spec output', () => {
+      // A var() is NOT a <custom-ident>, so the omitted end never copies it.
+      expect(run('var(--line)', { output: 'spec' })).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'gridRowStart',
+            value: 'var(--line)',
+            origin: 'explicit',
+          },
+          { property: 'gridRowEnd', value: 'auto', origin: 'defaulted' },
+        ],
+      });
+    });
+
+    it('keeps a var() fallback (slashes inside stay inert) verbatim', () => {
+      expect(run('var(--line, 2 / 3) / 4', { output: 'minimal' })).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'gridRowStart',
+            value: 'var(--line, 2 / 3)',
+            origin: 'explicit',
+          },
+          { property: 'gridRowEnd', value: '4', origin: 'explicit' },
+        ],
+      });
+    });
+
+    it('still refuses non-var functions as group components', () => {
+      expectParseError(
+        run('calc(1 + 1) / 2', { output: 'spec' }),
+        /Unexpected component/,
+      );
     });
   });
 
@@ -320,6 +379,57 @@ describe('grid-area def', () => {
           { property: 'gridColumnStart', value: '2', origin: 'explicit' },
           { property: 'gridRowEnd', value: '3', origin: 'explicit' },
           { property: 'gridColumnEnd', value: '4', origin: 'explicit' },
+        ],
+      });
+    });
+  });
+
+  describe('var() group components', () => {
+    it('treats var() groups as non-idents: no replication, auto ends', () => {
+      expect(run('var(--r) / var(--c)', { output: 'minimal' })).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'gridRowStart', value: 'var(--r)', origin: 'explicit' },
+          {
+            property: 'gridColumnStart',
+            value: 'var(--c)',
+            origin: 'explicit',
+          },
+        ],
+      });
+      expect(run('var(--r) / var(--c)', { output: 'spec' })).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'gridRowStart', value: 'var(--r)', origin: 'explicit' },
+          {
+            property: 'gridColumnStart',
+            value: 'var(--c)',
+            origin: 'explicit',
+          },
+          { property: 'gridRowEnd', value: 'auto', origin: 'defaulted' },
+          { property: 'gridColumnEnd', value: 'auto', origin: 'defaulted' },
+        ],
+      });
+    });
+
+    it('is identity for a single lone var() group in minimal output', () => {
+      expect(run('var(--area)', { output: 'minimal' })).toEqual({
+        type: 'no-op',
+      });
+      expect(run('var(--area)', { output: 'spec' })).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'gridRowStart',
+            value: 'var(--area)',
+            origin: 'explicit',
+          },
+          { property: 'gridColumnStart', value: 'auto', origin: 'defaulted' },
+          { property: 'gridRowEnd', value: 'auto', origin: 'defaulted' },
+          { property: 'gridColumnEnd', value: 'auto', origin: 'defaulted' },
         ],
       });
     });
