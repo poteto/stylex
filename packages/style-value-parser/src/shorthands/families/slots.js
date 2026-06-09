@@ -13,7 +13,7 @@ import type { TokenList } from '../../token-types';
 import type { ComponentRange } from '../css-wide';
 
 import { TokenType } from '@csstools/css-tokenizer';
-import { TokenParser } from '../../token-parser';
+import { TokenParser, parseError } from '../../token-parser';
 import { splitTopLevelComponents } from '../css-wide';
 
 /**
@@ -95,7 +95,7 @@ export function walkComponents(input: TokenList): ComponentWalk {
 
   const fail = (message: string): Error => {
     input.setCurrentIndex(startIndex);
-    return new Error(message);
+    return parseError(message);
   };
 
   const finish = (): void => {
@@ -155,9 +155,10 @@ export function balancedFunction(
   const label = `Function<${names.join('|')}>`;
   return new TokenParser((input): void | Error => {
     const startIndex = input.currentIndex;
+    // Probed per component during slot elimination; failures are hot.
     const fail = (message: string): Error => {
       input.setCurrentIndex(startIndex);
-      return new Error(message);
+      return parseError(message);
     };
 
     const fn = input.consumeNextToken();

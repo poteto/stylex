@@ -9,7 +9,7 @@
 
 import type { CSSToken } from '@csstools/css-tokenizer';
 
-import { TokenParser } from '../token-parser';
+import { TokenParser, parseError } from '../token-parser';
 import { TokenType } from '@csstools/css-tokenizer';
 
 /**
@@ -208,9 +208,11 @@ export function hasTopLevelComma(tokens: ReadonlyArray<CSSToken>): boolean {
 export const varFunction: TokenParser<void> = new TokenParser(
   (input): void | Error => {
     const startIndex = input.currentIndex;
+    // This parser is probed against every component in slot grammars,
+    // so its failures are hot: parseError keeps them stackless.
     const fail = (message: string): Error => {
       input.setCurrentIndex(startIndex);
-      return new Error(message);
+      return parseError(message);
     };
 
     const fn = input.consumeNextToken();

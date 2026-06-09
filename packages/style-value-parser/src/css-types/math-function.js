@@ -7,7 +7,7 @@
  * @flow strict
  */
 
-import { TokenParser } from '../token-parser';
+import { TokenParser, parseError } from '../token-parser';
 import { TokenType } from '@csstools/css-tokenizer';
 
 const MATH_FUNCTION_NAMES: ReadonlySet<string> = new Set([
@@ -31,9 +31,10 @@ const MATH_FUNCTION_NAMES: ReadonlySet<string> = new Set([
 export const mathFunction: TokenParser<void> = new TokenParser(
   (input): void | Error => {
     const startIndex = input.currentIndex;
+    // Probed against every length-ish slot component; failures are hot.
     const fail = (message: string): Error => {
       input.setCurrentIndex(startIndex);
-      return new Error(message);
+      return parseError(message);
     };
 
     const fn = input.consumeNextToken();
