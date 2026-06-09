@@ -30,12 +30,13 @@ const currentColorKeyword: TokenParser<'currentcolor'> =
   );
 
 // Slot grammars; var() is handled at the matcher level, not per slot.
-const widthSlot: TokenParser<unknown> = TokenParser.oneOf(
+// The width and color slots are exported for the outline def, whose
+// outline-width and outline-color embed the same productions.
+export const lineWidthSlot: TokenParser<unknown> = TokenParser.oneOf(
   lineWidth,
   Calc.parser,
 );
-const styleSlot: TokenParser<unknown> = lineStyle;
-const colorSlot: TokenParser<unknown> = TokenParser.oneOf(
+export const colorSlot: TokenParser<unknown> = TokenParser.oneOf(
   Color.parser,
   currentColorKeyword,
 );
@@ -51,7 +52,7 @@ const colorSlot: TokenParser<unknown> = TokenParser.oneOf(
  */
 export const borderDef: ShorthandDef = lineTrio({
   canonical: 'border',
-  slots: { width: widthSlot, style: styleSlot, color: colorSlot },
+  slots: { width: lineWidthSlot, style: lineStyle, color: colorSlot },
   longhands: {
     width: 'borderWidth',
     style: 'borderStyle',
@@ -59,3 +60,30 @@ export const borderDef: ShorthandDef = lineTrio({
   },
   defaults: { width: 'medium', style: 'none', color: 'currentcolor' },
 });
+
+/**
+ * The four physical sides share border's slots and defaults and expand to
+ * their true longhands. No dialectMap: the old splitter applies no
+ * preferInline mapping for physical sides (borderLeft stays borderLeft*);
+ * kept for parity.
+ */
+function borderSideDef(
+  side: 'top' | 'right' | 'bottom' | 'left',
+): ShorthandDef {
+  const sideKey = side[0].toUpperCase() + side.slice(1);
+  return lineTrio({
+    canonical: `border-${side}`,
+    slots: { width: lineWidthSlot, style: lineStyle, color: colorSlot },
+    longhands: {
+      width: `border${sideKey}Width`,
+      style: `border${sideKey}Style`,
+      color: `border${sideKey}Color`,
+    },
+    defaults: { width: 'medium', style: 'none', color: 'currentcolor' },
+  });
+}
+
+export const borderTopDef: ShorthandDef = borderSideDef('top');
+export const borderRightDef: ShorthandDef = borderSideDef('right');
+export const borderBottomDef: ShorthandDef = borderSideDef('bottom');
+export const borderLeftDef: ShorthandDef = borderSideDef('left');

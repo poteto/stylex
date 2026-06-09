@@ -10,7 +10,13 @@
 import type { ShorthandDef } from './define';
 
 import { camelize } from './define';
-import { borderDef } from '../properties/border';
+import {
+  borderBottomDef,
+  borderDef,
+  borderLeftDef,
+  borderRightDef,
+  borderTopDef,
+} from '../properties/border';
 import { borderColorDef } from '../properties/border-color';
 import { borderRadiusDef } from '../properties/border-radius';
 import { borderStyleDef } from '../properties/border-style';
@@ -23,6 +29,7 @@ import {
   marginDef,
   marginInlineDef,
 } from '../properties/margin';
+import { outlineDef } from '../properties/outline';
 import { overflowDef } from '../properties/overflow';
 import { overscrollBehaviorDef } from '../properties/overscroll-behavior';
 import {
@@ -40,9 +47,13 @@ import { scrollPaddingDef } from '../properties/scroll-padding';
  */
 export const registry: Readonly<{ +[string]: ShorthandDef }> = Object.freeze({
   border: borderDef,
+  borderBottom: borderBottomDef,
   borderColor: borderColorDef,
+  borderLeft: borderLeftDef,
   borderRadius: borderRadiusDef,
+  borderRight: borderRightDef,
   borderStyle: borderStyleDef,
+  borderTop: borderTopDef,
   borderWidth: borderWidthDef,
   cornerShape: cornerShapeDef,
   gap: gapDef,
@@ -52,6 +63,7 @@ export const registry: Readonly<{ +[string]: ShorthandDef }> = Object.freeze({
   margin: marginDef,
   marginBlock: marginBlockDef,
   marginInline: marginInlineDef,
+  outline: outlineDef,
   overflow: overflowDef,
   overscrollBehavior: overscrollBehaviorDef,
   padding: paddingDef,

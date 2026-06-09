@@ -46,7 +46,14 @@ describe('expandShorthand', () => {
     });
 
     it('defaults singleComponentIsIdentity to true outside line-trio defs', () => {
-      const escapees = new Set(['border']);
+      const escapees = new Set([
+        'border',
+        'borderTop',
+        'borderRight',
+        'borderBottom',
+        'borderLeft',
+        'outline',
+      ]);
       for (const key of Object.keys(registry)) {
         expect(registry[key].singleComponentIsIdentity).toBe(
           !escapees.has(key),
