@@ -15,18 +15,40 @@ const MATH_FUNCTION_NAMES: ReadonlySet<string> = new Set([
   'min',
   'max',
   'clamp',
+  // CSS Values 4 stepped-value, sign-related, exponential, and
+  // trigonometric functions. A rem(...) FUNCTION token is lexically
+  // distinct from the rem unit (a Dimension token), so the name cannot
+  // shadow the unit.
+  'round',
+  'mod',
+  'rem',
+  'abs',
+  'sign',
+  'pow',
+  'sqrt',
+  'hypot',
+  'log',
+  'exp',
+  'sin',
+  'cos',
+  'tan',
+  'asin',
+  'acos',
+  'atan',
+  'atan2',
 ]);
 
 /**
- * A math function -- calc | min | max | clamp, ASCII case-insensitive --
- * consumed as exactly ONE component, balanced through the matching close
- * paren (the same depth walk as varFunction). Arguments are NOT
- * validated: shorthand slots relocate the author's text verbatim, never
- * interpret it, so 'min(var(--a), 2px)' is one length-ish component even
- * though calc's full grammar would refuse the nested var(). calc retains
- * its full argument parser in css-types/calc.js for consumers that need
- * the parsed expression. The parsed value is void on purpose: callers
- * only ever emit the verbatim slice (via TokenParser.sourced).
+ * A math function -- calc | min | max | clamp plus the CSS Values 4
+ * names above, ASCII case-insensitive -- consumed as exactly ONE
+ * component, balanced through the matching close paren (the same depth
+ * walk as varFunction). Arguments are NOT validated: shorthand slots
+ * relocate the author's text verbatim, never interpret it, so
+ * 'min(var(--a), 2px)' is one length-ish component even though calc's
+ * full grammar would refuse the nested var(). calc retains its full
+ * argument parser in css-types/calc.js for consumers that need the
+ * parsed expression. The parsed value is void on purpose: callers only
+ * ever emit the verbatim slice (via TokenParser.sourced).
  */
 export const mathFunction: TokenParser<void> = new TokenParser(
   (input): void | Error => {

@@ -33,6 +33,8 @@ margin: "auto" <mdn> minimal -> no-op
 margin: "auto" <mdn> spec -> ok marginTop="auto"(e) marginRight="auto"(r) marginBottom="auto"(r) marginLeft="auto"(r)
 margin: "1px 2px 3px" <mdn> minimal -> ok marginTop="1px"(e) marginRight="2px"(e) marginBottom="3px"(e) marginLeft="2px"(r)
 margin: "1px 2px 3px" <mdn> spec -> ok marginTop="1px"(e) marginRight="2px"(e) marginBottom="3px"(e) marginLeft="2px"(r)
+margin: "round(2.5px) 10px" <mdn> minimal -> ok marginBlock="round(2.5px)"(e) marginInline="10px"(e)
+margin: "round(2.5px) 10px" <mdn> spec -> ok marginTop="round(2.5px)"(e) marginRight="10px"(e) marginBottom="round(2.5px)"(r) marginLeft="10px"(r)
 padding: "1px 2px 3px 4px !important" <mdn> minimal -> cannot-expand:important-disallowed
 padding: "1px 2px 3px 4px !important" <mdn> spec -> cannot-expand:important-disallowed
 margin: "10px 12px !important" <mdn> minimal -> cannot-expand:important-disallowed

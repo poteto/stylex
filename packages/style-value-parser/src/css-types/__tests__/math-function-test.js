@@ -37,6 +37,42 @@ describe('Test CSS Type: math functions', () => {
     );
   });
 
+  test('captures the CSS Values 4 math function names verbatim', () => {
+    // The extended set: stepped-value, sign-related, exponential, and
+    // trigonometric functions all classify as ONE math component, with
+    // the same unvalidated balanced capture as calc/min/max/clamp.
+    for (const input of [
+      'round(2.5px)',
+      'round(up, 101px, 10px)',
+      'mod(18px, 5px)',
+      'rem(18px, 5px)',
+      'abs(-10px)',
+      'sign(-5%)',
+      'pow(2, 10)',
+      'sqrt(2)',
+      'hypot(3em, 4em)',
+      'log(8, 2)',
+      'exp(1)',
+      'sin(45deg)',
+      'cos(0.25turn)',
+      'tan(1.5rad)',
+      'asin(0.5)',
+      'acos(0.5)',
+      'atan(1)',
+      'atan2(1, -1)',
+    ]) {
+      expect(sourced.parseToEnd(input).raw).toEqual(input);
+    }
+  });
+
+  test('a rem() FUNCTION token is distinct from the rem unit', () => {
+    // 'rem(' lexes as one Function token; '1rem' is a Dimension token
+    // whose unit happens to share the name. No ambiguity at the token
+    // level, so accepting the function cannot shadow the unit.
+    expect(sourced.parseToEnd('rem(10px, 3px)').raw).toEqual('rem(10px, 3px)');
+    expect(mathFunction.parse('1rem')).toBeInstanceOf(Error);
+  });
+
   test('captures balanced nested functions and groups', () => {
     expect(sourced.parseToEnd('min(var(--a), 2px)').raw).toEqual(
       'min(var(--a), 2px)',

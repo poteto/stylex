@@ -458,6 +458,23 @@ describe('expandShorthand', () => {
       });
     });
 
+    it('accepts extended math functions as length-ish components', () => {
+      expect(
+        expandShorthand('margin', 'round(2.5px) 10px', { output: 'minimal' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'marginBlock',
+            value: 'round(2.5px)',
+            origin: 'explicit',
+          },
+          { property: 'marginInline', value: '10px', origin: 'explicit' },
+        ],
+      });
+    });
+
     it('accepts a var() nested inside a math function', () => {
       // The nested var() is invisible to splitting AND to the boundary's
       // contains-variable reclassification (hasTopLevelVar only looks at
