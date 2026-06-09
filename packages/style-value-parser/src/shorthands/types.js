@@ -16,7 +16,9 @@
  *                  keyword fan-out, vertical radius defaulting to horizontal).
  *  - 'defaulted':  the shorthand's defined default for an omitted slot
  *                  (usually the longhand's initial value). Spec output emits
- *                  these; minimal output never does.
+ *                  these; minimal output omits them, unless a def's condense
+ *                  documents that the default is load-bearing (flex's filled
+ *                  basis '0%' differs from the longhand's initial 'auto').
  */
 export type LonghandOrigin = 'explicit' | 'replicated' | 'defaulted';
 
