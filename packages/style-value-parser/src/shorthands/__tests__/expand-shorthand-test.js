@@ -447,6 +447,122 @@ describe('expandShorthand', () => {
     });
   });
 
+  describe('new def boundary vectors', () => {
+    it('expands a gap number in spec output and no-ops in minimal', () => {
+      expect(expandShorthand('gap', 4, { output: 'spec' })).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'rowGap', value: 4, origin: 'explicit' },
+          { property: 'columnGap', value: 4, origin: 'replicated' },
+        ],
+      });
+      expect(expandShorthand('gap', 4, { output: 'minimal' })).toEqual({
+        type: 'no-op',
+      });
+    });
+
+    it('resolves the gridGap legacy alias to the gap def', () => {
+      expect(normalizeKey('gridGap')).toEqual('gap');
+      expect(
+        expandShorthand('gridGap', '1px 2px', { output: 'minimal' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'rowGap', value: '1px', origin: 'explicit' },
+          { property: 'columnGap', value: '2px', origin: 'explicit' },
+        ],
+      });
+    });
+
+    it('projects a 2-value borderColor per output mode', () => {
+      expect(
+        expandShorthand('borderColor', '#fff blue', { output: 'spec' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'borderTopColor', value: '#fff', origin: 'explicit' },
+          { property: 'borderRightColor', value: 'blue', origin: 'explicit' },
+          {
+            property: 'borderBottomColor',
+            value: '#fff',
+            origin: 'replicated',
+          },
+          { property: 'borderLeftColor', value: 'blue', origin: 'replicated' },
+        ],
+      });
+      expect(
+        expandShorthand('borderColor', '#fff blue', { output: 'minimal' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'borderBlockColor', value: '#fff', origin: 'explicit' },
+          { property: 'borderInlineColor', value: 'blue', origin: 'explicit' },
+        ],
+      });
+    });
+
+    it('accepts auto inside inset and maps sides for preferInline', () => {
+      expect(
+        expandShorthand('inset', 'auto 10px', { output: 'minimal' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'insetBlock', value: 'auto', origin: 'explicit' },
+          { property: 'insetInline', value: '10px', origin: 'explicit' },
+        ],
+      });
+      expect(
+        expandShorthand('inset', '1px 2px 3px 4px', {
+          output: 'minimal',
+          preferInline: true,
+        }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'top', value: '1px', origin: 'explicit' },
+          { property: 'insetInlineEnd', value: '2px', origin: 'explicit' },
+          { property: 'bottom', value: '3px', origin: 'explicit' },
+          { property: 'insetInlineStart', value: '4px', origin: 'explicit' },
+        ],
+      });
+    });
+
+    it('splits an overflow pair and no-ops a single overflow keyword', () => {
+      expect(
+        expandShorthand('overflow', 'hidden scroll', { output: 'minimal' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'overflowX', value: 'hidden', origin: 'explicit' },
+          { property: 'overflowY', value: 'scroll', origin: 'explicit' },
+        ],
+      });
+      expect(
+        expandShorthand('overflow', 'hidden', { output: 'minimal' }),
+      ).toEqual({ type: 'no-op' });
+    });
+
+    it('keeps authored unit casing verbatim in padding output', () => {
+      expect(
+        expandShorthand('padding', '1PX 2px', { output: 'minimal' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'paddingBlock', value: '1PX', origin: 'explicit' },
+          { property: 'paddingInline', value: '2px', origin: 'explicit' },
+        ],
+      });
+    });
+  });
+
   describe('refusals', () => {
     it('refuses values the grammar cannot parse', () => {
       const result = expandShorthand('margin', 'red green', {
