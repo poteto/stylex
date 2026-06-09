@@ -12,13 +12,26 @@ import { babel } from '@rollup/plugin-babel';
 
 const extensions = ['.js', '.jsx'];
 
+const external = [/@babel\/traverse/, /@babel\/types/, /@babel\/core/];
+
 const config = {
   input: './src/index.js',
   output: {
     file: './lib/index.js',
     format: 'cjs',
   },
-  external: [/@babel\/traverse/, /@babel\/types/, /@babel\/core/],
+  // The npm build keeps published dependencies external and bundles only
+  // the private style-value-parser workspace package (the babel-plugin
+  // convention); the haste build keeps bundling everything.
+  external: process.env['HASTE']
+    ? external
+    : [
+        ...external,
+        '@csstools/css-tokenizer',
+        '@stylexjs/shared',
+        'micromatch',
+        'postcss-value-parser',
+      ],
   plugins: [
     babel({ babelHelpers: 'bundled', extensions, include: ['./src/**/*'] }),
     nodeResolve({
