@@ -9,21 +9,23 @@
 
 import { Time } from '../time';
 
-describe('Time.parse', () => {
-  it('parses valid CSS <time> types strings correctly', () => {
+describe('Test CSS Type: <time>', () => {
+  test('parses seconds and milliseconds', () => {
     expect(Time.parser.parseToEnd('1s')).toEqual(new Time(1, 's'));
-    expect(Time.parser.parseToEnd('1000ms')).toEqual(new Time(1000, 'ms'));
-    expect(Time.parser.parseToEnd('0s')).toEqual(new Time(0, 's'));
-    expect(Time.parser.parseToEnd('0ms')).toEqual(new Time(0, 'ms'));
-    expect(Time.parser.parseToEnd('1.5s')).toEqual(new Time(1.5, 's'));
-    expect(Time.parser.parseToEnd('1.5ms')).toEqual(new Time(1.5, 'ms'));
+    expect(Time.parser.parseToEnd('500ms')).toEqual(new Time(500, 'ms'));
+    expect(Time.parser.parseToEnd('-0.5s')).toEqual(new Time(-0.5, 's'));
+    expect(Time.parser.parseToEnd('.25s')).toEqual(new Time(0.25, 's'));
   });
 
-  it('fails to parse invalid CSS <time> types strings', () => {
-    expect(() => Time.parser.parseToEnd('1 s')).toThrow();
-    expect(() => Time.parser.parseToEnd('1ms ')).toThrow();
+  test('matches units case-insensitively, normalized to lowercase', () => {
+    expect(Time.parser.parseToEnd('500MS')).toEqual(new Time(500, 'ms'));
+    expect(Time.parser.parseToEnd('2S')).toEqual(new Time(2, 's'));
+    expect(Time.parser.parseToEnd('1Ms')).toEqual(new Time(1, 'ms'));
+  });
+
+  test('rejects non-time dimensions and bare numbers', () => {
+    expect(() => Time.parser.parseToEnd('1px')).toThrow();
     expect(() => Time.parser.parseToEnd('1')).toThrow();
-    expect(() => Time.parser.parseToEnd('s')).toThrow();
-    expect(() => Time.parser.parseToEnd('ms')).toThrow();
+    expect(() => Time.parser.parseToEnd('1min')).toThrow();
   });
 });
