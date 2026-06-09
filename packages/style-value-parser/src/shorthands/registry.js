@@ -17,6 +17,7 @@ import {
   borderRightDef,
   borderTopDef,
 } from '../properties/border';
+import { animationDef } from '../properties/animation';
 import { backgroundDef } from '../properties/background';
 import { borderColorDef } from '../properties/border-color';
 import { borderRadiusDef } from '../properties/border-radius';
@@ -49,6 +50,7 @@ import { scrollPaddingDef } from '../properties/scroll-padding';
  * derives from this object at module init and is never synced by hand.
  */
 export const registry: Readonly<{ +[string]: ShorthandDef }> = Object.freeze({
+  animation: animationDef,
   background: backgroundDef,
   border: borderDef,
   borderBottom: borderBottomDef,
