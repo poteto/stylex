@@ -1,0 +1,93 @@
+/**
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @flow strict
+ */
+
+import type { ShorthandDef } from '../shorthands/define';
+
+import { TokenParser } from '../token-parser';
+import { varFunction } from '../shorthands/css-wide';
+import { corners } from '../shorthands/families/corners';
+
+type CornerShapeKeyword =
+  | 'round'
+  | 'scoop'
+  | 'bevel'
+  | 'notch'
+  | 'square'
+  | 'squircle';
+
+const cornerShapeKeyword: TokenParser<CornerShapeKeyword> =
+  TokenParser.tokens.Ident.map((token): string =>
+    token[4].value.toLowerCase(),
+  ).where<CornerShapeKeyword>(
+    (str): str is CornerShapeKeyword =>
+      str === 'round' ||
+      str === 'scoop' ||
+      str === 'bevel' ||
+      str === 'notch' ||
+      str === 'square' ||
+      str === 'squircle',
+  );
+
+/**
+ * superellipse(<number>): the only functional corner-shape value. The
+ * argument is a bare number (no unit); the slice is emitted verbatim, so
+ * the parsed value carries no payload.
+ */
+const superellipseFunction: TokenParser<void> = TokenParser.sequence(
+  TokenParser.tokens.Function.map((token): string =>
+    token[4].value.toLowerCase(),
+  ).where((name) => name === 'superellipse'),
+  TokenParser.tokens.Number.surroundedBy(
+    TokenParser.tokens.Whitespace.optional,
+  ),
+  TokenParser.tokens.CloseParen,
+).map(() => undefined);
+
+const cornerShapeComponent: TokenParser<unknown> = TokenParser.oneOf(
+  cornerShapeKeyword,
+  superellipseFunction,
+  varFunction,
+);
+
+/**
+ * corner-shape has no two-axis '/' form, hence no `slash` here.
+ *
+ * Key-list parity note: when minimal output cannot collapse, it emits the
+ * LOGICAL corner-*-shape keys in quad order -- exactly what
+ * splitShorthands.js emits for corner-shape. That table pairs the BR quad
+ * slot with cornerEndStartShape and the BL slot with cornerEndEndShape,
+ * which is the REVERSE of CORNER_SHAPE_MAP (and of this def's dialectMap,
+ * which follows it: bottom-left -> end-start under the LTR/horizontal-tb
+ * assumption). The disagreement is reproduced rather than resolved so the
+ * splitter swap stays byte-compatible; reconciling the two pairings is a
+ * deliberate follow-up.
+ */
+export const cornerShapeDef: ShorthandDef = corners({
+  canonical: 'corner-shape',
+  component: cornerShapeComponent,
+  corners: {
+    topLeft: 'cornerTopLeftShape',
+    topRight: 'cornerTopRightShape',
+    bottomRight: 'cornerBottomRightShape',
+    bottomLeft: 'cornerBottomLeftShape',
+  },
+  minimalCorners: {
+    topLeft: 'cornerStartStartShape',
+    topRight: 'cornerStartEndShape',
+    bottomRight: 'cornerEndStartShape',
+    bottomLeft: 'cornerEndEndShape',
+  },
+  dialectMap: {
+    cornerTopLeftShape: 'cornerStartStartShape',
+    cornerTopRightShape: 'cornerStartEndShape',
+    cornerBottomLeftShape: 'cornerEndStartShape',
+    cornerBottomRightShape: 'cornerEndEndShape',
+  },
+  acceptsNumber: false,
+});
