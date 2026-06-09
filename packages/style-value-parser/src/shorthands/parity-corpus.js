@@ -223,6 +223,14 @@ export const PARITY_CORPUS: ReadonlyArray<ParityCase> = [
   mdn('background', 'green'),
   mdn('background', 'no-repeat url("../../media/examples/lizard.png")'),
   mdn('background', 'left 5% / 15% 60% repeat-x url("star.png")'),
+  // comma-separated layers: symmetric authorship autofixes (joined
+  // lists), asymmetric authorship is spec-expandable only, and a color
+  // outside the final layer is invalid CSS
+  mdn('background', 'url(a.png) no-repeat, url(b.png) repeat-x'),
+  mdn('background', 'url(a.png), red url(b.png)'),
+  mdn('background', 'url(a.png), url(b.png), url(c.png)'),
+  mdn('background', 'url(a.png) no-repeat, lightblue center / contain'),
+  mdn('background', 'red, blue'),
 
   // font
   rule('font', 'italic small-caps bold 16px/1.5 "Helvetica Neue"'),
@@ -248,6 +256,13 @@ export const PARITY_CORPUS: ReadonlyArray<ParityCase> = [
   rule('animation', 'bounce 1s alternate-reverse'),
   mdn('animation', '3s linear 1s slidein'),
   mdn('animation', 'none'),
+  // comma-separated layers: symmetric authorship autofixes (joined
+  // lists); the MDN two-animation example is asymmetric (only the
+  // second layer has a delay) so it is spec-expandable only; glued
+  // commas count as one component, so minimal output no-ops on them
+  mdn('animation', 'spin 1s linear infinite, pulse 2s ease-in 3'),
+  mdn('animation', '3s linear slidein, 3s ease-out 5s slideout'),
+  mdn('animation', 'slidein,fadeout'),
 
   // flex
   rule('flex', 1),
