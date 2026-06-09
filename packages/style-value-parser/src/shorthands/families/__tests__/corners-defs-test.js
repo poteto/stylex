@@ -192,6 +192,58 @@ describe('corner-shape def', () => {
     });
 
     it.each([
+      'superellipse(infinity)',
+      'superellipse(-infinity)',
+      'superellipse(calc(0.5 * 4))',
+    ])("accepts the math-constant and calc argument '%s'", (value) => {
+      const result = run(`${value} round`, { output: 'minimal' });
+      expect(result.type).toEqual('ok');
+      if (result.type === 'ok') {
+        expect(result.assignments[0]).toEqual({
+          property: 'cornerTopLeftShape',
+          value,
+          origin: 'explicit',
+        });
+      }
+    });
+
+    it('expands four superellipse() corners, infinity included (WPT)', () => {
+      // WPT corner-shape-valid marks superellipse(infinity) a valid corner
+      // and Chromium accepts the four-corner form.
+      expect(
+        run(
+          'superellipse(0.5) superellipse(3) superellipse(1) superellipse(infinity)',
+          { output: 'spec' },
+        ),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'cornerTopLeftShape',
+            value: 'superellipse(0.5)',
+            origin: 'explicit',
+          },
+          {
+            property: 'cornerTopRightShape',
+            value: 'superellipse(3)',
+            origin: 'explicit',
+          },
+          {
+            property: 'cornerBottomRightShape',
+            value: 'superellipse(1)',
+            origin: 'explicit',
+          },
+          {
+            property: 'cornerBottomLeftShape',
+            value: 'superellipse(infinity)',
+            origin: 'explicit',
+          },
+        ],
+      });
+    });
+
+    it.each([
       ['superellipse(red) round', 'a non-numeric argument'],
       ['superellipse(1px) round', 'a dimension argument'],
       ['superellipse(1 round', 'unbalanced parentheses'],

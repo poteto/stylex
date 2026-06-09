@@ -10,8 +10,10 @@
 import type { ShorthandDef } from '../shorthands/define';
 
 import { TokenParser } from '../token-parser';
+import { mathFunction } from '../css-types/math-function';
 import { varFunction } from '../shorthands/css-wide';
 import { corners } from '../shorthands/families/corners';
+import { identKeyword } from '../shorthands/families/slots';
 
 type CornerShapeKeyword =
   | 'round'
@@ -36,16 +38,22 @@ const cornerShapeKeyword: TokenParser<CornerShapeKeyword> =
 
 /**
  * superellipse(<number>): the only functional corner-shape value. The
- * argument is a bare number (no unit); the slice is emitted verbatim, so
- * the parsed value carries no payload.
+ * argument is a <number>, which per CSS Values is a bare number, a math
+ * function (calc and friends), or the math-constant keywords `infinity`
+ * / `-infinity` that the WPT suite and Chromium accept here. The slice
+ * is emitted verbatim, so the parsed value carries no payload.
  */
+const superellipseArgument: TokenParser<unknown> = TokenParser.oneOf(
+  TokenParser.tokens.Number,
+  identKeyword(['infinity', '-infinity']),
+  mathFunction,
+);
+
 const superellipseFunction: TokenParser<void> = TokenParser.sequence(
   TokenParser.tokens.Function.map((token): string =>
     token[4].value.toLowerCase(),
   ).where((name) => name === 'superellipse'),
-  TokenParser.tokens.Number.surroundedBy(
-    TokenParser.tokens.Whitespace.optional,
-  ),
+  superellipseArgument.surroundedBy(TokenParser.tokens.Whitespace.optional),
   TokenParser.tokens.CloseParen,
 ).map(() => undefined);
 
