@@ -30,7 +30,6 @@ const config = {
         '@csstools/css-tokenizer',
         '@stylexjs/shared',
         'micromatch',
-        'postcss-value-parser',
       ],
   plugins: [
     babel({ babelHelpers: 'bundled', extensions, include: ['./src/**/*'] }),
