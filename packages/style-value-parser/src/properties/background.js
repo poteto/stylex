@@ -75,6 +75,16 @@ const repeatComponent: TokenParser<string> = identKeyword([
   'round',
 ]);
 
+// Two-value repeat forms draw only from this subset per the grammar
+// `repeat-x | repeat-y | [ repeat | space | round | no-repeat ]{1,2}`;
+// repeat-x and repeat-y are single-only.
+const repeatPairComponent: TokenParser<string> = identKeyword([
+  'repeat',
+  'no-repeat',
+  'space',
+  'round',
+]);
+
 const attachmentComponent: TokenParser<string> = identKeyword([
   'scroll',
   'fixed',
@@ -108,6 +118,7 @@ const boxComponent: TokenParser<string> = identKeyword([
 
 const sourcedImage = TokenParser.sourced(imageComponent);
 const sourcedRepeat = TokenParser.sourced(repeatComponent);
+const sourcedRepeatPair = TokenParser.sourced(repeatPairComponent);
 const sourcedAttachment = TokenParser.sourced(attachmentComponent);
 const sourcedColor = TokenParser.sourced(colorSlot);
 const sourcedPosition = TokenParser.sourced(positionComponent);
@@ -215,6 +226,19 @@ const parseLayer = (
       const match = matchRange(SINGLE_SLOT_PARSERS[slot], component);
       if (match != null) {
         filled[slot] = match.raw;
+        // <repeat-style> admits a second adjacent keyword (position-pair
+        // precedent); repeat-x/repeat-y fail the pair parser and stay single.
+        if (
+          slot === 'repeat' &&
+          matchRange(sourcedRepeatPair, component) != null &&
+          index + 1 < components.length
+        ) {
+          const second = matchRange(sourcedRepeatPair, components[index + 1]);
+          if (second != null) {
+            filled.repeat = `${match.raw} ${second.raw}`;
+            index += 1;
+          }
+        }
         matched = true;
         break;
       }

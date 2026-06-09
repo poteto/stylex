@@ -684,6 +684,60 @@ describe('background def', () => {
     });
   });
 
+  describe('two-value repeat', () => {
+    it('accepts a two-keyword repeat pair as one backgroundRepeat value', () => {
+      const result = run('url(a.png) space round', { output: 'spec' });
+      expect(result.type).toEqual('ok');
+      if (result.type === 'ok') {
+        expect(
+          result.assignments.find((a) => a.property === 'backgroundRepeat'),
+        ).toEqual({
+          property: 'backgroundRepeat',
+          value: 'space round',
+          origin: 'explicit',
+        });
+      }
+    });
+
+    it('emits only the pair in minimal output', () => {
+      expect(run('space round', { output: 'minimal' })).toEqual({
+        type: 'ok',
+        assignments: [
+          {
+            property: 'backgroundRepeat',
+            value: 'space round',
+            origin: 'explicit',
+          },
+        ],
+        important: false,
+      });
+    });
+
+    it('keeps repeat-x and repeat-y single-only', () => {
+      for (const value of ['repeat-x repeat', 'space repeat-y']) {
+        const result = run(value, { output: 'spec' });
+        expect(result.type).toEqual('cannot-expand');
+        if (result.type === 'cannot-expand') {
+          expect(result.reason.kind).toEqual('parse-error');
+        }
+      }
+    });
+
+    it('routes the full WPT layer with box keywords to the typed refusal', () => {
+      const result = run(
+        'url("https://example.com/") 1px 2px / 3px 4px space round local padding-box content-box',
+        { output: 'spec' },
+      );
+      expect(result).toEqual({
+        type: 'cannot-expand',
+        reason: {
+          kind: 'unsupported-feature',
+          feature: 'background-box-values',
+        },
+      });
+    });
+  });
+
   describe('box keywords', () => {
     it('refuses origin/clip box keywords as a typed unsupported-feature', () => {
       for (const value of [
