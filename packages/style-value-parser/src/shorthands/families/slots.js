@@ -126,6 +126,57 @@ export function splitOnSlashes(
 }
 
 /**
+ * The walk's span split into comma-separated layer groups (background,
+ * animation). Top-level commas partition the TOKEN span -- a glued comma
+ * ('url(a),url(b)') sits inside a single component run, so this is not a
+ * partition of `walk.components` -- and each group's component ranges
+ * are computed over its own slice, shifted back to walk-relative
+ * positions so matchRange/sliceOf/isSlash work unchanged. Commas nested
+ * in functions or brackets are inert (the same depth rules
+ * splitTopLevelComponents uses). Empty groups (leading, trailing, or
+ * doubled commas) are preserved so grammars can refuse them. A commaless
+ * walk is one group.
+ */
+export function splitOnCommas(
+  walk: ComponentWalk,
+): ReadonlyArray<ReadonlyArray<ComponentRange>> {
+  const { tokens } = walk;
+  const groups: Array<ReadonlyArray<ComponentRange>> = [];
+  let groupStart = 0;
+  let depth = 0;
+  const endGroup = (end: number): void => {
+    groups.push(
+      splitTopLevelComponents(tokens.slice(groupStart, end)).map((range) => ({
+        start: range.start + groupStart,
+        end: range.end + groupStart,
+      })),
+    );
+  };
+  for (let index = 0; index < tokens.length; index++) {
+    const type = tokens[index][0];
+    if (depth === 0 && type === TokenType.Comma) {
+      endGroup(index);
+      groupStart = index + 1;
+    } else if (
+      type === TokenType.Function ||
+      type === TokenType.OpenParen ||
+      type === TokenType.OpenSquare ||
+      type === TokenType.OpenCurly
+    ) {
+      depth++;
+    } else if (
+      type === TokenType.CloseParen ||
+      type === TokenType.CloseSquare ||
+      type === TokenType.CloseCurly
+    ) {
+      depth = Math.max(0, depth - 1);
+    }
+  }
+  endGroup(tokens.length);
+  return groups;
+}
+
+/**
  * One keyword out of `keywords`, ASCII case-insensitive. The parsed value
  * is the lowercased keyword for grammar-level decisions; emitted slices
  * stay verbatim (via TokenParser.sourced).

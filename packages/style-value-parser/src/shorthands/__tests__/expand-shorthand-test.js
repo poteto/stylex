@@ -1446,19 +1446,72 @@ describe('expandShorthand', () => {
       });
     });
 
-    it('refuses comma-separated layers as multiple-layers', () => {
+    it('expands comma-separated layers per output mode', () => {
       expect(
         expandShorthand('background', 'url(a), url(b)', { output: 'minimal' }),
       ).toEqual({
-        type: 'cannot-expand',
-        reason: { kind: 'multiple-layers' },
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'backgroundImage',
+            value: 'url(a), url(b)',
+            origin: 'explicit',
+          },
+        ],
       });
       expect(
         expandShorthand('background', 'url(a), url(b)', { output: 'spec' }),
       ).toEqual({
-        type: 'cannot-expand',
-        reason: { kind: 'multiple-layers' },
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'backgroundColor',
+            value: 'transparent',
+            origin: 'defaulted',
+          },
+          {
+            property: 'backgroundImage',
+            value: 'url(a), url(b)',
+            origin: 'explicit',
+          },
+          {
+            property: 'backgroundRepeat',
+            value: 'repeat, repeat',
+            origin: 'defaulted',
+          },
+          {
+            property: 'backgroundAttachment',
+            value: 'scroll, scroll',
+            origin: 'defaulted',
+          },
+          {
+            property: 'backgroundPosition',
+            value: '0% 0%, 0% 0%',
+            origin: 'defaulted',
+          },
+          {
+            property: 'backgroundSize',
+            value: 'auto, auto',
+            origin: 'defaulted',
+          },
+        ],
       });
+    });
+
+    it('refuses asymmetric layers in minimal output only', () => {
+      const value =
+        'no-repeat center/cover, linear-gradient(to right, #ff7e5f, #feb47b)';
+      expect(
+        expandShorthand('background', value, { output: 'minimal' }),
+      ).toEqual({
+        type: 'cannot-expand',
+        reason: { kind: 'unsupported-feature', feature: 'asymmetric-layers' },
+      });
+      expect(
+        expandShorthand('background', value, { output: 'spec' }).type,
+      ).toEqual('ok');
     });
 
     it('refuses box keywords as unsupported-feature', () => {

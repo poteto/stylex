@@ -449,21 +449,232 @@ describe('background def', () => {
   });
 
   describe('multiple layers', () => {
-    it('refuses top-level commas as multiple-layers', () => {
-      for (const value of [
-        'url(a.png), url(b.png)',
-        'url(a.png),url(b.png)',
-        'red, blue',
-      ]) {
-        expect(run(value, { output: 'spec' })).toEqual({
-          type: 'cannot-expand',
-          reason: { kind: 'multiple-layers' },
-        });
-        expect(run(value, { output: 'minimal' })).toEqual({
-          type: 'cannot-expand',
-          reason: { kind: 'multiple-layers' },
+    it('comma-joins every longhand across two layers in spec output', () => {
+      expect(
+        run('url(a.png) no-repeat, url(b.png) repeat-x', { output: 'spec' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'backgroundColor',
+            value: 'transparent',
+            origin: 'defaulted',
+          },
+          {
+            property: 'backgroundImage',
+            value: 'url(a.png), url(b.png)',
+            origin: 'explicit',
+          },
+          {
+            property: 'backgroundRepeat',
+            value: 'no-repeat, repeat-x',
+            origin: 'explicit',
+          },
+          {
+            property: 'backgroundAttachment',
+            value: 'scroll, scroll',
+            origin: 'defaulted',
+          },
+          {
+            property: 'backgroundPosition',
+            value: '0% 0%, 0% 0%',
+            origin: 'defaulted',
+          },
+          {
+            property: 'backgroundSize',
+            value: 'auto, auto',
+            origin: 'defaulted',
+          },
+        ],
+      });
+    });
+
+    it('emits symmetric authored slots joined verbatim in minimal output', () => {
+      expect(
+        run('url(a.png) no-repeat, url(b.png) repeat-x', {
+          output: 'minimal',
+        }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'backgroundImage',
+            value: 'url(a.png), url(b.png)',
+            origin: 'explicit',
+          },
+          {
+            property: 'backgroundRepeat',
+            value: 'no-repeat, repeat-x',
+            origin: 'explicit',
+          },
+        ],
+      });
+    });
+
+    it('splits layers on glued commas (no whitespace)', () => {
+      expect(run('url(a.png),url(b.png)', { output: 'minimal' })).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'backgroundImage',
+            value: 'url(a.png), url(b.png)',
+            origin: 'explicit',
+          },
+        ],
+      });
+    });
+
+    it('handles per-layer position/size slashes', () => {
+      expect(
+        run('center / cover, left top / 50% auto', { output: 'minimal' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'backgroundPosition',
+            value: 'center, left top',
+            origin: 'explicit',
+          },
+          {
+            property: 'backgroundSize',
+            value: 'cover, 50% auto',
+            origin: 'explicit',
+          },
+        ],
+      });
+    });
+
+    it('expands three layers in authored order', () => {
+      expect(
+        run('url(a.png), url(b.png), url(c.png)', { output: 'minimal' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'backgroundImage',
+            value: 'url(a.png), url(b.png), url(c.png)',
+            origin: 'explicit',
+          },
+        ],
+      });
+      const spec = run('url(a.png), url(b.png), url(c.png)', {
+        output: 'spec',
+      });
+      expect(spec.type).toEqual('ok');
+      if (spec.type === 'ok') {
+        expect(spec.assignments[2]).toEqual({
+          property: 'backgroundRepeat',
+          value: 'repeat, repeat, repeat',
+          origin: 'defaulted',
         });
       }
+    });
+
+    it('refuses asymmetric authorship in minimal output only', () => {
+      const value = 'url(a.png) no-repeat, url(b.png)';
+      expect(run(value, { output: 'minimal' })).toEqual({
+        type: 'cannot-expand',
+        reason: { kind: 'unsupported-feature', feature: 'asymmetric-layers' },
+      });
+      expect(run(value, { output: 'spec' })).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'backgroundColor',
+            value: 'transparent',
+            origin: 'defaulted',
+          },
+          {
+            property: 'backgroundImage',
+            value: 'url(a.png), url(b.png)',
+            origin: 'explicit',
+          },
+          {
+            property: 'backgroundRepeat',
+            value: 'no-repeat, repeat',
+            origin: 'explicit',
+          },
+          {
+            property: 'backgroundAttachment',
+            value: 'scroll, scroll',
+            origin: 'defaulted',
+          },
+          {
+            property: 'backgroundPosition',
+            value: '0% 0%, 0% 0%',
+            origin: 'defaulted',
+          },
+          {
+            property: 'backgroundSize',
+            value: 'auto, auto',
+            origin: 'defaulted',
+          },
+        ],
+      });
+    });
+
+    it('takes the color from the final layer as a single un-joined value', () => {
+      expect(run('url(a.png), red url(b.png)', { output: 'minimal' })).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'backgroundColor', value: 'red', origin: 'explicit' },
+          {
+            property: 'backgroundImage',
+            value: 'url(a.png), url(b.png)',
+            origin: 'explicit',
+          },
+        ],
+      });
+      const spec = run('url(a.png), red url(b.png)', { output: 'spec' });
+      expect(spec.type).toEqual('ok');
+      if (spec.type === 'ok') {
+        expect(spec.assignments[0]).toEqual({
+          property: 'backgroundColor',
+          value: 'red',
+          origin: 'explicit',
+        });
+      }
+    });
+
+    it('refuses a color outside the final layer in both modes', () => {
+      for (const value of ['red url(a.png), url(b.png)', 'red, blue']) {
+        expectParseError(run(value, { output: 'spec' }), /final layer/);
+        expectParseError(run(value, { output: 'minimal' }), /final layer/);
+      }
+    });
+
+    it('refuses empty layers (leading, trailing, doubled commas)', () => {
+      for (const value of [
+        ', url(a.png)',
+        'url(a.png),',
+        'url(a.png), , url(b.png)',
+      ]) {
+        expectParseError(run(value, { output: 'spec' }), /Empty background/);
+      }
+    });
+
+    it('refuses box keywords in any layer', () => {
+      expect(run('url(a.png), content-box red', { output: 'spec' })).toEqual({
+        type: 'cannot-expand',
+        reason: {
+          kind: 'unsupported-feature',
+          feature: 'background-box-values',
+        },
+      });
+    });
+
+    it('reports per-layer slot errors', () => {
+      expectParseError(
+        run('url(a.png) url(b.png), url(c.png)', { output: 'spec' }),
+        /Duplicate image/,
+      );
     });
 
     it('keeps function-nested commas inert', () => {

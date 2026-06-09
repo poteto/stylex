@@ -91,9 +91,12 @@ export function defineShorthand<T, K: string>(
      * engine cannot expand (font's system keywords, background's box
      * keywords). Checked after a successful parse and before any
      * expansion; a non-null feature name becomes a cannot-expand result
-     * with reason unsupported-feature.
+     * with reason unsupported-feature. Receives the EmitOptions so a def
+     * can refuse per output mode (background/animation accept asymmetric
+     * comma layers in spec output but refuse them in minimal output,
+     * where an autofix would have to invent unauthored defaults).
      */
-    unsupported?: (parsed: T) => ?string,
+    unsupported?: (parsed: T, options: EmitOptions) => ?string,
     /**
      * Typed refusal for comma-separated layer lists (background,
      * animation): the grammar tags the multi-layer form on a per-def
@@ -172,7 +175,7 @@ export function defineShorthand<T, K: string>(
       };
     }
 
-    const feature = unsupported != null ? unsupported(parsed) : null;
+    const feature = unsupported != null ? unsupported(parsed, options) : null;
     if (feature != null) {
       return {
         type: 'cannot-expand',
