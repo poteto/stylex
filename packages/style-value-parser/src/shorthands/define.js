@@ -1,0 +1,165 @@
+/**
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @flow strict
+ */
+
+import type { TokenParser } from '../token-parser';
+import type { TokenList } from '../token-types';
+import type { Cell, Declaration, EmitOptions, ExpandResult } from './types';
+
+import { TokenType } from '@csstools/css-tokenizer';
+
+export function camelize(cssName: string): string {
+  return cssName.replace(/-([a-z])/g, (_, letter: string) =>
+    letter.toUpperCase(),
+  );
+}
+
+/**
+ * Monomorphic registry entry. The grammar's value type T is hidden: `run`
+ * closes over parse+expand+condense, so a def's pieces can never be
+ * mismatched and the registry needs no generics.
+ */
+export type ShorthandDef = Readonly<{
+  /** Canonical CSS name, kebab-case: 'border-top'. */
+  canonical: string,
+  /** Primary stylex key, camelCase: 'borderTop' (derived from canonical). */
+  key: string,
+  /** Extra accepted keys mapping to this def: e.g. 'gridGap' on gap. */
+  aliases: ReadonlyArray<string>,
+  /** Spec-ordered longhand stylex keys. THE list; everything else derives. */
+  longhands: ReadonlyArray<string>,
+  /**
+   * Physical-to-logical key table applied at the boundary when the caller
+   * asks for `preferInline`. Registry data, not family logic, because the
+   * key naming is not uniform across shorthands (marginLeft vs
+   * borderLeftWidth).
+   */
+  dialectMap: Readonly<{ +[string]: string }>,
+  /**
+   * Parse (already-tokenized, !important/css-wide/var pre-passes done) and
+   * emit declarations per EmitOptions. Implements:
+   *   spec    -> expand(T): every longhand, in `longhands` order
+   *   minimal -> condense(T) if provided, else origin-filter of expand(T)
+   * `important` is always false here; the boundary owns !important.
+   */
+  run: (tokens: TokenList, options: EmitOptions) => ExpandResult,
+  /**
+   * Numeric fast path: a number is single-component by construction, so
+   * minimal output is always a no-op and spec output fans the number out
+   * with numeric identity preserved. Null when the shorthand has no
+   * meaningful single-number form.
+   */
+  runNumber: ?(value: number, options: EmitOptions) => ExpandResult,
+}>;
+
+/**
+ * Builds a ShorthandDef from typed pieces.
+ *
+ * Exhaustiveness: K is the union of the literal strings in `longhands`;
+ * the mapped return type of `expand` forces a Cell for EVERY longhand --
+ * forgetting one is a Flow error at the def site, not a runtime surprise.
+ * (Family factories that compute keys at runtime infer K = string and give
+ * up that check; defs written with literal keys keep it.)
+ *
+ * `parse` is evaluated ONCE at module load and held -- unlike the
+ * `static get parse` idiom which rebuilds the combinator graph per access.
+ */
+export function defineShorthand<T, K: string>(
+  config: Readonly<{
+    canonical: string,
+    longhands: ReadonlyArray<K>,
+    aliases?: ReadonlyArray<string>,
+    dialectMap?: Readonly<{ +[string]: string }>,
+    parse: TokenParser<T>,
+    expand: (parsed: T) => Readonly<{ [_k in K]: Cell }>,
+    /**
+     * Optional minimal-output override where the smallest representation
+     * uses intermediate stylex keys the plain origin-filter cannot produce
+     * (marginBlock/marginInline pairing; grid-area's single custom-ident).
+     * Returning null signals that expansion would be identity (no-op).
+     */
+    condense?: (parsed: T, options: EmitOptions) => ?ReadonlyArray<Declaration>,
+    /** Spec-output cells for a single numeric component. */
+    expandNumber?: (value: number) => Readonly<{ [_k in K]: Cell }>,
+  }>,
+): ShorthandDef {
+  const { canonical, longhands, parse, expand, condense, expandNumber } =
+    config;
+
+  const project = (
+    cells: Readonly<{ [_k in K]: Cell }>,
+  ): ReadonlyArray<Declaration> =>
+    longhands.map((property) => {
+      const cell = cells[property];
+      return { property, value: cell.raw, origin: cell.origin };
+    });
+
+  const run = (tokens: TokenList, options: EmitOptions): ExpandResult => {
+    const parsed = parse.run(tokens);
+    if (parsed instanceof Error) {
+      return {
+        type: 'cannot-expand',
+        reason: { kind: 'parse-error', message: parsed.message },
+      };
+    }
+    let trailing = tokens.peek();
+    while (trailing != null && trailing[0] === TokenType.Whitespace) {
+      tokens.consumeNextToken();
+      trailing = tokens.peek();
+    }
+    if (trailing != null && trailing[0] !== TokenType.EOF) {
+      return {
+        type: 'cannot-expand',
+        reason: {
+          kind: 'parse-error',
+          message: `Unexpected trailing input: ${trailing[1]}`,
+        },
+      };
+    }
+
+    if (options.output === 'spec') {
+      return {
+        type: 'ok',
+        assignments: project(expand(parsed)),
+        important: false,
+      };
+    }
+    const assignments =
+      condense != null
+        ? condense(parsed, options)
+        : project(expand(parsed)).filter((d) => d.origin !== 'defaulted');
+    if (assignments == null) {
+      return { type: 'no-op' };
+    }
+    return { type: 'ok', assignments, important: false };
+  };
+
+  const runNumber =
+    expandNumber == null
+      ? null
+      : (value: number, options: EmitOptions): ExpandResult => {
+          if (options.output === 'minimal') {
+            return { type: 'no-op' };
+          }
+          return {
+            type: 'ok',
+            assignments: project(expandNumber(value)),
+            important: false,
+          };
+        };
+
+  return {
+    canonical,
+    key: camelize(canonical),
+    aliases: config.aliases ?? [],
+    longhands,
+    dialectMap: config.dialectMap ?? {},
+    run,
+    runNumber,
+  };
+}
