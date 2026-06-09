@@ -427,6 +427,61 @@ describe('expandShorthand', () => {
         ],
       });
     });
+
+    it('accepts min/max/clamp as length-ish components', () => {
+      expect(
+        expandShorthand('margin', 'min(1px, 2vw) 2px', { output: 'minimal' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'marginBlock',
+            value: 'min(1px, 2vw)',
+            origin: 'explicit',
+          },
+          { property: 'marginInline', value: '2px', origin: 'explicit' },
+        ],
+      });
+      expect(
+        expandShorthand('border', 'clamp(1px,2px,3px) solid', {
+          output: 'minimal',
+        }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'borderWidth',
+            value: 'clamp(1px,2px,3px)',
+            origin: 'explicit',
+          },
+          { property: 'borderStyle', value: 'solid', origin: 'explicit' },
+        ],
+      });
+    });
+
+    it('accepts a var() nested inside a math function', () => {
+      // The nested var() is invisible to splitting AND to the boundary's
+      // contains-variable reclassification (hasTopLevelVar only looks at
+      // depth 0): the math function is one opaque length-ish component.
+      expect(
+        expandShorthand('margin', 'min(var(--a), 2px) 1px', {
+          output: 'minimal',
+        }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'marginBlock',
+            value: 'min(var(--a), 2px)',
+            origin: 'explicit',
+          },
+          { property: 'marginInline', value: '1px', origin: 'explicit' },
+        ],
+      });
+    });
   });
 
   describe('verbatim value preservation', () => {

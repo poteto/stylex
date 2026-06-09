@@ -10,10 +10,10 @@
 import type { ShorthandDef } from '../shorthands/define';
 
 import { TokenParser } from '../token-parser';
-import { Calc } from '../css-types/calc';
 import { Color } from '../css-types/color';
 import { lineStyle } from '../css-types/line-style';
 import { lineWidth } from '../css-types/line-width';
+import { mathFunction } from '../css-types/math-function';
 import { lineTrio } from '../shorthands/families/line-trio';
 
 /**
@@ -34,7 +34,7 @@ const currentColorKeyword: TokenParser<'currentcolor'> =
 // outline-width and outline-color embed the same productions.
 export const lineWidthSlot: TokenParser<unknown> = TokenParser.oneOf(
   lineWidth,
-  Calc.parser,
+  mathFunction,
 );
 export const colorSlot: TokenParser<unknown> = TokenParser.oneOf(
   Color.parser,
