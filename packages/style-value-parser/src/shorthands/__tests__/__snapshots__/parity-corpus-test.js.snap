@@ -304,6 +304,8 @@ font: "small-caps bold 24px/1 sans-serif" <mdn> minimal -> ok fontVariant="small
 font: "small-caps bold 24px/1 sans-serif" <mdn> spec -> ok fontStyle="normal"(d) fontVariant="small-caps"(e) fontWeight="bold"(e) fontSize="24px"(e) lineHeight="1"(e) fontFamily="sans-serif"(e)
 font: "oblique 45deg 12px serif" <mdn> minimal -> ok fontStyle="oblique 45deg"(e) fontSize="12px"(e) fontFamily="serif"(e)
 font: "oblique 45deg 12px serif" <mdn> spec -> ok fontStyle="oblique 45deg"(e) fontVariant="normal"(d) fontWeight="normal"(d) fontSize="12px"(e) lineHeight="normal"(d) fontFamily="serif"(e)
+font: "oblique 45DEG 12px serif" <mdn> minimal -> ok fontStyle="oblique 45DEG"(e) fontSize="12px"(e) fontFamily="serif"(e)
+font: "oblique 45DEG 12px serif" <mdn> spec -> ok fontStyle="oblique 45DEG"(e) fontVariant="normal"(d) fontWeight="normal"(d) fontSize="12px"(e) lineHeight="normal"(d) fontFamily="serif"(e)
 font: "caption" <mdn> minimal -> no-op
 font: "caption" <mdn> spec -> cannot-expand:unsupported-feature (system-font)
 animation: "slidein 3s" <rule-fixture> minimal -> ok animationDuration="3s"(e) animationName="slidein"(e)

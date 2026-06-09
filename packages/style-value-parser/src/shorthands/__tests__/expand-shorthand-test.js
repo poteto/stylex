@@ -1340,6 +1340,26 @@ describe('expandShorthand', () => {
       });
     });
 
+    it('matches the oblique angle unit case-insensitively, slices verbatim', () => {
+      expect(
+        expandShorthand('font', 'oblique 45DEG 12px serif', {
+          output: 'minimal',
+        }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'fontStyle',
+            value: 'oblique 45DEG',
+            origin: 'explicit',
+          },
+          { property: 'fontSize', value: '12px', origin: 'explicit' },
+          { property: 'fontFamily', value: 'serif', origin: 'explicit' },
+        ],
+      });
+    });
+
     it('splits a mid-run slash into size and line-height', () => {
       expect(
         expandShorthand('font', '12px/1.5 serif', { output: 'minimal' }),

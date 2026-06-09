@@ -7,8 +7,6 @@
  * @flow strict
  */
 
-import type { TokenDimension } from '@csstools/css-tokenizer';
-
 import { TokenParser } from '../token-parser';
 
 export class Angle {
@@ -22,15 +20,22 @@ export class Angle {
     return `${this.value}${this.unit}`;
   }
   static get parser(): TokenParser<Angle> {
-    const withUnit = TokenParser.tokens.Dimension.map((v) => v[4])
+    // CSS unit matching is ASCII case-insensitive ('45DEG' is '45deg');
+    // the stored unit is normalized to lowercase so toString is
+    // canonical (the Length/Time precedent).
+    const withUnit = TokenParser.tokens.Dimension.map(
+      (v): $ReadOnly<[number, string]> => [v[4].value, v[4].unit.toLowerCase()],
+    )
       .where(
-        (v: TokenDimension[4]): implies v is TokenDimension[4] =>
-          v.unit === 'deg' ||
-          v.unit === 'grad' ||
-          v.unit === 'rad' ||
-          v.unit === 'turn',
+        (
+          tuple: $ReadOnly<[number, string]>,
+        ): implies tuple is $ReadOnly<[number, string]> =>
+          tuple[1] === 'deg' ||
+          tuple[1] === 'grad' ||
+          tuple[1] === 'rad' ||
+          tuple[1] === 'turn',
       )
-      .map((v) => new Angle(v.value, v.unit));
+      .map(([value, unit]) => new Angle(value, unit));
 
     return TokenParser.oneOf(
       withUnit,

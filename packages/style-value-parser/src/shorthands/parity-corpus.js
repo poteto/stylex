@@ -230,6 +230,7 @@ export const PARITY_CORPUS: ReadonlyArray<ParityCase> = [
   mdn('font', 'italic bold 12px/30px Georgia, serif'),
   mdn('font', 'small-caps bold 24px/1 sans-serif'),
   mdn('font', 'oblique 45deg 12px serif'),
+  mdn('font', 'oblique 45DEG 12px serif'),
   mdn('font', 'caption'),
 
   // animation

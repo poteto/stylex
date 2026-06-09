@@ -22,6 +22,14 @@ describe('Test CSS Type: <angle>', () => {
     expect(Angle.parser.parse('100grad')).toEqual(new Angle(100, 'grad'));
     expect(Angle.parser.parse('1.5deg')).toEqual(new Angle(1.5, 'deg'));
   });
+  test('matches units ASCII case-insensitively, storing lowercase', () => {
+    // The Length/Time precedent: the stored unit is normalized to
+    // lowercase so toString stays canonical.
+    expect(Angle.parser.parse('45DEG')).toEqual(new Angle(45, 'deg'));
+    expect(Angle.parser.parse('0.5Turn')).toEqual(new Angle(0.5, 'turn'));
+    expect(Angle.parser.parse('2RAD')).toEqual(new Angle(2, 'rad'));
+    expect(Angle.parser.parse('100GRad')).toEqual(new Angle(100, 'grad'));
+  });
   describe('Rejects', () => {
     test('rejects invalid angle values', () => {
       expect(() => Angle.parser.parseToEnd('invalid')).toThrow();
