@@ -34,7 +34,8 @@ export class Color {
  * The <color-function> NAMES, for callers that classify a function as
  * color-valued by name alone (shorthand slot disambiguation) without
  * requiring the typed parsers above to model every argument syntax.
- * Spec color functions only -- a name here must never be valid in a
+ * Spec color functions only (CSS Color 4's absolute forms plus Color 5's
+ * color-mix()/light-dark()) -- a name here must never be valid in a
  * non-color slot.
  */
 export const colorFunctionNames: ReadonlyArray<string> = [
@@ -48,6 +49,8 @@ export const colorFunctionNames: ReadonlyArray<string> = [
   'oklab',
   'oklch',
   'color',
+  'color-mix',
+  'light-dark',
 ];
 
 export class NamedColor extends Color {
@@ -62,7 +65,8 @@ export class NamedColor extends Color {
   // Keyword matching is ASCII case-insensitive like every CSS identifier;
   // the parsed value is normalized to lowercase (the lineWidth/lineStyle/
   // Length precedent). The list also carries the non-<named-color> keywords
-  // 'transparent' and 'currentcolor', which parse identically.
+  // 'transparent' and 'currentcolor' and the CSS Color 4 <system-color>
+  // keywords, which all parse identically.
   static parser: TokenParser<NamedColor> = TokenParser.tokens.Ident.map(
     (token) => token[4].value.toLowerCase(),
   )
@@ -218,6 +222,26 @@ export class NamedColor extends Color {
         'whitesmoke',
         'yellow',
         'yellowgreen',
+        // CSS Color 4 <system-color> keywords.
+        'accentcolor',
+        'accentcolortext',
+        'activetext',
+        'buttonborder',
+        'buttonface',
+        'buttontext',
+        'canvas',
+        'canvastext',
+        'field',
+        'fieldtext',
+        'graytext',
+        'highlight',
+        'highlighttext',
+        'linktext',
+        'mark',
+        'marktext',
+        'selecteditem',
+        'selecteditemtext',
+        'visitedtext',
       ].includes(str),
     )
     .map((value) => new NamedColor(value));

@@ -184,7 +184,7 @@ borderColor: "hsb(220 3% 15% / 10%)" <rule-fixture> spec -> cannot-expand:parse-
 - Error: Never
 - Error: Never
 - Error: Never
-- Error: Expected a Function<rgb|rgba|hsl|hsla|hwb|lab|lch|oklab|oklch|color>, got hsb()
+- Error: Expected a Function<rgb|rgba|hsl|hsla|hwb|lab|lch|oklab|oklch|color|color-mix|light-dark>, got hsb()
 - Error: Expected var())
 borderColor: "oklch(0.7 0.15 180 / 0.8)" <rule-fixture> minimal -> no-op
 borderColor: "oklch(0.7 0.15 180 / 0.8)" <rule-fixture> spec -> ok borderTopColor="oklch(0.7 0.15 180 / 0.8)"(e) borderRightColor="oklch(0.7 0.15 180 / 0.8)"(r) borderBottomColor="oklch(0.7 0.15 180 / 0.8)"(r) borderLeftColor="oklch(0.7 0.15 180 / 0.8)"(r)
@@ -206,6 +206,10 @@ borderWidth: "medium" <mdn> minimal -> no-op
 borderWidth: "medium" <mdn> spec -> ok borderTopWidth="medium"(e) borderRightWidth="medium"(r) borderBottomWidth="medium"(r) borderLeftWidth="medium"(r)
 borderStyle: "none" <mdn> minimal -> no-op
 borderStyle: "none" <mdn> spec -> ok borderTopStyle="none"(e) borderRightStyle="none"(r) borderBottomStyle="none"(r) borderLeftStyle="none"(r)
+borderColor: "Canvas CanvasText" <mdn> minimal -> ok borderBlockColor="Canvas"(e) borderInlineColor="CanvasText"(e)
+borderColor: "Canvas CanvasText" <mdn> spec -> ok borderTopColor="Canvas"(e) borderRightColor="CanvasText"(e) borderBottomColor="Canvas"(r) borderLeftColor="CanvasText"(r)
+borderColor: "light-dark(#333, #ccc)" <mdn> minimal -> no-op
+borderColor: "light-dark(#333, #ccc)" <mdn> spec -> ok borderTopColor="light-dark(#333, #ccc)"(e) borderRightColor="light-dark(#333, #ccc)"(r) borderBottomColor="light-dark(#333, #ccc)"(r) borderLeftColor="light-dark(#333, #ccc)"(r)
 border: "none" <rule-fixture> minimal -> no-op
 border: "none" <rule-fixture> spec -> ok borderWidth="medium"(d) borderStyle="none"(e) borderColor="currentcolor"(d)
 border: "solid" <rule-fixture> minimal -> no-op
@@ -240,10 +244,14 @@ border: "1px solid var(--c)" <mdn> minimal -> ok borderWidth="1px"(e) borderStyl
 border: "1px solid var(--c)" <mdn> spec -> ok borderWidth="1px"(e) borderStyle="solid"(e) borderColor="var(--c)"(e)
 border: "var(--a) var(--b) solid" <mdn> minimal -> cannot-expand:contains-variable
 border: "var(--a) var(--b) solid" <mdn> spec -> cannot-expand:contains-variable
+border: "1px solid color-mix(in srgb, red 40%, blue)" <mdn> minimal -> ok borderWidth="1px"(e) borderStyle="solid"(e) borderColor="color-mix(in srgb, red 40%, blue)"(e)
+border: "1px solid color-mix(in srgb, red 40%, blue)" <mdn> spec -> ok borderWidth="1px"(e) borderStyle="solid"(e) borderColor="color-mix(in srgb, red 40%, blue)"(e)
 outline: "dashed" <mdn> minimal -> no-op
 outline: "dashed" <mdn> spec -> ok outlineWidth="medium"(d) outlineStyle="dashed"(e) outlineColor="auto"(d)
 outline: "1px solid var(--focus-ring)" <mdn> minimal -> ok outlineWidth="1px"(e) outlineStyle="solid"(e) outlineColor="var(--focus-ring)"(e)
 outline: "1px solid var(--focus-ring)" <mdn> spec -> ok outlineWidth="1px"(e) outlineStyle="solid"(e) outlineColor="var(--focus-ring)"(e)
+outline: "2px solid ButtonText" <mdn> minimal -> ok outlineWidth="2px"(e) outlineStyle="solid"(e) outlineColor="ButtonText"(e)
+outline: "2px solid ButtonText" <mdn> spec -> ok outlineWidth="2px"(e) outlineStyle="solid"(e) outlineColor="ButtonText"(e)
 outline: "2px dashed red" <rule-fixture> minimal -> ok outlineWidth="2px"(e) outlineStyle="dashed"(e) outlineColor="red"(e)
 outline: "2px dashed red" <rule-fixture> spec -> ok outlineWidth="2px"(e) outlineStyle="dashed"(e) outlineColor="red"(e)
 borderRadius: 5 <rule-fixture> minimal -> no-op

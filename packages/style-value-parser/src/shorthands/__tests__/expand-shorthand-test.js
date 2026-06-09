@@ -573,6 +573,29 @@ describe('expandShorthand', () => {
       });
     });
 
+    it('pairs system colors in a 2-value borderColor', () => {
+      expect(
+        expandShorthand('borderColor', 'Canvas CanvasText', {
+          output: 'minimal',
+        }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'borderBlockColor',
+            value: 'Canvas',
+            origin: 'explicit',
+          },
+          {
+            property: 'borderInlineColor',
+            value: 'CanvasText',
+            origin: 'explicit',
+          },
+        ],
+      });
+    });
+
     it('accepts auto inside inset and maps sides for preferInline', () => {
       expect(
         expandShorthand('inset', 'auto 10px', { output: 'minimal' }),
@@ -960,6 +983,48 @@ describe('expandShorthand', () => {
           { property: 'borderWidth', value: '1px', origin: 'explicit' },
           { property: 'borderStyle', value: 'solid', origin: 'explicit' },
           { property: 'borderColor', value: 'RED', origin: 'explicit' },
+        ],
+      });
+    });
+
+    it('fills the color slot with a name-classified color function', () => {
+      // color-mix/light-dark ride the <color-function> name backstop:
+      // classified by name, arguments relocated verbatim.
+      expect(
+        expandShorthand(
+          'border',
+          '1px solid color-mix(in srgb, red 40%, blue)',
+          {
+            output: 'minimal',
+          },
+        ),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'borderWidth', value: '1px', origin: 'explicit' },
+          { property: 'borderStyle', value: 'solid', origin: 'explicit' },
+          {
+            property: 'borderColor',
+            value: 'color-mix(in srgb, red 40%, blue)',
+            origin: 'explicit',
+          },
+        ],
+      });
+    });
+
+    it('accepts system colors in the color slot, emitted verbatim', () => {
+      expect(
+        expandShorthand('outline', '2px solid ButtonText', {
+          output: 'minimal',
+        }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'outlineWidth', value: '2px', origin: 'explicit' },
+          { property: 'outlineStyle', value: 'solid', origin: 'explicit' },
+          { property: 'outlineColor', value: 'ButtonText', origin: 'explicit' },
         ],
       });
     });

@@ -161,6 +161,8 @@ export const PARITY_CORPUS: ReadonlyArray<ParityCase> = [
   mdn('borderWidth', 'thin thick'),
   mdn('borderWidth', 'medium'),
   mdn('borderStyle', 'none'),
+  mdn('borderColor', 'Canvas CanvasText'),
+  mdn('borderColor', 'light-dark(#333, #ccc)'),
 
   // border + sides (line trios)
   rule('border', 'none'),
@@ -180,8 +182,10 @@ export const PARITY_CORPUS: ReadonlyArray<ParityCase> = [
   mdn('border', 'thick double'),
   mdn('border', '1px solid var(--c)'),
   mdn('border', 'var(--a) var(--b) solid'),
+  mdn('border', '1px solid color-mix(in srgb, red 40%, blue)'),
   mdn('outline', 'dashed'),
   mdn('outline', '1px solid var(--focus-ring)'),
+  mdn('outline', '2px solid ButtonText'),
 
   // outline
   rule('outline', '2px dashed red'),

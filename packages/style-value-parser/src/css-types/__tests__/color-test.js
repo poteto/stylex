@@ -7,8 +7,18 @@
  * @flow strict
  */
 
+import { TokenParser } from '../../token-parser';
+import { balancedFunction } from '../../shorthands/families/slots';
+import {
+  Color,
+  NamedColor,
+  HashColor,
+  Rgb,
+  Rgba,
+  Lch,
+  colorFunctionNames,
+} from '../color';
 import { Angle } from '../angle';
-import { Color, NamedColor, HashColor, Rgb, Rgba, Lch } from '../color';
 
 describe('Test CSS Type: <color>', () => {
   test('parses named colors', () => {
@@ -41,6 +51,39 @@ describe('Test CSS Type: <color>', () => {
     expect(Color.parser.parse('CURRENTCOLOR')).toEqual(
       new NamedColor('currentcolor'),
     );
+  });
+
+  test('parses CSS Color 4 system colors like the named colors', () => {
+    // ASCII case-insensitive, stored lowercase -- the same rule as every
+    // other keyword in the list.
+    for (const keyword of [
+      'AccentColor',
+      'AccentColorText',
+      'ActiveText',
+      'ButtonBorder',
+      'ButtonFace',
+      'ButtonText',
+      'Canvas',
+      'CanvasText',
+      'Field',
+      'FieldText',
+      'GrayText',
+      'Highlight',
+      'HighlightText',
+      'LinkText',
+      'Mark',
+      'MarkText',
+      'SelectedItem',
+      'SelectedItemText',
+      'VisitedText',
+    ]) {
+      expect(Color.parser.parse(keyword)).toEqual(
+        new NamedColor(keyword.toLowerCase()),
+      );
+      expect(Color.parser.parse(keyword.toUpperCase())).toEqual(
+        new NamedColor(keyword.toLowerCase()),
+      );
+    }
   });
 
   test('parses hash colors', () => {
@@ -106,5 +149,43 @@ describe('Test CSS Type: <color>', () => {
     expect(() => Color.parser.parseToEnd('invalid')).toThrow();
     expect(() => Color.parser.parseToEnd('#gggggg')).toThrow();
     expect(() => Color.parser.parseToEnd('rgb(256, 0, 0)')).toThrow();
+  });
+});
+
+describe('the <color-function> name backstop', () => {
+  // The backstop classifies a function as color-valued by NAME alone;
+  // arguments relocate verbatim through balanced capture, exactly like
+  // the existing entries (modern space-separated forms, color()).
+  const sourced = TokenParser.sourced(balancedFunction(colorFunctionNames));
+
+  test('carries the CSS Color 5 mixing functions', () => {
+    expect(colorFunctionNames).toContain('color-mix');
+    expect(colorFunctionNames).toContain('light-dark');
+  });
+
+  test('captures color-mix() and light-dark() verbatim', () => {
+    expect(sourced.parseToEnd('color-mix(in srgb, red 40%, blue)').raw).toEqual(
+      'color-mix(in srgb, red 40%, blue)',
+    );
+    expect(sourced.parseToEnd('light-dark(white, black)').raw).toEqual(
+      'light-dark(white, black)',
+    );
+  });
+
+  test('matches the new names ASCII case-insensitively, slices verbatim', () => {
+    expect(sourced.parseToEnd('COLOR-MIX(in srgb, red, blue)').raw).toEqual(
+      'COLOR-MIX(in srgb, red, blue)',
+    );
+    expect(sourced.parseToEnd('Light-Dark(#333, #ccc)').raw).toEqual(
+      'Light-Dark(#333, #ccc)',
+    );
+  });
+
+  test('captures balanced nested functions and groups', () => {
+    expect(
+      sourced.parseToEnd(
+        'color-mix(in oklch, light-dark(white, black) 40%, var(--c))',
+      ).raw,
+    ).toEqual('color-mix(in oklch, light-dark(white, black) 40%, var(--c))');
   });
 });
