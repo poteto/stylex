@@ -13,6 +13,7 @@ import { TokenParser } from '../token-parser';
 import { Calc } from '../css-types/calc';
 import { lengthPercentage } from '../css-types/length-percentage';
 import { varFunction } from '../shorthands/css-wide';
+import { axisPair } from '../shorthands/families/axis-pair';
 import { fourSides } from '../shorthands/families/four-sides';
 
 // Unlike margin, padding has no 'auto'.
@@ -36,4 +37,16 @@ export const paddingDef: ShorthandDef = fourSides({
     paddingRight: 'paddingInlineEnd',
     paddingLeft: 'paddingInlineStart',
   },
+});
+
+export const paddingBlockDef: ShorthandDef = axisPair({
+  canonical: 'padding-block',
+  component: paddingComponent,
+  longhands: { first: 'paddingBlockStart', second: 'paddingBlockEnd' },
+});
+
+export const paddingInlineDef: ShorthandDef = axisPair({
+  canonical: 'padding-inline',
+  component: paddingComponent,
+  longhands: { first: 'paddingInlineStart', second: 'paddingInlineEnd' },
 });

@@ -14,6 +14,7 @@ import { Calc } from '../css-types/calc';
 import { auto } from '../css-types/common-types';
 import { lengthPercentage } from '../css-types/length-percentage';
 import { varFunction } from '../shorthands/css-wide';
+import { axisPair } from '../shorthands/families/axis-pair';
 import { fourSides } from '../shorthands/families/four-sides';
 
 const marginComponent: TokenParser<unknown> = TokenParser.oneOf(
@@ -37,4 +38,16 @@ export const marginDef: ShorthandDef = fourSides({
     marginRight: 'marginInlineEnd',
     marginLeft: 'marginInlineStart',
   },
+});
+
+export const marginBlockDef: ShorthandDef = axisPair({
+  canonical: 'margin-block',
+  component: marginComponent,
+  longhands: { first: 'marginBlockStart', second: 'marginBlockEnd' },
+});
+
+export const marginInlineDef: ShorthandDef = axisPair({
+  canonical: 'margin-inline',
+  component: marginComponent,
+  longhands: { first: 'marginInlineStart', second: 'marginInlineEnd' },
 });

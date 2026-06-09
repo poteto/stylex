@@ -14,6 +14,7 @@ import { Calc } from '../css-types/calc';
 import { auto } from '../css-types/common-types';
 import { lengthPercentage } from '../css-types/length-percentage';
 import { varFunction } from '../shorthands/css-wide';
+import { axisPair } from '../shorthands/families/axis-pair';
 import { fourSides } from '../shorthands/families/four-sides';
 
 const insetComponent: TokenParser<unknown> = TokenParser.oneOf(
@@ -38,4 +39,16 @@ export const insetDef: ShorthandDef = fourSides({
     right: 'insetInlineEnd',
     left: 'insetInlineStart',
   },
+});
+
+export const insetBlockDef: ShorthandDef = axisPair({
+  canonical: 'inset-block',
+  component: insetComponent,
+  longhands: { first: 'insetBlockStart', second: 'insetBlockEnd' },
+});
+
+export const insetInlineDef: ShorthandDef = axisPair({
+  canonical: 'inset-inline',
+  component: insetComponent,
+  longhands: { first: 'insetInlineStart', second: 'insetInlineEnd' },
 });

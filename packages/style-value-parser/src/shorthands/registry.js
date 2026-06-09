@@ -13,9 +13,20 @@ import { camelize } from './define';
 import { borderColorDef } from '../properties/border-color';
 import { borderStyleDef } from '../properties/border-style';
 import { borderWidthDef } from '../properties/border-width';
-import { insetDef } from '../properties/inset';
-import { marginDef } from '../properties/margin';
-import { paddingDef } from '../properties/padding';
+import { gapDef } from '../properties/gap';
+import { insetBlockDef, insetDef, insetInlineDef } from '../properties/inset';
+import {
+  marginBlockDef,
+  marginDef,
+  marginInlineDef,
+} from '../properties/margin';
+import { overflowDef } from '../properties/overflow';
+import { overscrollBehaviorDef } from '../properties/overscroll-behavior';
+import {
+  paddingBlockDef,
+  paddingDef,
+  paddingInlineDef,
+} from '../properties/padding';
 import { scrollMarginDef } from '../properties/scroll-margin';
 import { scrollPaddingDef } from '../properties/scroll-padding';
 
@@ -28,9 +39,18 @@ export const registry: Readonly<{ +[string]: ShorthandDef }> = Object.freeze({
   borderColor: borderColorDef,
   borderStyle: borderStyleDef,
   borderWidth: borderWidthDef,
+  gap: gapDef,
   inset: insetDef,
+  insetBlock: insetBlockDef,
+  insetInline: insetInlineDef,
   margin: marginDef,
+  marginBlock: marginBlockDef,
+  marginInline: marginInlineDef,
+  overflow: overflowDef,
+  overscrollBehavior: overscrollBehaviorDef,
   padding: paddingDef,
+  paddingBlock: paddingBlockDef,
+  paddingInline: paddingInlineDef,
   scrollMargin: scrollMarginDef,
   scrollPadding: scrollPaddingDef,
 });
