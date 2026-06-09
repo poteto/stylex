@@ -39,8 +39,12 @@ export class NamedColor extends Color {
   toString(): string {
     return this.value;
   }
+  // Keyword matching is ASCII case-insensitive like every CSS identifier;
+  // the parsed value is normalized to lowercase (the lineWidth/lineStyle/
+  // Length precedent). The list also carries the non-<named-color> keywords
+  // 'transparent' and 'currentcolor', which parse identically.
   static parser: TokenParser<NamedColor> = TokenParser.tokens.Ident.map(
-    (token) => token[4].value,
+    (token) => token[4].value.toLowerCase(),
   )
     .where((str: string): implies str is string =>
       [
@@ -64,6 +68,7 @@ export class NamedColor extends Color {
         'cornflowerblue',
         'cornsilk',
         'crimson',
+        'currentcolor',
         'cyan',
         'darkblue',
         'darkcyan',

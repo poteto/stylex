@@ -16,19 +16,6 @@ import { lineWidth } from '../css-types/line-width';
 import { mathFunction } from '../css-types/math-function';
 import { lineTrio } from '../shorthands/families/line-trio';
 
-/**
- * currentcolor is a valid <color> (and border's defaulted color) but not
- * a <named-color>, so Color.parser does not recognize it; the color slot
- * composes it explicitly. Keyword matching is ASCII case-insensitive; the
- * emitted slice stays verbatim.
- */
-const currentColorKeyword: TokenParser<'currentcolor'> =
-  TokenParser.tokens.Ident.map((token): string =>
-    token[4].value.toLowerCase(),
-  ).where<'currentcolor'>(
-    (str): str is 'currentcolor' => str === 'currentcolor',
-  );
-
 // Slot grammars; var() is handled at the matcher level, not per slot.
 // The width and color slots are exported for the outline def, whose
 // outline-width and outline-color embed the same productions.
@@ -36,10 +23,7 @@ export const lineWidthSlot: TokenParser<unknown> = TokenParser.oneOf(
   lineWidth,
   mathFunction,
 );
-export const colorSlot: TokenParser<unknown> = TokenParser.oneOf(
-  Color.parser,
-  currentColorKeyword,
-);
+export const colorSlot: TokenParser<unknown> = Color.parser;
 
 /**
  * border expands ONE level, to borderWidth/borderStyle/borderColor --

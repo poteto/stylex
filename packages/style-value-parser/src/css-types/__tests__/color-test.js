@@ -20,6 +20,29 @@ describe('Test CSS Type: <color>', () => {
     );
   });
 
+  test('matches named colors case-insensitively, storing lowercase', () => {
+    expect(Color.parser.parse('Red')).toEqual(new NamedColor('red'));
+    expect(Color.parser.parse('BLUE')).toEqual(new NamedColor('blue'));
+    expect(Color.parser.parse('rebeccaPurple')).toEqual(
+      new NamedColor('rebeccapurple'),
+    );
+    expect(Color.parser.parse('TRANSPARENT')).toEqual(
+      new NamedColor('transparent'),
+    );
+  });
+
+  test('parses currentcolor in any casing, storing lowercase', () => {
+    expect(Color.parser.parse('currentcolor')).toEqual(
+      new NamedColor('currentcolor'),
+    );
+    expect(Color.parser.parse('currentColor')).toEqual(
+      new NamedColor('currentcolor'),
+    );
+    expect(Color.parser.parse('CURRENTCOLOR')).toEqual(
+      new NamedColor('currentcolor'),
+    );
+  });
+
   test('parses hash colors', () => {
     expect(Color.parser.parse('#ff0000')).toEqual(new HashColor('ff0000'));
     expect(Color.parser.parse('#00ff00')).toEqual(new HashColor('00ff00'));
