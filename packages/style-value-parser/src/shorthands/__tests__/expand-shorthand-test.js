@@ -706,24 +706,62 @@ describe('expandShorthand', () => {
         important: false,
         assignments: [
           {
+            property: 'cornerTopLeftShape',
+            value: 'round',
+            origin: 'explicit',
+          },
+          {
+            property: 'cornerTopRightShape',
+            value: 'squircle',
+            origin: 'explicit',
+          },
+          {
+            property: 'cornerBottomRightShape',
+            value: 'round',
+            origin: 'replicated',
+          },
+          {
+            property: 'cornerBottomLeftShape',
+            value: 'squircle',
+            origin: 'replicated',
+          },
+        ],
+      });
+    });
+
+    it('maps cornerShape corners to logical keys for preferInline', () => {
+      // The dialectMap pairing follows CORNER_SHAPE_MAP: bottom-left maps
+      // to end-start and bottom-right to end-end, so the BR/BL quad slots
+      // emit EndEnd before EndStart (same shape as the borderRadius
+      // vector above).
+      expect(
+        expandShorthand('cornerShape', 'round scoop bevel notch', {
+          output: 'minimal',
+          preferInline: true,
+        }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
             property: 'cornerStartStartShape',
             value: 'round',
             origin: 'explicit',
           },
           {
             property: 'cornerStartEndShape',
-            value: 'squircle',
+            value: 'scoop',
+            origin: 'explicit',
+          },
+          {
+            property: 'cornerEndEndShape',
+            value: 'bevel',
             origin: 'explicit',
           },
           {
             property: 'cornerEndStartShape',
-            value: 'round',
-            origin: 'replicated',
-          },
-          {
-            property: 'cornerEndEndShape',
-            value: 'squircle',
-            origin: 'replicated',
+            value: 'notch',
+            origin: 'explicit',
           },
         ],
       });
