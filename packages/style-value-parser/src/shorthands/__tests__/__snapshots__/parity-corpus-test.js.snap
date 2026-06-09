@@ -1,0 +1,423 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`parity corpus matches the pinned output snapshot 1`] = `
+"margin: 10 <rule-fixture> minimal -> no-op
+margin: 10 <rule-fixture> spec -> ok marginTop=10(e) marginRight=10(r) marginBottom=10(r) marginLeft=10(r)
+margin: "0px" <rule-fixture> minimal -> no-op
+margin: "0px" <rule-fixture> spec -> ok marginTop="0px"(e) marginRight="0px"(r) marginBottom="0px"(r) marginLeft="0px"(r)
+margin: "10px 12px" <rule-fixture> minimal -> ok marginBlock="10px"(e) marginInline="12px"(e)
+margin: "10px 12px" <rule-fixture> spec -> ok marginTop="10px"(e) marginRight="12px"(e) marginBottom="10px"(r) marginLeft="12px"(r)
+margin: "10em 1em" <rule-fixture> minimal -> ok marginBlock="10em"(e) marginInline="1em"(e)
+margin: "10em 1em" <rule-fixture> spec -> ok marginTop="10em"(e) marginRight="1em"(e) marginBottom="10em"(r) marginLeft="1em"(r)
+margin: "10px 10px 10px" <rule-fixture> minimal -> ok margin="10px"(e)
+margin: "10px 10px 10px" <rule-fixture> spec -> ok marginTop="10px"(e) marginRight="10px"(e) marginBottom="10px"(e) marginLeft="10px"(r)
+margin: "10px 12px 13px 14px" <rule-fixture> minimal -> ok marginTop="10px"(e) marginRight="12px"(e) marginBottom="13px"(e) marginLeft="14px"(e)
+margin: "10px 12px 13px 14px" <rule-fixture> spec -> ok marginTop="10px"(e) marginRight="12px"(e) marginBottom="13px"(e) marginLeft="14px"(e)
+margin: "10px 12px 13px 14px !important" <rule-fixture> minimal -> cannot-expand:important-disallowed
+margin: "10px 12px 13px 14px !important" <rule-fixture> spec -> cannot-expand:important-disallowed
+margin: "10px 12px 13px 14px !important" [allowImportant] <rule-fixture> minimal -> ok! marginTop="10px !important"(e) marginRight="12px !important"(e) marginBottom="13px !important"(e) marginLeft="14px !important"(e)
+margin: "10px 12px 13px 14px !important" [allowImportant] <rule-fixture> spec -> ok! marginTop="10px !important"(e) marginRight="12px !important"(e) marginBottom="13px !important"(e) marginLeft="14px !important"(e)
+margin: "10em 1em 5em 2em" [preferInline] <rule-fixture> minimal -> ok marginTop="10em"(e) marginInlineEnd="1em"(e) marginBottom="5em"(e) marginInlineStart="2em"(e)
+margin: "10em 1em 5em 2em" [preferInline] <rule-fixture> spec -> ok marginTop="10em"(e) marginInlineEnd="1em"(e) marginBottom="5em"(e) marginInlineStart="2em"(e)
+padding: "calc(0.5 * 100px)" <rule-fixture> minimal -> no-op
+padding: "calc(0.5 * 100px)" <rule-fixture> spec -> ok paddingTop="calc(0.5 * 100px)"(e) paddingRight="calc(0.5 * 100px)"(r) paddingBottom="calc(0.5 * 100px)"(r) paddingLeft="calc(0.5 * 100px)"(r)
+padding: "10em 1em" <rule-fixture> minimal -> ok paddingBlock="10em"(e) paddingInline="1em"(e)
+padding: "10em 1em" <rule-fixture> spec -> ok paddingTop="10em"(e) paddingRight="1em"(e) paddingBottom="10em"(r) paddingLeft="1em"(r)
+padding: "5px 10px" <rule-fixture> minimal -> ok paddingBlock="5px"(e) paddingInline="10px"(e)
+padding: "5px 10px" <rule-fixture> spec -> ok paddingTop="5px"(e) paddingRight="10px"(e) paddingBottom="5px"(r) paddingLeft="10px"(r)
+padding: "20px 20px 20px 20px" <rule-fixture> minimal -> ok padding="20px"(e)
+padding: "20px 20px 20px 20px" <rule-fixture> spec -> ok paddingTop="20px"(e) paddingRight="20px"(e) paddingBottom="20px"(e) paddingLeft="20px"(e)
+margin: "var(--a) 10px" <mdn> minimal -> ok marginBlock="var(--a)"(e) marginInline="10px"(e)
+margin: "var(--a) 10px" <mdn> spec -> ok marginTop="var(--a)"(e) marginRight="10px"(e) marginBottom="var(--a)"(r) marginLeft="10px"(r)
+margin: "auto" <mdn> minimal -> no-op
+margin: "auto" <mdn> spec -> ok marginTop="auto"(e) marginRight="auto"(r) marginBottom="auto"(r) marginLeft="auto"(r)
+margin: "1px 2px 3px" <mdn> minimal -> ok marginTop="1px"(e) marginRight="2px"(e) marginBottom="3px"(e) marginLeft="2px"(r)
+margin: "1px 2px 3px" <mdn> spec -> ok marginTop="1px"(e) marginRight="2px"(e) marginBottom="3px"(e) marginLeft="2px"(r)
+padding: "1px 2px 3px 4px !important" <mdn> minimal -> cannot-expand:important-disallowed
+padding: "1px 2px 3px 4px !important" <mdn> spec -> cannot-expand:important-disallowed
+marginInline: 0 <rule-fixture> minimal -> no-op
+marginInline: 0 <rule-fixture> spec -> ok marginInlineStart=0(e) marginInlineEnd=0(r)
+marginInline: "15px 15px" <rule-fixture> minimal -> ok marginInline="15px"(e)
+marginInline: "15px 15px" <rule-fixture> spec -> ok marginInlineStart="15px"(e) marginInlineEnd="15px"(e)
+marginInline: "10em 1em" <rule-fixture> minimal -> ok marginInlineStart="10em"(e) marginInlineEnd="1em"(e)
+marginInline: "10em 1em" <rule-fixture> spec -> ok marginInlineStart="10em"(e) marginInlineEnd="1em"(e)
+marginBlock: 10 <rule-fixture> minimal -> no-op
+marginBlock: 10 <rule-fixture> spec -> ok marginBlockStart=10(e) marginBlockEnd=10(r)
+marginBlock: "10em 1em" <rule-fixture> minimal -> ok marginBlockStart="10em"(e) marginBlockEnd="1em"(e)
+marginBlock: "10em 1em" <rule-fixture> spec -> ok marginBlockStart="10em"(e) marginBlockEnd="1em"(e)
+paddingInline: 0 <rule-fixture> minimal -> no-op
+paddingInline: 0 <rule-fixture> spec -> ok paddingInlineStart=0(e) paddingInlineEnd=0(r)
+paddingBlock: 10 <rule-fixture> minimal -> no-op
+paddingBlock: 10 <rule-fixture> spec -> ok paddingBlockStart=10(e) paddingBlockEnd=10(r)
+paddingBlock: "10em 1em" <rule-fixture> minimal -> ok paddingBlockStart="10em"(e) paddingBlockEnd="1em"(e)
+paddingBlock: "10em 1em" <rule-fixture> spec -> ok paddingBlockStart="10em"(e) paddingBlockEnd="1em"(e)
+paddingInline: "1rem 2rem" <mdn> minimal -> ok paddingInlineStart="1rem"(e) paddingInlineEnd="2rem"(e)
+paddingInline: "1rem 2rem" <mdn> spec -> ok paddingInlineStart="1rem"(e) paddingInlineEnd="2rem"(e)
+marginBlock: "var(--x) 1em" <mdn> minimal -> ok marginBlockStart="var(--x)"(e) marginBlockEnd="1em"(e)
+marginBlock: "var(--x) 1em" <mdn> spec -> ok marginBlockStart="var(--x)"(e) marginBlockEnd="1em"(e)
+inset: "10px" <mdn> minimal -> no-op
+inset: "10px" <mdn> spec -> ok top="10px"(e) right="10px"(r) bottom="10px"(r) left="10px"(r)
+inset: "4px 8px" <mdn> minimal -> ok insetBlock="4px"(e) insetInline="8px"(e)
+inset: "4px 8px" <mdn> spec -> ok top="4px"(e) right="8px"(e) bottom="4px"(r) left="8px"(r)
+inset: "2.4em 3em 3em 3em" <mdn> minimal -> ok top="2.4em"(e) right="3em"(e) bottom="3em"(e) left="3em"(e)
+inset: "2.4em 3em 3em 3em" <mdn> spec -> ok top="2.4em"(e) right="3em"(e) bottom="3em"(e) left="3em"(e)
+inset: "0 auto" <mdn> minimal -> ok insetBlock="0"(e) insetInline="auto"(e)
+inset: "0 auto" <mdn> spec -> ok top="0"(e) right="auto"(e) bottom="0"(r) left="auto"(r)
+inset: "10% 20% 30% 40%" [preferInline] <mdn> minimal -> ok top="10%"(e) insetInlineEnd="20%"(e) bottom="30%"(e) insetInlineStart="40%"(e)
+inset: "10% 20% 30% 40%" [preferInline] <mdn> spec -> ok top="10%"(e) insetInlineEnd="20%"(e) bottom="30%"(e) insetInlineStart="40%"(e)
+insetBlock: "10px 20px" <mdn> minimal -> ok insetBlockStart="10px"(e) insetBlockEnd="20px"(e)
+insetBlock: "10px 20px" <mdn> spec -> ok insetBlockStart="10px"(e) insetBlockEnd="20px"(e)
+insetInline: "5% 10%" <mdn> minimal -> ok insetInlineStart="5%"(e) insetInlineEnd="10%"(e)
+insetInline: "5% 10%" <mdn> spec -> ok insetInlineStart="5%"(e) insetInlineEnd="10%"(e)
+insetInline: "auto auto" <mdn> minimal -> ok insetInline="auto"(e)
+insetInline: "auto auto" <mdn> spec -> ok insetInlineStart="auto"(e) insetInlineEnd="auto"(e)
+scrollMargin: "1em" <mdn> minimal -> no-op
+scrollMargin: "1em" <mdn> spec -> ok scrollMarginTop="1em"(e) scrollMarginRight="1em"(r) scrollMarginBottom="1em"(r) scrollMarginLeft="1em"(r)
+scrollMargin: "10px 20px 30px 40px" <mdn> minimal -> ok scrollMarginTop="10px"(e) scrollMarginRight="20px"(e) scrollMarginBottom="30px"(e) scrollMarginLeft="40px"(e)
+scrollMargin: "10px 20px 30px 40px" <mdn> spec -> ok scrollMarginTop="10px"(e) scrollMarginRight="20px"(e) scrollMarginBottom="30px"(e) scrollMarginLeft="40px"(e)
+scrollPadding: "10% 20%" <mdn> minimal -> ok scrollPaddingBlock="10%"(e) scrollPaddingInline="20%"(e)
+scrollPadding: "10% 20%" <mdn> spec -> ok scrollPaddingTop="10%"(e) scrollPaddingRight="20%"(e) scrollPaddingBottom="10%"(r) scrollPaddingLeft="20%"(r)
+scrollPadding: "auto" <mdn> minimal -> no-op
+scrollPadding: "auto" <mdn> spec -> ok scrollPaddingTop="auto"(e) scrollPaddingRight="auto"(r) scrollPaddingBottom="auto"(r) scrollPaddingLeft="auto"(r)
+overflow: "hidden" <mdn> minimal -> no-op
+overflow: "hidden" <mdn> spec -> ok overflowX="hidden"(e) overflowY="hidden"(r)
+overflow: "hidden scroll" <mdn> minimal -> ok overflowX="hidden"(e) overflowY="scroll"(e)
+overflow: "hidden scroll" <mdn> spec -> ok overflowX="hidden"(e) overflowY="scroll"(e)
+overflow: "visible clip" <mdn> minimal -> ok overflowX="visible"(e) overflowY="clip"(e)
+overflow: "visible clip" <mdn> spec -> ok overflowX="visible"(e) overflowY="clip"(e)
+overscrollBehavior: "contain" <mdn> minimal -> no-op
+overscrollBehavior: "contain" <mdn> spec -> ok overscrollBehaviorX="contain"(e) overscrollBehaviorY="contain"(r)
+overscrollBehavior: "contain auto" <mdn> minimal -> ok overscrollBehaviorX="contain"(e) overscrollBehaviorY="auto"(e)
+overscrollBehavior: "contain auto" <mdn> spec -> ok overscrollBehaviorX="contain"(e) overscrollBehaviorY="auto"(e)
+overscrollBehavior: "none contain" <mdn> minimal -> ok overscrollBehaviorX="none"(e) overscrollBehaviorY="contain"(e)
+overscrollBehavior: "none contain" <mdn> spec -> ok overscrollBehaviorX="none"(e) overscrollBehaviorY="contain"(e)
+gap: "10px" <rule-fixture> minimal -> no-op
+gap: "10px" <rule-fixture> spec -> ok rowGap="10px"(e) columnGap="10px"(r)
+gap: 10 <rule-fixture> minimal -> no-op
+gap: 10 <rule-fixture> spec -> ok rowGap=10(e) columnGap=10(r)
+gap: 0 <rule-fixture> minimal -> no-op
+gap: 0 <rule-fixture> spec -> ok rowGap=0(e) columnGap=0(r)
+gap: "var(--spacing)" <rule-fixture> minimal -> no-op
+gap: "var(--spacing)" <rule-fixture> spec -> ok rowGap="var(--spacing)"(e) columnGap="var(--spacing)"(r)
+gap: "calc(10px + 1rem)" <rule-fixture> minimal -> no-op
+gap: "calc(10px + 1rem)" <rule-fixture> spec -> ok rowGap="calc(10px + 1rem)"(e) columnGap="calc(10px + 1rem)"(r)
+gap: "10px 20px" <rule-fixture> minimal -> ok rowGap="10px"(e) columnGap="20px"(e)
+gap: "10px 20px" <rule-fixture> spec -> ok rowGap="10px"(e) columnGap="20px"(e)
+gap: "calc(10px + 1rem) calc(20px + 2rem)" <rule-fixture> minimal -> ok rowGap="calc(10px + 1rem)"(e) columnGap="calc(20px + 2rem)"(e)
+gap: "calc(10px + 1rem) calc(20px + 2rem)" <rule-fixture> spec -> ok rowGap="calc(10px + 1rem)"(e) columnGap="calc(20px + 2rem)"(e)
+gap: "0px 0px" <rule-fixture> minimal -> ok rowGap="0px"(e) columnGap="0px"(e)
+gap: "0px 0px" <rule-fixture> spec -> ok rowGap="0px"(e) columnGap="0px"(e)
+gap: "10px 20px !important" [allowImportant] <rule-fixture> minimal -> ok! rowGap="10px !important"(e) columnGap="20px !important"(e)
+gap: "10px 20px !important" [allowImportant] <rule-fixture> spec -> ok! rowGap="10px !important"(e) columnGap="20px !important"(e)
+gap: "10px, 20px" <rule-fixture> minimal -> cannot-expand:parse-error (Unexpected trailing input: ,)
+gap: "10px, 20px" <rule-fixture> spec -> cannot-expand:parse-error (Unexpected trailing input: ,)
+gap: "10px / 20px" <rule-fixture> minimal -> cannot-expand:parse-error (Unexpected trailing input: /)
+gap: "10px / 20px" <rule-fixture> spec -> cannot-expand:parse-error (Unexpected trailing input: /)
+gap: "10px 20px 30px" <rule-fixture> minimal -> cannot-expand:parse-error (Unexpected trailing input: 30px)
+gap: "10px 20px 30px" <rule-fixture> spec -> cannot-expand:parse-error (Unexpected trailing input: 30px)
+gridGap: "10px" <rule-fixture> minimal -> no-op
+gridGap: "10px" <rule-fixture> spec -> ok rowGap="10px"(e) columnGap="10px"(r)
+gridGap: 10 <rule-fixture> minimal -> no-op
+gridGap: 10 <rule-fixture> spec -> ok rowGap=10(e) columnGap=10(r)
+gridGap: "10px 20px" <rule-fixture> minimal -> ok rowGap="10px"(e) columnGap="20px"(e)
+gridGap: "10px 20px" <rule-fixture> spec -> ok rowGap="10px"(e) columnGap="20px"(e)
+borderWidth: "1px" <rule-fixture> minimal -> no-op
+borderWidth: "1px" <rule-fixture> spec -> ok borderTopWidth="1px"(e) borderRightWidth="1px"(r) borderBottomWidth="1px"(r) borderLeftWidth="1px"(r)
+borderWidth: "var(--border-width, 10)" <rule-fixture> minimal -> no-op
+borderWidth: "var(--border-width, 10)" <rule-fixture> spec -> ok borderTopWidth="var(--border-width, 10)"(e) borderRightWidth="var(--border-width, 10)"(r) borderBottomWidth="var(--border-width, 10)"(r) borderLeftWidth="var(--border-width, 10)"(r)
+borderWidth: "1px 2px 3px 4px" <rule-fixture> minimal -> ok borderTopWidth="1px"(e) borderRightWidth="2px"(e) borderBottomWidth="3px"(e) borderLeftWidth="4px"(e)
+borderWidth: "1px 2px 3px 4px" <rule-fixture> spec -> ok borderTopWidth="1px"(e) borderRightWidth="2px"(e) borderBottomWidth="3px"(e) borderLeftWidth="4px"(e)
+borderWidth: "4px 5px 6px 7px" <rule-fixture> minimal -> ok borderTopWidth="4px"(e) borderRightWidth="5px"(e) borderBottomWidth="6px"(e) borderLeftWidth="7px"(e)
+borderWidth: "4px 5px 6px 7px" <rule-fixture> spec -> ok borderTopWidth="4px"(e) borderRightWidth="5px"(e) borderBottomWidth="6px"(e) borderLeftWidth="7px"(e)
+borderWidth: "4px 5px 6px 7px" [preferInline] <rule-fixture> minimal -> ok borderTopWidth="4px"(e) borderInlineEndWidth="5px"(e) borderBottomWidth="6px"(e) borderInlineStartWidth="7px"(e)
+borderWidth: "4px 5px 6px 7px" [preferInline] <rule-fixture> spec -> ok borderTopWidth="4px"(e) borderInlineEndWidth="5px"(e) borderBottomWidth="6px"(e) borderInlineStartWidth="7px"(e)
+borderWidth: "var(--vertical-border-width, 10) var(--horizontal-border-width, 15)" <rule-fixture> minimal -> ok borderBlockWidth="var(--vertical-border-width, 10)"(e) borderInlineWidth="var(--horizontal-border-width, 15)"(e)
+borderWidth: "var(--vertical-border-width, 10) var(--horizontal-border-width, 15)" <rule-fixture> spec -> ok borderTopWidth="var(--vertical-border-width, 10)"(e) borderRightWidth="var(--horizontal-border-width, 15)"(e) borderBottomWidth="var(--vertical-border-width, 10)"(r) borderLeftWidth="var(--horizontal-border-width, 15)"(r)
+borderWidth: "calc(100% - 20px) calc(90% - 20px)" <rule-fixture> minimal -> ok borderBlockWidth="calc(100% - 20px)"(e) borderInlineWidth="calc(90% - 20px)"(e)
+borderWidth: "calc(100% - 20px) calc(90% - 20px)" <rule-fixture> spec -> ok borderTopWidth="calc(100% - 20px)"(e) borderRightWidth="calc(90% - 20px)"(e) borderBottomWidth="calc(100% - 20px)"(r) borderLeftWidth="calc(90% - 20px)"(r)
+borderStyle: "solid" <rule-fixture> minimal -> no-op
+borderStyle: "solid" <rule-fixture> spec -> ok borderTopStyle="solid"(e) borderRightStyle="solid"(r) borderBottomStyle="solid"(r) borderLeftStyle="solid"(r)
+borderStyle: "solid dashed dotted double" <rule-fixture> minimal -> ok borderTopStyle="solid"(e) borderRightStyle="dashed"(e) borderBottomStyle="dotted"(e) borderLeftStyle="double"(e)
+borderStyle: "solid dashed dotted double" <rule-fixture> spec -> ok borderTopStyle="solid"(e) borderRightStyle="dashed"(e) borderBottomStyle="dotted"(e) borderLeftStyle="double"(e)
+borderStyle: "solid dashed dotted double" [preferInline] <rule-fixture> minimal -> ok borderTopStyle="solid"(e) borderInlineEndStyle="dashed"(e) borderBottomStyle="dotted"(e) borderInlineStartStyle="double"(e)
+borderStyle: "solid dashed dotted double" [preferInline] <rule-fixture> spec -> ok borderTopStyle="solid"(e) borderInlineEndStyle="dashed"(e) borderBottomStyle="dotted"(e) borderInlineStartStyle="double"(e)
+borderColor: "black" <rule-fixture> minimal -> no-op
+borderColor: "black" <rule-fixture> spec -> ok borderTopColor="black"(e) borderRightColor="black"(r) borderBottomColor="black"(r) borderLeftColor="black"(r)
+borderColor: "rgb(0, 0, 0)" <rule-fixture> minimal -> no-op
+borderColor: "rgb(0, 0, 0)" <rule-fixture> spec -> ok borderTopColor="rgb(0, 0, 0)"(e) borderRightColor="rgb(0, 0, 0)"(r) borderBottomColor="rgb(0, 0, 0)"(r) borderLeftColor="rgb(0, 0, 0)"(r)
+borderColor: "oklch(0.928 0.006 264.531)" <rule-fixture> minimal -> no-op
+borderColor: "oklch(0.928 0.006 264.531)" <rule-fixture> spec -> ok borderTopColor="oklch(0.928 0.006 264.531)"(e) borderRightColor="oklch(0.928 0.006 264.531)"(r) borderBottomColor="oklch(0.928 0.006 264.531)"(r) borderLeftColor="oklch(0.928 0.006 264.531)"(r)
+borderColor: "oklab(0.9 -0.003 -0.003)" <rule-fixture> minimal -> no-op
+borderColor: "oklab(0.9 -0.003 -0.003)" <rule-fixture> spec -> ok borderTopColor="oklab(0.9 -0.003 -0.003)"(e) borderRightColor="oklab(0.9 -0.003 -0.003)"(r) borderBottomColor="oklab(0.9 -0.003 -0.003)"(r) borderLeftColor="oklab(0.9 -0.003 -0.003)"(r)
+borderColor: "lch(50% 20 240)" <rule-fixture> minimal -> no-op
+borderColor: "lch(50% 20 240)" <rule-fixture> spec -> ok borderTopColor="lch(50% 20 240)"(e) borderRightColor="lch(50% 20 240)"(r) borderBottomColor="lch(50% 20 240)"(r) borderLeftColor="lch(50% 20 240)"(r)
+borderColor: "lab(50% -20 -20)" <rule-fixture> minimal -> no-op
+borderColor: "lab(50% -20 -20)" <rule-fixture> spec -> ok borderTopColor="lab(50% -20 -20)"(e) borderRightColor="lab(50% -20 -20)"(r) borderBottomColor="lab(50% -20 -20)"(r) borderLeftColor="lab(50% -20 -20)"(r)
+borderColor: "color(display-p3 1 0.5 0)" <rule-fixture> minimal -> no-op
+borderColor: "color(display-p3 1 0.5 0)" <rule-fixture> spec -> ok borderTopColor="color(display-p3 1 0.5 0)"(e) borderRightColor="color(display-p3 1 0.5 0)"(r) borderBottomColor="color(display-p3 1 0.5 0)"(r) borderLeftColor="color(display-p3 1 0.5 0)"(r)
+borderColor: "hwb(240 100% 50%)" <rule-fixture> minimal -> no-op
+borderColor: "hwb(240 100% 50%)" <rule-fixture> spec -> ok borderTopColor="hwb(240 100% 50%)"(e) borderRightColor="hwb(240 100% 50%)"(r) borderBottomColor="hwb(240 100% 50%)"(r) borderLeftColor="hwb(240 100% 50%)"(r)
+borderColor: "rgb(255 0 0 / 0.5)" <rule-fixture> minimal -> no-op
+borderColor: "rgb(255 0 0 / 0.5)" <rule-fixture> spec -> ok borderTopColor="rgb(255 0 0 / 0.5)"(e) borderRightColor="rgb(255 0 0 / 0.5)"(r) borderBottomColor="rgb(255 0 0 / 0.5)"(r) borderLeftColor="rgb(255 0 0 / 0.5)"(r)
+borderColor: "hsl(220 3% 15% / 10%)" <rule-fixture> minimal -> no-op
+borderColor: "hsl(220 3% 15% / 10%)" <rule-fixture> spec -> ok borderTopColor="hsl(220 3% 15% / 10%)"(e) borderRightColor="hsl(220 3% 15% / 10%)"(r) borderBottomColor="hsl(220 3% 15% / 10%)"(r) borderLeftColor="hsl(220 3% 15% / 10%)"(r)
+borderColor: "hsb(220 3% 15% / 10%)" <rule-fixture> minimal -> no-op
+borderColor: "hsb(220 3% 15% / 10%)" <rule-fixture> spec -> cannot-expand:parse-error (No parser matched
+- Error: No parser matched
+- Error: No parser matched
+- Error: Expected token type ident-token, got function-token
+- Error: Expected token type hash-token, got function-token
+- Error: No parser matched
+- Error: Never
+- Error: Never
+- Error: No parser matched
+- Error: Never
+- Error: Never
+- Error: No parser matched
+- Error: Never
+- Error: Never
+- Error: No parser matched
+- Error: Never
+- Error: Never
+- Error: Never
+- Error: Never
+- Error: Never
+- Error: Expected a Function<rgb|rgba|hsl|hsla|hwb|lab|lch|oklab|oklch|color>, got hsb()
+- Error: Expected var())
+borderColor: "oklch(0.7 0.15 180 / 0.8)" <rule-fixture> minimal -> no-op
+borderColor: "oklch(0.7 0.15 180 / 0.8)" <rule-fixture> spec -> ok borderTopColor="oklch(0.7 0.15 180 / 0.8)"(e) borderRightColor="oklch(0.7 0.15 180 / 0.8)"(r) borderBottomColor="oklch(0.7 0.15 180 / 0.8)"(r) borderLeftColor="oklch(0.7 0.15 180 / 0.8)"(r)
+borderColor: "red green blue yellow" <rule-fixture> minimal -> ok borderTopColor="red"(e) borderRightColor="green"(e) borderBottomColor="blue"(e) borderLeftColor="yellow"(e)
+borderColor: "red green blue yellow" <rule-fixture> spec -> ok borderTopColor="red"(e) borderRightColor="green"(e) borderBottomColor="blue"(e) borderLeftColor="yellow"(e)
+borderColor: "red green blue yellow" [preferInline] <rule-fixture> minimal -> ok borderTopColor="red"(e) borderInlineEndColor="green"(e) borderBottomColor="blue"(e) borderInlineStartColor="yellow"(e)
+borderColor: "red green blue yellow" [preferInline] <rule-fixture> spec -> ok borderTopColor="red"(e) borderInlineEndColor="green"(e) borderBottomColor="blue"(e) borderInlineStartColor="yellow"(e)
+borderColor: "hsl(220 3% 15%) hsl(240 3% 20%)" <rule-fixture> minimal -> ok borderBlockColor="hsl(220 3% 15%)"(e) borderInlineColor="hsl(240 3% 20%)"(e)
+borderColor: "hsl(220 3% 15%) hsl(240 3% 20%)" <rule-fixture> spec -> ok borderTopColor="hsl(220 3% 15%)"(e) borderRightColor="hsl(240 3% 20%)"(e) borderBottomColor="hsl(220 3% 15%)"(r) borderLeftColor="hsl(240 3% 20%)"(r)
+borderColor: "oklch(0.7 0.15 180) rgb(255 0 0)" <rule-fixture> minimal -> ok borderBlockColor="oklch(0.7 0.15 180)"(e) borderInlineColor="rgb(255 0 0)"(e)
+borderColor: "oklch(0.7 0.15 180) rgb(255 0 0)" <rule-fixture> spec -> ok borderTopColor="oklch(0.7 0.15 180)"(e) borderRightColor="rgb(255 0 0)"(e) borderBottomColor="oklch(0.7 0.15 180)"(r) borderLeftColor="rgb(255 0 0)"(r)
+borderColor: "var(--fds-gray-10) var(--fds-gray-20) var(--fds-gray-30) var(--fds-gray-40)" <rule-fixture> minimal -> ok borderTopColor="var(--fds-gray-10)"(e) borderRightColor="var(--fds-gray-20)"(e) borderBottomColor="var(--fds-gray-30)"(e) borderLeftColor="var(--fds-gray-40)"(e)
+borderColor: "var(--fds-gray-10) var(--fds-gray-20) var(--fds-gray-30) var(--fds-gray-40)" <rule-fixture> spec -> ok borderTopColor="var(--fds-gray-10)"(e) borderRightColor="var(--fds-gray-20)"(e) borderBottomColor="var(--fds-gray-30)"(e) borderLeftColor="var(--fds-gray-40)"(e)
+borderColor: "var(--test-color, #ccc) linear-gradient(to right, #ff7e5f, #feb47b)" <rule-fixture> minimal -> cannot-expand:contains-variable
+borderColor: "var(--test-color, #ccc) linear-gradient(to right, #ff7e5f, #feb47b)" <rule-fixture> spec -> cannot-expand:contains-variable
+borderWidth: "thin thick" <mdn> minimal -> ok borderBlockWidth="thin"(e) borderInlineWidth="thick"(e)
+borderWidth: "thin thick" <mdn> spec -> ok borderTopWidth="thin"(e) borderRightWidth="thick"(e) borderBottomWidth="thin"(r) borderLeftWidth="thick"(r)
+borderWidth: "medium" <mdn> minimal -> no-op
+borderWidth: "medium" <mdn> spec -> ok borderTopWidth="medium"(e) borderRightWidth="medium"(r) borderBottomWidth="medium"(r) borderLeftWidth="medium"(r)
+borderStyle: "none" <mdn> minimal -> no-op
+borderStyle: "none" <mdn> spec -> ok borderTopStyle="none"(e) borderRightStyle="none"(r) borderBottomStyle="none"(r) borderLeftStyle="none"(r)
+border: "none" <rule-fixture> minimal -> ok borderStyle="none"(e)
+border: "none" <rule-fixture> spec -> ok borderWidth="medium"(d) borderStyle="none"(e) borderColor="currentcolor"(d)
+border: "solid" <rule-fixture> minimal -> ok borderStyle="solid"(e)
+border: "solid" <rule-fixture> spec -> ok borderWidth="medium"(d) borderStyle="solid"(e) borderColor="currentcolor"(d)
+border: 0 <rule-fixture> minimal -> ok borderWidth="0"(e)
+border: 0 <rule-fixture> spec -> ok borderWidth="0"(e) borderStyle="none"(d) borderColor="currentcolor"(d)
+border: "1px solid" <rule-fixture> minimal -> ok borderWidth="1px"(e) borderStyle="solid"(e)
+border: "1px solid" <rule-fixture> spec -> ok borderWidth="1px"(e) borderStyle="solid"(e) borderColor="currentcolor"(d)
+border: "1px solid red" <rule-fixture> minimal -> ok borderWidth="1px"(e) borderStyle="solid"(e) borderColor="red"(e)
+border: "1px solid red" <rule-fixture> spec -> ok borderWidth="1px"(e) borderStyle="solid"(e) borderColor="red"(e)
+border: "2px dashed blue" <rule-fixture> minimal -> ok borderWidth="2px"(e) borderStyle="dashed"(e) borderColor="blue"(e)
+border: "2px dashed blue" <rule-fixture> spec -> ok borderWidth="2px"(e) borderStyle="dashed"(e) borderColor="blue"(e)
+border: "1px solid rgba(0, 0, 0, 0.5)" <rule-fixture> minimal -> ok borderWidth="1px"(e) borderStyle="solid"(e) borderColor="rgba(0, 0, 0, 0.5)"(e)
+border: "1px solid rgba(0, 0, 0, 0.5)" <rule-fixture> spec -> ok borderWidth="1px"(e) borderStyle="solid"(e) borderColor="rgba(0, 0, 0, 0.5)"(e)
+border: "1px solid red !important" [allowImportant] <rule-fixture> minimal -> ok! borderWidth="1px !important"(e) borderStyle="solid !important"(e) borderColor="red !important"(e)
+border: "1px solid red !important" [allowImportant] <rule-fixture> spec -> ok! borderWidth="1px !important"(e) borderStyle="solid !important"(e) borderColor="red !important"(e)
+borderTop: "2px solid red" <rule-fixture> minimal -> ok borderTopWidth="2px"(e) borderTopStyle="solid"(e) borderTopColor="red"(e)
+borderTop: "2px solid red" <rule-fixture> spec -> ok borderTopWidth="2px"(e) borderTopStyle="solid"(e) borderTopColor="red"(e)
+borderRight: "3px dashed green" <rule-fixture> minimal -> ok borderRightWidth="3px"(e) borderRightStyle="dashed"(e) borderRightColor="green"(e)
+borderRight: "3px dashed green" <rule-fixture> spec -> ok borderRightWidth="3px"(e) borderRightStyle="dashed"(e) borderRightColor="green"(e)
+borderRight: "4px solid var(--fds-gray-10)" <rule-fixture> minimal -> ok borderRightWidth="4px"(e) borderRightStyle="solid"(e) borderRightColor="var(--fds-gray-10)"(e)
+borderRight: "4px solid var(--fds-gray-10)" <rule-fixture> spec -> ok borderRightWidth="4px"(e) borderRightStyle="solid"(e) borderRightColor="var(--fds-gray-10)"(e)
+borderBottom: "4px dotted blue" <rule-fixture> minimal -> ok borderBottomWidth="4px"(e) borderBottomStyle="dotted"(e) borderBottomColor="blue"(e)
+borderBottom: "4px dotted blue" <rule-fixture> spec -> ok borderBottomWidth="4px"(e) borderBottomStyle="dotted"(e) borderBottomColor="blue"(e)
+borderLeft: "5px double yellow" <rule-fixture> minimal -> ok borderLeftWidth="5px"(e) borderLeftStyle="double"(e) borderLeftColor="yellow"(e)
+borderLeft: "5px double yellow" <rule-fixture> spec -> ok borderLeftWidth="5px"(e) borderLeftStyle="double"(e) borderLeftColor="yellow"(e)
+border: "solid red" <mdn> minimal -> ok borderStyle="solid"(e) borderColor="red"(e)
+border: "solid red" <mdn> spec -> ok borderWidth="medium"(d) borderStyle="solid"(e) borderColor="red"(e)
+border: "thick double" <mdn> minimal -> ok borderWidth="thick"(e) borderStyle="double"(e)
+border: "thick double" <mdn> spec -> ok borderWidth="thick"(e) borderStyle="double"(e) borderColor="currentcolor"(d)
+border: "1px solid var(--c)" <mdn> minimal -> ok borderWidth="1px"(e) borderStyle="solid"(e) borderColor="var(--c)"(e)
+border: "1px solid var(--c)" <mdn> spec -> ok borderWidth="1px"(e) borderStyle="solid"(e) borderColor="var(--c)"(e)
+border: "var(--a) var(--b) solid" <mdn> minimal -> cannot-expand:contains-variable
+border: "var(--a) var(--b) solid" <mdn> spec -> cannot-expand:contains-variable
+outline: "dashed" <mdn> minimal -> ok outlineStyle="dashed"(e)
+outline: "dashed" <mdn> spec -> ok outlineWidth="medium"(d) outlineStyle="dashed"(e) outlineColor="auto"(d)
+outline: "1px solid var(--focus-ring)" <mdn> minimal -> ok outlineWidth="1px"(e) outlineStyle="solid"(e) outlineColor="var(--focus-ring)"(e)
+outline: "1px solid var(--focus-ring)" <mdn> spec -> ok outlineWidth="1px"(e) outlineStyle="solid"(e) outlineColor="var(--focus-ring)"(e)
+outline: "2px dashed red" <rule-fixture> minimal -> ok outlineWidth="2px"(e) outlineStyle="dashed"(e) outlineColor="red"(e)
+outline: "2px dashed red" <rule-fixture> spec -> ok outlineWidth="2px"(e) outlineStyle="dashed"(e) outlineColor="red"(e)
+borderRadius: 5 <rule-fixture> minimal -> no-op
+borderRadius: 5 <rule-fixture> spec -> ok borderTopLeftRadius=5(e) borderTopRightRadius=5(r) borderBottomRightRadius=5(r) borderBottomLeftRadius=5(r)
+borderRadius: "10px 15px 20px 25px" <rule-fixture> minimal -> ok borderTopLeftRadius="10px"(e) borderTopRightRadius="15px"(e) borderBottomRightRadius="20px"(e) borderBottomLeftRadius="25px"(e)
+borderRadius: "10px 15px 20px 25px" <rule-fixture> spec -> ok borderTopLeftRadius="10px"(e) borderTopRightRadius="15px"(e) borderBottomRightRadius="20px"(e) borderBottomLeftRadius="25px"(e)
+borderRadius: "10px 15px 20px 25px" [preferInline] <rule-fixture> minimal -> ok borderStartStartRadius="10px"(e) borderStartEndRadius="15px"(e) borderEndEndRadius="20px"(e) borderEndStartRadius="25px"(e)
+borderRadius: "10px 15px 20px 25px" [preferInline] <rule-fixture> spec -> ok borderStartStartRadius="10px"(e) borderStartEndRadius="15px"(e) borderEndEndRadius="20px"(e) borderEndStartRadius="25px"(e)
+borderRadius: "10px 20px 30px 40px" <rule-fixture> minimal -> ok borderTopLeftRadius="10px"(e) borderTopRightRadius="20px"(e) borderBottomRightRadius="30px"(e) borderBottomLeftRadius="40px"(e)
+borderRadius: "10px 20px 30px 40px" <rule-fixture> spec -> ok borderTopLeftRadius="10px"(e) borderTopRightRadius="20px"(e) borderBottomRightRadius="30px"(e) borderBottomLeftRadius="40px"(e)
+cornerShape: "squircle" <rule-fixture> minimal -> no-op
+cornerShape: "squircle" <rule-fixture> spec -> ok cornerTopLeftShape="squircle"(e) cornerTopRightShape="squircle"(r) cornerBottomRightShape="squircle"(r) cornerBottomLeftShape="squircle"(r)
+cornerShape: "scoop notch" <rule-fixture> minimal -> ok cornerTopLeftShape="scoop"(e) cornerTopRightShape="notch"(e) cornerBottomRightShape="scoop"(r) cornerBottomLeftShape="notch"(r)
+cornerShape: "scoop notch" <rule-fixture> spec -> ok cornerTopLeftShape="scoop"(e) cornerTopRightShape="notch"(e) cornerBottomRightShape="scoop"(r) cornerBottomLeftShape="notch"(r)
+borderRadius: "10px / 20px" <mdn> minimal -> ok borderRadius="10px / 20px"(e)
+borderRadius: "10px / 20px" <mdn> spec -> ok borderTopLeftRadius="10px 20px"(e) borderTopRightRadius="10px 20px"(r) borderBottomRightRadius="10px 20px"(r) borderBottomLeftRadius="10px 20px"(r)
+borderRadius: "10px 20px / 30px 40px" <mdn> minimal -> ok borderTopLeftRadius="10px 30px"(e) borderTopRightRadius="20px 40px"(e) borderBottomRightRadius="10px 30px"(r) borderBottomLeftRadius="20px 40px"(r)
+borderRadius: "10px 20px / 30px 40px" <mdn> spec -> ok borderTopLeftRadius="10px 30px"(e) borderTopRightRadius="20px 40px"(e) borderBottomRightRadius="10px 30px"(r) borderBottomLeftRadius="20px 40px"(r)
+borderRadius: "1em 2em 3em 4em / 0.5em" <mdn> minimal -> ok borderTopLeftRadius="1em 0.5em"(e) borderTopRightRadius="2em 0.5em"(e) borderBottomRightRadius="3em 0.5em"(e) borderBottomLeftRadius="4em 0.5em"(e)
+borderRadius: "1em 2em 3em 4em / 0.5em" <mdn> spec -> ok borderTopLeftRadius="1em 0.5em"(e) borderTopRightRadius="2em 0.5em"(e) borderBottomRightRadius="3em 0.5em"(e) borderBottomLeftRadius="4em 0.5em"(e)
+borderRadius: "2em 1em 4em / 0.5em 3em" [preferInline] <mdn> minimal -> ok borderStartStartRadius="2em 0.5em"(e) borderStartEndRadius="1em 3em"(e) borderEndEndRadius="4em 0.5em"(e) borderEndStartRadius="1em 3em"(r)
+borderRadius: "2em 1em 4em / 0.5em 3em" [preferInline] <mdn> spec -> ok borderStartStartRadius="2em 0.5em"(e) borderStartEndRadius="1em 3em"(e) borderEndEndRadius="4em 0.5em"(e) borderEndStartRadius="1em 3em"(r)
+cornerShape: "round bevel notch squircle" <mdn> minimal -> ok cornerTopLeftShape="round"(e) cornerTopRightShape="bevel"(e) cornerBottomRightShape="notch"(e) cornerBottomLeftShape="squircle"(e)
+cornerShape: "round bevel notch squircle" <mdn> spec -> ok cornerTopLeftShape="round"(e) cornerTopRightShape="bevel"(e) cornerBottomRightShape="notch"(e) cornerBottomLeftShape="squircle"(e)
+cornerShape: "superellipse(3) squircle" <mdn> minimal -> ok cornerTopLeftShape="superellipse(3)"(e) cornerTopRightShape="squircle"(e) cornerBottomRightShape="superellipse(3)"(r) cornerBottomLeftShape="squircle"(r)
+cornerShape: "superellipse(3) squircle" <mdn> spec -> ok cornerTopLeftShape="superellipse(3)"(e) cornerTopRightShape="squircle"(e) cornerBottomRightShape="superellipse(3)"(r) cornerBottomLeftShape="squircle"(r)
+cornerShape: "scoop notch" [preferInline] <mdn> minimal -> ok cornerStartStartShape="scoop"(e) cornerStartEndShape="notch"(e) cornerEndEndShape="scoop"(r) cornerEndStartShape="notch"(r)
+cornerShape: "scoop notch" [preferInline] <mdn> spec -> ok cornerStartStartShape="scoop"(e) cornerStartEndShape="notch"(e) cornerEndEndShape="scoop"(r) cornerEndStartShape="notch"(r)
+background: "#ff0 url(\\"image.jpg\\") no-repeat fixed center / cover !important" <rule-fixture> minimal -> cannot-expand:important-disallowed
+background: "#ff0 url(\\"image.jpg\\") no-repeat fixed center / cover !important" <rule-fixture> spec -> cannot-expand:important-disallowed
+background: "#ff0 url(\\"image.jpg\\") no-repeat fixed center / cover !important" [allowImportant] <rule-fixture> minimal -> ok! backgroundColor="#ff0 !important"(e) backgroundImage="url(\\"image.jpg\\") !important"(e) backgroundRepeat="no-repeat !important"(e) backgroundAttachment="fixed !important"(e) backgroundPosition="center !important"(e) backgroundSize="cover !important"(e)
+background: "#ff0 url(\\"image.jpg\\") no-repeat fixed center / cover !important" [allowImportant] <rule-fixture> spec -> ok! backgroundColor="#ff0 !important"(e) backgroundImage="url(\\"image.jpg\\") !important"(e) backgroundRepeat="no-repeat !important"(e) backgroundAttachment="fixed !important"(e) backgroundPosition="center !important"(e) backgroundSize="cover !important"(e)
+background: "no-repeat center/cover, linear-gradient(to right, #ff7e5f, #feb47b)" <rule-fixture> minimal -> cannot-expand:multiple-layers
+background: "no-repeat center/cover, linear-gradient(to right, #ff7e5f, #feb47b)" <rule-fixture> spec -> cannot-expand:multiple-layers
+background: "green" <mdn> minimal -> no-op
+background: "green" <mdn> spec -> ok backgroundColor="green"(e) backgroundImage="none"(d) backgroundRepeat="repeat"(d) backgroundAttachment="scroll"(d) backgroundPosition="0% 0%"(d) backgroundSize="auto"(d)
+background: "no-repeat url(\\"../../media/examples/lizard.png\\")" <mdn> minimal -> ok backgroundImage="url(\\"../../media/examples/lizard.png\\")"(e) backgroundRepeat="no-repeat"(e)
+background: "no-repeat url(\\"../../media/examples/lizard.png\\")" <mdn> spec -> ok backgroundColor="transparent"(d) backgroundImage="url(\\"../../media/examples/lizard.png\\")"(e) backgroundRepeat="no-repeat"(e) backgroundAttachment="scroll"(d) backgroundPosition="0% 0%"(d) backgroundSize="auto"(d)
+background: "left 5% / 15% 60% repeat-x url(\\"star.png\\")" <mdn> minimal -> ok backgroundImage="url(\\"star.png\\")"(e) backgroundRepeat="repeat-x"(e) backgroundPosition="left 5%"(e) backgroundSize="15% 60%"(e)
+background: "left 5% / 15% 60% repeat-x url(\\"star.png\\")" <mdn> spec -> ok backgroundColor="transparent"(d) backgroundImage="url(\\"star.png\\")"(e) backgroundRepeat="repeat-x"(e) backgroundAttachment="scroll"(d) backgroundPosition="left 5%"(e) backgroundSize="15% 60%"(e)
+font: "italic small-caps bold 16px/1.5 \\"Helvetica Neue\\"" <rule-fixture> minimal -> ok fontStyle="italic"(e) fontVariant="small-caps"(e) fontWeight="bold"(e) fontSize="16px"(e) lineHeight="1.5"(e) fontFamily="\\"Helvetica Neue\\""(e)
+font: "italic small-caps bold 16px/1.5 \\"Helvetica Neue\\"" <rule-fixture> spec -> ok fontStyle="italic"(e) fontVariant="small-caps"(e) fontWeight="bold"(e) fontSize="16px"(e) lineHeight="1.5"(e) fontFamily="\\"Helvetica Neue\\""(e)
+font: "1.2em \\"Fira Sans\\", sans-serif" <mdn> minimal -> ok fontSize="1.2em"(e) fontFamily="\\"Fira Sans\\", sans-serif"(e)
+font: "1.2em \\"Fira Sans\\", sans-serif" <mdn> spec -> ok fontStyle="normal"(d) fontVariant="normal"(d) fontWeight="normal"(d) fontSize="1.2em"(e) lineHeight="normal"(d) fontFamily="\\"Fira Sans\\", sans-serif"(e)
+font: "italic bold 12px/30px Georgia, serif" <mdn> minimal -> ok fontStyle="italic"(e) fontWeight="bold"(e) fontSize="12px"(e) lineHeight="30px"(e) fontFamily="Georgia, serif"(e)
+font: "italic bold 12px/30px Georgia, serif" <mdn> spec -> ok fontStyle="italic"(e) fontVariant="normal"(d) fontWeight="bold"(e) fontSize="12px"(e) lineHeight="30px"(e) fontFamily="Georgia, serif"(e)
+font: "small-caps bold 24px/1 sans-serif" <mdn> minimal -> ok fontVariant="small-caps"(e) fontWeight="bold"(e) fontSize="24px"(e) lineHeight="1"(e) fontFamily="sans-serif"(e)
+font: "small-caps bold 24px/1 sans-serif" <mdn> spec -> ok fontStyle="normal"(d) fontVariant="small-caps"(e) fontWeight="bold"(e) fontSize="24px"(e) lineHeight="1"(e) fontFamily="sans-serif"(e)
+font: "caption" <mdn> minimal -> no-op
+font: "caption" <mdn> spec -> cannot-expand:unsupported-feature (system-font)
+animation: "slidein 3s" <rule-fixture> minimal -> ok animationDuration="3s"(e) animationName="slidein"(e)
+animation: "slidein 3s" <rule-fixture> spec -> ok animationDuration="3s"(e) animationTimingFunction="ease"(d) animationDelay="0s"(d) animationIterationCount="1"(d) animationDirection="normal"(d) animationFillMode="none"(d) animationPlayState="running"(d) animationName="slidein"(e)
+animation: "slidein 3s ease-in" <rule-fixture> minimal -> ok animationDuration="3s"(e) animationTimingFunction="ease-in"(e) animationName="slidein"(e)
+animation: "slidein 3s ease-in" <rule-fixture> spec -> ok animationDuration="3s"(e) animationTimingFunction="ease-in"(e) animationDelay="0s"(d) animationIterationCount="1"(d) animationDirection="normal"(d) animationFillMode="none"(d) animationPlayState="running"(d) animationName="slidein"(e)
+animation: "slidein 3s 1s" <rule-fixture> minimal -> ok animationDuration="3s"(e) animationDelay="1s"(e) animationName="slidein"(e)
+animation: "slidein 3s 1s" <rule-fixture> spec -> ok animationDuration="3s"(e) animationTimingFunction="ease"(d) animationDelay="1s"(e) animationIterationCount="1"(d) animationDirection="normal"(d) animationFillMode="none"(d) animationPlayState="running"(d) animationName="slidein"(e)
+animation: "3s ease-in 1s 2 reverse both paused slidein" <rule-fixture> minimal -> ok animationDuration="3s"(e) animationTimingFunction="ease-in"(e) animationDelay="1s"(e) animationIterationCount="2"(e) animationDirection="reverse"(e) animationFillMode="both"(e) animationPlayState="paused"(e) animationName="slidein"(e)
+animation: "3s ease-in 1s 2 reverse both paused slidein" <rule-fixture> spec -> ok animationDuration="3s"(e) animationTimingFunction="ease-in"(e) animationDelay="1s"(e) animationIterationCount="2"(e) animationDirection="reverse"(e) animationFillMode="both"(e) animationPlayState="paused"(e) animationName="slidein"(e)
+animation: "slidein 300ms cubic-bezier(0.4, 0, 0.2, 1)" <rule-fixture> minimal -> ok animationDuration="300ms"(e) animationTimingFunction="cubic-bezier(0.4, 0, 0.2, 1)"(e) animationName="slidein"(e)
+animation: "slidein 300ms cubic-bezier(0.4, 0, 0.2, 1)" <rule-fixture> spec -> ok animationDuration="300ms"(e) animationTimingFunction="cubic-bezier(0.4, 0, 0.2, 1)"(e) animationDelay="0s"(d) animationIterationCount="1"(d) animationDirection="normal"(d) animationFillMode="none"(d) animationPlayState="running"(d) animationName="slidein"(e)
+animation: "spin 1s linear infinite" <rule-fixture> minimal -> ok animationDuration="1s"(e) animationTimingFunction="linear"(e) animationIterationCount="infinite"(e) animationName="spin"(e)
+animation: "spin 1s linear infinite" <rule-fixture> spec -> ok animationDuration="1s"(e) animationTimingFunction="linear"(e) animationDelay="0s"(d) animationIterationCount="infinite"(e) animationDirection="normal"(d) animationFillMode="none"(d) animationPlayState="running"(d) animationName="spin"(e)
+animation: "slidein 2s ease !important" [allowImportant] <rule-fixture> minimal -> ok! animationDuration="2s !important"(e) animationTimingFunction="ease !important"(e) animationName="slidein !important"(e)
+animation: "slidein 2s ease !important" [allowImportant] <rule-fixture> spec -> ok! animationDuration="2s !important"(e) animationTimingFunction="ease !important"(e) animationDelay="0s !important"(d) animationIterationCount="1 !important"(d) animationDirection="normal !important"(d) animationFillMode="none !important"(d) animationPlayState="running !important"(d) animationName="slidein !important"(e)
+animation: "slidein 3s, fadeout 2s" <rule-fixture> minimal -> cannot-expand:multiple-layers
+animation: "slidein 3s, fadeout 2s" <rule-fixture> spec -> cannot-expand:multiple-layers
+animation: "2 3s slidein" <rule-fixture> minimal -> ok animationDuration="3s"(e) animationIterationCount="2"(e) animationName="slidein"(e)
+animation: "2 3s slidein" <rule-fixture> spec -> ok animationDuration="3s"(e) animationTimingFunction="ease"(d) animationDelay="0s"(d) animationIterationCount="2"(e) animationDirection="normal"(d) animationFillMode="none"(d) animationPlayState="running"(d) animationName="slidein"(e)
+animation: "1s none" <rule-fixture> minimal -> ok animationDuration="1s"(e) animationName="none"(e)
+animation: "1s none" <rule-fixture> spec -> ok animationDuration="1s"(e) animationTimingFunction="ease"(d) animationDelay="0s"(d) animationIterationCount="1"(d) animationDirection="normal"(d) animationFillMode="none"(d) animationPlayState="running"(d) animationName="none"(e)
+animation: "fadein 1s none" <rule-fixture> minimal -> ok animationDuration="1s"(e) animationFillMode="none"(e) animationName="fadein"(e)
+animation: "fadein 1s none" <rule-fixture> spec -> ok animationDuration="1s"(e) animationTimingFunction="ease"(d) animationDelay="0s"(d) animationIterationCount="1"(d) animationDirection="normal"(d) animationFillMode="none"(e) animationPlayState="running"(d) animationName="fadein"(e)
+animation: "bounce 1s alternate-reverse" <rule-fixture> minimal -> ok animationDuration="1s"(e) animationDirection="alternate-reverse"(e) animationName="bounce"(e)
+animation: "bounce 1s alternate-reverse" <rule-fixture> spec -> ok animationDuration="1s"(e) animationTimingFunction="ease"(d) animationDelay="0s"(d) animationIterationCount="1"(d) animationDirection="alternate-reverse"(e) animationFillMode="none"(d) animationPlayState="running"(d) animationName="bounce"(e)
+animation: "3s linear 1s slidein" <mdn> minimal -> ok animationDuration="3s"(e) animationTimingFunction="linear"(e) animationDelay="1s"(e) animationName="slidein"(e)
+animation: "3s linear 1s slidein" <mdn> spec -> ok animationDuration="3s"(e) animationTimingFunction="linear"(e) animationDelay="1s"(e) animationIterationCount="1"(d) animationDirection="normal"(d) animationFillMode="none"(d) animationPlayState="running"(d) animationName="slidein"(e)
+animation: "none" <mdn> minimal -> no-op
+animation: "none" <mdn> spec -> ok animationDuration="0s"(d) animationTimingFunction="ease"(d) animationDelay="0s"(d) animationIterationCount="1"(d) animationDirection="normal"(d) animationFillMode="none"(d) animationPlayState="running"(d) animationName="none"(e)
+flex: 1 <rule-fixture> minimal -> no-op
+flex: 1 <rule-fixture> spec -> ok flexGrow=1(e) flexShrink="1"(d) flexBasis="0%"(d)
+flex: "2" <rule-fixture> minimal -> no-op
+flex: "2" <rule-fixture> spec -> ok flexGrow="2"(e) flexShrink="1"(d) flexBasis="0%"(d)
+flex: "auto" <rule-fixture> minimal -> no-op
+flex: "auto" <rule-fixture> spec -> ok flexGrow="1"(r) flexShrink="1"(r) flexBasis="auto"(r)
+flex: "none" <rule-fixture> minimal -> no-op
+flex: "none" <rule-fixture> spec -> ok flexGrow="0"(r) flexShrink="0"(r) flexBasis="auto"(r)
+flex: "initial" <rule-fixture> minimal -> no-op
+flex: "initial" <rule-fixture> spec -> ok flexGrow="initial"(r) flexShrink="initial"(r) flexBasis="initial"(r)
+flex: "100px" <rule-fixture> minimal -> no-op
+flex: "100px" <rule-fixture> spec -> ok flexGrow="1"(d) flexShrink="1"(d) flexBasis="100px"(e)
+flex: "1 0" <rule-fixture> minimal -> ok flexGrow="1"(e) flexShrink="0"(e) flexBasis="0%"(d)
+flex: "1 0" <rule-fixture> spec -> ok flexGrow="1"(e) flexShrink="0"(e) flexBasis="0%"(d)
+flex: "1 30px" <rule-fixture> minimal -> ok flexGrow="1"(e) flexShrink="1"(d) flexBasis="30px"(e)
+flex: "1 30px" <rule-fixture> spec -> ok flexGrow="1"(e) flexShrink="1"(d) flexBasis="30px"(e)
+flex: "2 2 10%" <rule-fixture> minimal -> ok flexGrow="2"(e) flexShrink="2"(e) flexBasis="10%"(e)
+flex: "2 2 10%" <rule-fixture> spec -> ok flexGrow="2"(e) flexShrink="2"(e) flexBasis="10%"(e)
+flex: "1 0 auto !important" [allowImportant] <rule-fixture> minimal -> ok! flexGrow="1 !important"(e) flexShrink="0 !important"(e) flexBasis="auto !important"(e)
+flex: "1 0 auto !important" [allowImportant] <rule-fixture> spec -> ok! flexGrow="1 !important"(e) flexShrink="0 !important"(e) flexBasis="auto !important"(e)
+flex: "1 1 calc(100% - 20px)" <rule-fixture> minimal -> ok flexGrow="1"(e) flexShrink="1"(e) flexBasis="calc(100% - 20px)"(e)
+flex: "1 1 calc(100% - 20px)" <rule-fixture> spec -> ok flexGrow="1"(e) flexShrink="1"(e) flexBasis="calc(100% - 20px)"(e)
+flex: "0 1 auto" <mdn> minimal -> ok flexGrow="0"(e) flexShrink="1"(e) flexBasis="auto"(e)
+flex: "0 1 auto" <mdn> spec -> ok flexGrow="0"(e) flexShrink="1"(e) flexBasis="auto"(e)
+flex: "1 1 0" <mdn> minimal -> ok flexGrow="1"(e) flexShrink="1"(e) flexBasis="0"(e)
+flex: "1 1 0" <mdn> spec -> ok flexGrow="1"(e) flexShrink="1"(e) flexBasis="0"(e)
+flex: "min-content" <mdn> minimal -> no-op
+flex: "min-content" <mdn> spec -> ok flexGrow="1"(d) flexShrink="1"(d) flexBasis="min-content"(e)
+flex: "1 var(--b)" <mdn> minimal -> cannot-expand:contains-variable
+flex: "1 var(--b)" <mdn> spec -> cannot-expand:contains-variable
+gridRow: 1 <rule-fixture> minimal -> no-op
+gridRow: 1 <rule-fixture> spec -> ok gridRowStart="1"(e) gridRowEnd="auto"(d)
+gridRow: "span 2" <rule-fixture> minimal -> no-op
+gridRow: "span 2" <rule-fixture> spec -> ok gridRowStart="span 2"(e) gridRowEnd="auto"(d)
+gridRow: "1 / 3" <rule-fixture> minimal -> ok gridRowStart="1"(e) gridRowEnd="3"(e)
+gridRow: "1 / 3" <rule-fixture> spec -> ok gridRowStart="1"(e) gridRowEnd="3"(e)
+gridRow: "header-start / content-end" <rule-fixture> minimal -> ok gridRowStart="header-start"(e) gridRowEnd="content-end"(e)
+gridRow: "header-start / content-end" <rule-fixture> spec -> ok gridRowStart="header-start"(e) gridRowEnd="content-end"(e)
+gridRow: "1 / span 2" <rule-fixture> minimal -> ok gridRowStart="1"(e) gridRowEnd="span 2"(e)
+gridRow: "1 / span 2" <rule-fixture> spec -> ok gridRowStart="1"(e) gridRowEnd="span 2"(e)
+gridColumn: "1" <rule-fixture> minimal -> no-op
+gridColumn: "1" <rule-fixture> spec -> ok gridColumnStart="1"(e) gridColumnEnd="auto"(d)
+gridColumn: "auto" <rule-fixture> minimal -> no-op
+gridColumn: "auto" <rule-fixture> spec -> ok gridColumnStart="auto"(e) gridColumnEnd="auto"(d)
+gridColumn: "span 3" <rule-fixture> minimal -> no-op
+gridColumn: "span 3" <rule-fixture> spec -> ok gridColumnStart="span 3"(e) gridColumnEnd="auto"(d)
+gridColumn: "calc(100%/3)" <rule-fixture> minimal -> no-op
+gridColumn: "calc(100%/3)" <rule-fixture> spec -> cannot-expand:parse-error (Unexpected component: calc(100%/3))
+gridColumn: "2 / 4" <rule-fixture> minimal -> ok gridColumnStart="2"(e) gridColumnEnd="4"(e)
+gridColumn: "2 / 4" <rule-fixture> spec -> ok gridColumnStart="2"(e) gridColumnEnd="4"(e)
+gridArea: "auto" <rule-fixture> minimal -> no-op
+gridArea: "auto" <rule-fixture> spec -> ok gridRowStart="auto"(e) gridColumnStart="auto"(d) gridRowEnd="auto"(d) gridColumnEnd="auto"(d)
+gridArea: "span 2" <rule-fixture> minimal -> no-op
+gridArea: "span 2" <rule-fixture> spec -> ok gridRowStart="span 2"(e) gridColumnStart="auto"(d) gridRowEnd="auto"(d) gridColumnEnd="auto"(d)
+gridArea: "1" <rule-fixture> minimal -> no-op
+gridArea: "1" <rule-fixture> spec -> ok gridRowStart="1"(e) gridColumnStart="auto"(d) gridRowEnd="auto"(d) gridColumnEnd="auto"(d)
+gridArea: "header" <rule-fixture> minimal -> ok gridRowStart="header"(e) gridColumnStart="header"(r) gridRowEnd="header"(r) gridColumnEnd="header"(r)
+gridArea: "header" <rule-fixture> spec -> ok gridRowStart="header"(e) gridColumnStart="header"(r) gridRowEnd="header"(r) gridColumnEnd="header"(r)
+gridArea: "header / sidebar" <rule-fixture> minimal -> ok gridRowStart="header"(e) gridColumnStart="sidebar"(e) gridRowEnd="header"(r) gridColumnEnd="sidebar"(r)
+gridArea: "header / sidebar" <rule-fixture> spec -> ok gridRowStart="header"(e) gridColumnStart="sidebar"(e) gridRowEnd="header"(r) gridColumnEnd="sidebar"(r)
+gridArea: "span 2 / span 3" <rule-fixture> minimal -> ok gridRowStart="span 2"(e) gridColumnStart="span 3"(e)
+gridArea: "span 2 / span 3" <rule-fixture> spec -> ok gridRowStart="span 2"(e) gridColumnStart="span 3"(e) gridRowEnd="auto"(d) gridColumnEnd="auto"(d)
+gridArea: "1 / 2 / 3" <rule-fixture> minimal -> ok gridRowStart="1"(e) gridColumnStart="2"(e) gridRowEnd="3"(e)
+gridArea: "1 / 2 / 3" <rule-fixture> spec -> ok gridRowStart="1"(e) gridColumnStart="2"(e) gridRowEnd="3"(e) gridColumnEnd="auto"(d)
+gridArea: "1 / 2 / 3 / 4" <rule-fixture> minimal -> ok gridRowStart="1"(e) gridColumnStart="2"(e) gridRowEnd="3"(e) gridColumnEnd="4"(e)
+gridArea: "1 / 2 / 3 / 4" <rule-fixture> spec -> ok gridRowStart="1"(e) gridColumnStart="2"(e) gridRowEnd="3"(e) gridColumnEnd="4"(e)
+gridArea: "header / 2" <rule-fixture> minimal -> ok gridRowStart="header"(e) gridColumnStart="2"(e) gridRowEnd="header"(r)
+gridArea: "header / 2" <rule-fixture> spec -> ok gridRowStart="header"(e) gridColumnStart="2"(e) gridRowEnd="header"(r) gridColumnEnd="auto"(d)
+gridArea: "1 / sidebar" <rule-fixture> minimal -> ok gridRowStart="1"(e) gridColumnStart="sidebar"(e) gridColumnEnd="sidebar"(r)
+gridArea: "1 / sidebar" <rule-fixture> spec -> ok gridRowStart="1"(e) gridColumnStart="sidebar"(e) gridRowEnd="auto"(d) gridColumnEnd="sidebar"(r)
+gridArea: "1 / sidebar / 3" <rule-fixture> minimal -> ok gridRowStart="1"(e) gridColumnStart="sidebar"(e) gridRowEnd="3"(e) gridColumnEnd="sidebar"(r)
+gridArea: "1 / sidebar / 3" <rule-fixture> spec -> ok gridRowStart="1"(e) gridColumnStart="sidebar"(e) gridRowEnd="3"(e) gridColumnEnd="sidebar"(r)
+gridRow: "var(--line) / 2" <mdn> minimal -> ok gridRowStart="var(--line)"(e) gridRowEnd="2"(e)
+gridRow: "var(--line) / 2" <mdn> spec -> ok gridRowStart="var(--line)"(e) gridRowEnd="2"(e)
+gridRow: "span 2 / 4" <mdn> minimal -> ok gridRowStart="span 2"(e) gridRowEnd="4"(e)
+gridRow: "span 2 / 4" <mdn> spec -> ok gridRowStart="span 2"(e) gridRowEnd="4"(e)
+gridColumn: "var(--start) / var(--end)" <mdn> minimal -> ok gridColumnStart="var(--start)"(e) gridColumnEnd="var(--end)"(e)
+gridColumn: "var(--start) / var(--end)" <mdn> spec -> ok gridColumnStart="var(--start)"(e) gridColumnEnd="var(--end)"(e)
+gridArea: "a / b / c / d" <mdn> minimal -> ok gridRowStart="a"(e) gridColumnStart="b"(e) gridRowEnd="c"(e) gridColumnEnd="d"(e)
+gridArea: "a / b / c / d" <mdn> spec -> ok gridRowStart="a"(e) gridColumnStart="b"(e) gridRowEnd="c"(e) gridColumnEnd="d"(e)
+gridArea: "var(--area)" <mdn> minimal -> no-op
+gridArea: "var(--area)" <mdn> spec -> ok gridRowStart="var(--area)"(e) gridColumnStart="auto"(d) gridRowEnd="auto"(d) gridColumnEnd="auto"(d)
+gridTemplate: "none" <rule-fixture> minimal -> no-op
+gridTemplate: "none" <rule-fixture> spec -> ok gridTemplateRows="none"(r) gridTemplateColumns="none"(r)
+gridTemplate: "1fr 2fr / 100px 1fr" <rule-fixture> minimal -> ok gridTemplateRows="1fr 2fr"(e) gridTemplateColumns="100px 1fr"(e)
+gridTemplate: "1fr 2fr / 100px 1fr" <rule-fixture> spec -> ok gridTemplateRows="1fr 2fr"(e) gridTemplateColumns="100px 1fr"(e)
+gridTemplate: "auto auto / repeat(3, 1fr)" <rule-fixture> minimal -> ok gridTemplateRows="auto auto"(e) gridTemplateColumns="repeat(3, 1fr)"(e)
+gridTemplate: "auto auto / repeat(3, 1fr)" <rule-fixture> spec -> ok gridTemplateRows="auto auto"(e) gridTemplateColumns="repeat(3, 1fr)"(e)
+gridTemplate: "minmax(20px, auto) 1fr / repeat(2, 100px)" <mdn> minimal -> ok gridTemplateRows="minmax(20px, auto) 1fr"(e) gridTemplateColumns="repeat(2, 100px)"(e)
+gridTemplate: "minmax(20px, auto) 1fr / repeat(2, 100px)" <mdn> spec -> ok gridTemplateRows="minmax(20px, auto) 1fr"(e) gridTemplateColumns="repeat(2, 100px)"(e)
+gridTemplate: "\\"a a a\\" \\"b b b\\" / 1fr 2fr" <mdn> minimal -> cannot-expand:unsupported-feature (template-areas)
+gridTemplate: "\\"a a a\\" \\"b b b\\" / 1fr 2fr" <mdn> spec -> cannot-expand:unsupported-feature (template-areas)
+marginHorizontal: "10px" <rule-fixture> minimal -> not-shorthand
+marginHorizontal: "10px" <rule-fixture> spec -> not-shorthand
+borderStart: "1px solid red" <rule-fixture> minimal -> not-shorthand
+borderStart: "1px solid red" <rule-fixture> spec -> not-shorthand
+gridColumnGap: "10px" <rule-fixture> minimal -> not-shorthand
+gridColumnGap: "10px" <rule-fixture> spec -> not-shorthand
+gridRowStart: 1 <rule-fixture> minimal -> not-shorthand
+gridRowStart: 1 <rule-fixture> spec -> not-shorthand"
+`;
