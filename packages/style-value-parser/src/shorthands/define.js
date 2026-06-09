@@ -87,6 +87,14 @@ export function defineShorthand<T, K: string>(
     parse: TokenParser<T>,
     expand: (parsed: T) => Readonly<{ [_k in K]: Cell }>,
     /**
+     * Typed non-parse refusal for values the grammar recognizes but the
+     * engine cannot expand (font's system keywords, oblique <angle>).
+     * Checked after a successful parse and before any expansion; a
+     * non-null feature name becomes a cannot-expand result with reason
+     * unsupported-feature.
+     */
+    unsupported?: (parsed: T) => ?string,
+    /**
      * Optional minimal-output override where the smallest representation
      * uses intermediate stylex keys the plain origin-filter cannot produce
      * (marginBlock/marginInline pairing; grid-area's single custom-ident;
@@ -105,8 +113,15 @@ export function defineShorthand<T, K: string>(
     singleComponentIsIdentity?: boolean,
   }>,
 ): ShorthandDef {
-  const { canonical, longhands, parse, expand, condense, expandNumber } =
-    config;
+  const {
+    canonical,
+    longhands,
+    parse,
+    expand,
+    condense,
+    expandNumber,
+    unsupported,
+  } = config;
   const key = camelize(canonical);
 
   const project = (
@@ -137,6 +152,14 @@ export function defineShorthand<T, K: string>(
           kind: 'parse-error',
           message: `Unexpected trailing input: ${trailing[1]}`,
         },
+      };
+    }
+
+    const feature = unsupported != null ? unsupported(parsed) : null;
+    if (feature != null) {
+      return {
+        type: 'cannot-expand',
+        reason: { kind: 'unsupported-feature', feature },
       };
     }
 
