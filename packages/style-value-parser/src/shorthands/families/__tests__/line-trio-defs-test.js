@@ -7,13 +7,29 @@
  * @flow strict
  */
 
+import type { ShorthandDef } from '../../define';
 import type { EmitOptions, ExpandResult } from '../../types';
 
 import { TokenList } from '../../../token-types';
-import { borderDef } from '../../../properties/border';
+import {
+  borderBottomDef,
+  borderDef,
+  borderLeftDef,
+  borderRightDef,
+  borderTopDef,
+} from '../../../properties/border';
+import { outlineDef } from '../../../properties/outline';
+
+function runDef(
+  def: ShorthandDef,
+  value: string,
+  options: EmitOptions,
+): ExpandResult {
+  return def.run(new TokenList(value), options);
+}
 
 function run(value: string, options: EmitOptions): ExpandResult {
-  return borderDef.run(new TokenList(value), options);
+  return runDef(borderDef, value, options);
 }
 
 function expectParseError(result: ExpandResult, message: RegExp) {
@@ -339,5 +355,139 @@ describe('border def (line-trio family)', () => {
     it('refuses an empty value', () => {
       expectParseError(run('', { output: 'spec' }), /at least one component/);
     });
+  });
+});
+
+describe('border side defs (line-trio family)', () => {
+  it('declares per-side longhands with no dialect mapping', () => {
+    const sides = [
+      ['top', borderTopDef],
+      ['right', borderRightDef],
+      ['bottom', borderBottomDef],
+      ['left', borderLeftDef],
+    ];
+    for (const [side, def] of sides) {
+      const Side = side[0].toUpperCase() + side.slice(1);
+      expect(def.canonical).toEqual(`border-${side}`);
+      expect(def.key).toEqual(`border${Side}`);
+      expect(def.longhands).toEqual([
+        `border${Side}Width`,
+        `border${Side}Style`,
+        `border${Side}Color`,
+      ]);
+      // The old splitter applies no preferInline mapping for physical
+      // sides; kept for parity.
+      expect(def.dialectMap).toEqual({});
+      expect(def.runNumber).toBe(null);
+      expect(def.singleComponentIsIdentity).toBe(false);
+    }
+  });
+
+  it('emits authored components on the side-specific longhands', () => {
+    expect(runDef(borderTopDef, '2px dashed', { output: 'minimal' })).toEqual({
+      type: 'ok',
+      important: false,
+      assignments: [
+        { property: 'borderTopWidth', value: '2px', origin: 'explicit' },
+        { property: 'borderTopStyle', value: 'dashed', origin: 'explicit' },
+      ],
+    });
+  });
+
+  it('defaults omitted slots like border in spec output', () => {
+    expect(runDef(borderLeftDef, 'red', { output: 'spec' })).toEqual({
+      type: 'ok',
+      important: false,
+      assignments: [
+        { property: 'borderLeftWidth', value: 'medium', origin: 'defaulted' },
+        { property: 'borderLeftStyle', value: 'none', origin: 'defaulted' },
+        { property: 'borderLeftColor', value: 'red', origin: 'explicit' },
+      ],
+    });
+  });
+});
+
+describe('outline def (line-trio family)', () => {
+  const runOutline = (value: string, options: EmitOptions) =>
+    runDef(outlineDef, value, options);
+
+  it('declares the outline longhands and auto color default', () => {
+    expect(outlineDef.canonical).toEqual('outline');
+    expect(outlineDef.key).toEqual('outline');
+    expect(outlineDef.longhands).toEqual([
+      'outlineWidth',
+      'outlineStyle',
+      'outlineColor',
+    ]);
+    expect(outlineDef.dialectMap).toEqual({});
+    expect(outlineDef.runNumber).toBe(null);
+    expect(outlineDef.singleComponentIsIdentity).toBe(false);
+  });
+
+  it("defaults width to 'medium', style to 'none', and color to 'auto'", () => {
+    expect(runOutline('thick', { output: 'spec' })).toEqual({
+      type: 'ok',
+      important: false,
+      assignments: [
+        { property: 'outlineWidth', value: 'thick', origin: 'explicit' },
+        { property: 'outlineStyle', value: 'none', origin: 'defaulted' },
+        { property: 'outlineColor', value: 'auto', origin: 'defaulted' },
+      ],
+    });
+  });
+
+  it("classifies a lone 'auto' to the style slot", () => {
+    expect(runOutline('auto', { output: 'minimal' })).toEqual({
+      type: 'ok',
+      important: false,
+      assignments: [
+        { property: 'outlineStyle', value: 'auto', origin: 'explicit' },
+      ],
+    });
+  });
+
+  it("classifies 'auto' to the color slot once style is filled", () => {
+    expect(runOutline('solid auto', { output: 'minimal' })).toEqual({
+      type: 'ok',
+      important: false,
+      assignments: [
+        { property: 'outlineStyle', value: 'solid', origin: 'explicit' },
+        { property: 'outlineColor', value: 'auto', origin: 'explicit' },
+      ],
+    });
+    expect(runOutline('auto AUTO', { output: 'minimal' })).toEqual({
+      type: 'ok',
+      important: false,
+      assignments: [
+        { property: 'outlineStyle', value: 'auto', origin: 'explicit' },
+        { property: 'outlineColor', value: 'AUTO', origin: 'explicit' },
+      ],
+    });
+  });
+
+  it('fills all three slots around an auto style', () => {
+    expect(runOutline('1px auto red', { output: 'minimal' })).toEqual({
+      type: 'ok',
+      important: false,
+      assignments: [
+        { property: 'outlineWidth', value: '1px', origin: 'explicit' },
+        { property: 'outlineStyle', value: 'auto', origin: 'explicit' },
+        { property: 'outlineColor', value: 'red', origin: 'explicit' },
+      ],
+    });
+  });
+
+  it("reports a style keyword after 'auto' as a duplicate", () => {
+    expectParseError(
+      runOutline('auto dotted', { output: 'minimal' }),
+      /Duplicate style/,
+    );
+  });
+
+  it("refuses the legacy 'invert' color", () => {
+    expectParseError(
+      runOutline('invert solid', { output: 'minimal' }),
+      /Unexpected component/,
+    );
   });
 });
