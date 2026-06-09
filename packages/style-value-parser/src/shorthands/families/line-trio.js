@@ -12,8 +12,9 @@ import type { ShorthandDef } from '../define';
 import type { Cell } from '../types';
 
 import { TokenParser } from '../../token-parser';
-import { splitTopLevelComponents, varFunction } from '../css-wide';
+import { varFunction } from '../css-wide';
 import { defineShorthand } from '../define';
+import { walkComponents } from './slots';
 
 type SlotName = 'width' | 'style' | 'color';
 
@@ -77,38 +78,11 @@ export function lineTrio(
 
   const parse: TokenParser<LineTrio> = new TokenParser(
     (input): LineTrio | Error => {
-      const startIndex = input.currentIndex;
-      const fail = (message: string): Error => {
-        input.setCurrentIndex(startIndex);
-        return new Error(message);
-      };
-
-      // Materialize the rest of the input so components can be sliced by
-      // range; slot parsers then re-run over exact [start, end) windows.
-      let drained = input.consumeNextToken();
-      while (drained != null) {
-        drained = input.consumeNextToken();
-      }
-      const endIndex = input.currentIndex;
-      const tokens = input.slice(startIndex, endIndex);
-      const components = splitTopLevelComponents(tokens);
+      const { components, matchRange, sliceOf, fail, finish } =
+        walkComponents(input);
       if (components.length === 0) {
         return fail('Expected at least one component');
       }
-
-      /** The verbatim slice when `parser` consumes EXACTLY [start, end). */
-      const matchRange = (
-        parser: TokenParser<Sourced<unknown>>,
-        start: number,
-        end: number,
-      ): string | null => {
-        input.setCurrentIndex(start);
-        const result = parser.run(input);
-        if (result instanceof Error || input.currentIndex !== end) {
-          return null;
-        }
-        return result.raw;
-      };
 
       const filled: {
         width: string | null,
@@ -118,12 +92,9 @@ export function lineTrio(
       const variables: Array<string> = [];
 
       for (const range of components) {
-        const start = startIndex + range.start;
-        const end = startIndex + range.end;
-
-        const varSlice = matchRange(variable, start, end);
-        if (varSlice != null) {
-          variables.push(varSlice);
+        const varMatch = matchRange(variable, range);
+        if (varMatch != null) {
+          variables.push(varMatch.raw);
           continue;
         }
 
@@ -132,9 +103,9 @@ export function lineTrio(
           if (filled[slot] != null) {
             continue;
           }
-          const slice = matchRange(slots[slot], start, end);
-          if (slice != null) {
-            filled[slot] = slice;
+          const match = matchRange(slots[slot], range);
+          if (match != null) {
+            filled[slot] = match.raw;
             matched = true;
             break;
           }
@@ -143,13 +114,10 @@ export function lineTrio(
           continue;
         }
 
-        const componentText = tokens
-          .slice(range.start, range.end)
-          .map((token) => token[1])
-          .join('');
+        const componentText = sliceOf(range);
         const duplicate = SLOT_ORDER.find(
           (slot) =>
-            filled[slot] != null && matchRange(slots[slot], start, end) != null,
+            filled[slot] != null && matchRange(slots[slot], range) != null,
         );
         if (duplicate != null) {
           return fail(`Duplicate ${duplicate} component: ${componentText}`);
@@ -165,7 +133,7 @@ export function lineTrio(
         filled[open[0]] = variables[0];
       }
 
-      input.setCurrentIndex(endIndex);
+      finish();
       return { width: filled.width, style: filled.style, color: filled.color };
     },
     `LineTrio<${config.canonical}>`,
