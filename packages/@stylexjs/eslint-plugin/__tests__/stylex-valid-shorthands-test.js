@@ -890,6 +890,9 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
         },
       ],
     },
+    // the background layers author different slots (asymmetric), so the
+    // value stays reported without a fix: joining the longhands would
+    // have to invent default values the author never wrote
     {
       code: `
         import * as stylex from '@stylexjs/stylex';
@@ -924,6 +927,60 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
         {
           message:
             'Property shorthands using multiple values like "background: no-repeat center/cover, linear-gradient(to right, #ff7e5f, #feb47b)" are not supported in StyleX. Separate into individual properties.',
+        },
+      ],
+    },
+    // background: comma-separated layers autofix when every layer
+    // authors the same slots; each longhand gets one value per layer
+    {
+      code: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            background: 'url(a.png) no-repeat, url(b.png) repeat-x',
+          },
+        });
+      `,
+      output: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            backgroundImage: 'url(a.png), url(b.png)',
+            backgroundRepeat: 'no-repeat, repeat-x',
+          },
+        });
+      `,
+      errors: [
+        {
+          message:
+            'Property shorthands using multiple values like "background: url(a.png) no-repeat, url(b.png) repeat-x" are not supported in StyleX. Separate into individual properties.',
+        },
+      ],
+    },
+    // background: a final-layer color is valid and emits as a single
+    // un-joined value (a color in any earlier layer is invalid CSS)
+    {
+      code: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            background: 'url(a.png), red url(b.png)',
+          },
+        });
+      `,
+      output: `
+        import * as stylex from '@stylexjs/stylex';
+        const styles = stylex.create({
+          main: {
+            backgroundColor: 'red',
+            backgroundImage: 'url(a.png), url(b.png)',
+          },
+        });
+      `,
+      errors: [
+        {
+          message:
+            'Property shorthands using multiple values like "background: url(a.png), red url(b.png)" are not supported in StyleX. Separate into individual properties.',
         },
       ],
     },
