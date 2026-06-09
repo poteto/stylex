@@ -45,6 +45,12 @@ describe('expandShorthand', () => {
       expect(lookupShorthand('nope')).toBe(null);
     });
 
+    it('defaults singleComponentIsIdentity to true on every def', () => {
+      for (const key of Object.keys(registry)) {
+        expect(registry[key].singleComponentIsIdentity).toBe(true);
+      }
+    });
+
     it('is re-exported from the package index as `shorthands`', () => {
       expect(typeof styleValueParser.shorthands.expandShorthand).toEqual(
         'function',
@@ -761,6 +767,27 @@ describe('expandShorthand', () => {
           {
             property: 'cornerEndStartShape',
             value: 'notch',
+            origin: 'explicit',
+          },
+        ],
+      });
+    });
+
+    it('collapses a no-whitespace slash form onto the shorthand key', () => {
+      // '10px/20px' is three top-level components (value, slash, value),
+      // so minimal output must reach the def instead of fast-path no-oping
+      // on a single whitespace-run. The old splitter refused any top-level
+      // slash here (CANNOT_FIX); collapsing to the canonical '<h> / <v>'
+      // form is a knowing improvement.
+      expect(
+        expandShorthand('borderRadius', '10px/20px', { output: 'minimal' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'borderRadius',
+            value: '10px / 20px',
             origin: 'explicit',
           },
         ],
