@@ -60,7 +60,8 @@ export type StyleXOptions = Readonly<{
   styleResolution:
     | 'application-order'
     | 'property-specificity'
-    | 'legacy-expand-shorthands';
+    | 'legacy-expand-shorthands'
+    | 'spec-expand-shorthands';
   test: boolean;
 }>;
 export type MutableCompiledNamespaces = { [key: string]: FlatCompiledStyles };

@@ -12,11 +12,13 @@ import type { StyleXOptions, TStyleValue } from '../common-types';
 import applicationOrder from './application-order';
 import legacyExpandShorthands from './legacy-expand-shorthands';
 import propertySpecificity from './property-specificity';
+import specExpandShorthands from './spec-expand-shorthands';
 
 const expansions = {
   'application-order': applicationOrder,
   'property-specificity': propertySpecificity,
   'legacy-expand-shorthands': legacyExpandShorthands,
+  'spec-expand-shorthands': specExpandShorthands,
 };
 
 export function getExpandedKeys(
@@ -40,13 +42,14 @@ export default function flatMapExpandedShorthands(
   if (key.startsWith('var(') && key.endsWith(')')) {
     key = key.slice(4, -1);
   }
-  const expansion: (
-    string | number | null,
-  ) => $ReadOnlyArray<[string, TStyleValue]> =
+  const expansion: (TStyleValue) => $ReadOnlyArray<[string, TStyleValue]> =
     expansions[options.styleResolution ?? 'property-specificity'][key];
   // $FlowFixMe[constant-condition] - expansion is a function
   if (expansion) {
-    if (Array.isArray(value)) {
+    if (
+      Array.isArray(value) &&
+      options.styleResolution !== 'spec-expand-shorthands'
+    ) {
       throw new Error(
         'Cannot use fallbacks for shorthands. Use the expansion instead.',
       );

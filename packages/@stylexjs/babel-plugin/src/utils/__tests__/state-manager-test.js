@@ -423,6 +423,7 @@ describe('StateManager config parsing', () => {
         	- the literal "application-order"
         	- the literal "property-specificity"
         	- the literal "legacy-expand-shorthands"
+        	- the literal "spec-expand-shorthands"
         But got: "something-else"",
           ],
         ]
@@ -445,6 +446,11 @@ describe('StateManager config parsing', () => {
       stateManager = makeState({ styleResolution: 'legacy-expand-shorthands' });
       expect(stateManager.options.styleResolution).toBe(
         'legacy-expand-shorthands',
+      );
+
+      stateManager = makeState({ styleResolution: 'spec-expand-shorthands' });
+      expect(stateManager.options.styleResolution).toBe(
+        'spec-expand-shorthands',
       );
 
       expect(warnings).toEqual([]);

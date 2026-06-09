@@ -74,7 +74,17 @@ export type StyleXOptions = $ReadOnly<{
     | 'property-specificity'
     // Legacy behavior, that expands shorthand properties into their longhand counterparts at compile-time.
     // This is not recommended, and will be removed in a future version.
-    | 'legacy-expand-shorthands',
+    | 'legacy-expand-shorthands'
+    // Like 'property-specificity', but statically-parseable shorthand values are
+    // expanded to their longhands at compile time using the CSS spec grammar,
+    // including the spec-defined defaults for omitted slots ('border: 1px solid'
+    // also sets 'borderColor: currentcolor'). Values that cannot be statically
+    // parsed (var() references, fallback arrays, dynamic styles) are left on the
+    // authored shorthand key. NOTE: expansion moves declarations from the
+    // shorthand priority tiers (1000/2000) to the longhand tiers (3000/4000),
+    // which changes merge outcomes for code that relied on shorthand-vs-longhand
+    // layering; every expanded declaration competes at longhand specificity.
+    | 'spec-expand-shorthands',
   test: boolean,
   ...
 }>;

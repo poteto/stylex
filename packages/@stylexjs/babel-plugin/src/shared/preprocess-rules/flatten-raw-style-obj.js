@@ -77,6 +77,13 @@ export function _flattenRawStyleObject(
 
     // Fallback Styles
     if (Array.isArray(value)) {
+      // Spec expansion would have to rewrite every fallback in lockstep,
+      // which is unsound when any of them references a var(). Fallback
+      // lists therefore keep the default property-specificity behavior.
+      const optionsForFallbacks =
+        options.styleResolution === 'spec-expand-shorthands'
+          ? { ...options, styleResolution: 'property-specificity' as const }
+          : options;
       // Step 1: Expand properties to its constituent parts
       // Collect the various values for each value in the array
       // that belongs to the same property.
@@ -84,7 +91,10 @@ export function _flattenRawStyleObject(
         [string]: Array<null | string | number>,
       } = {};
       for (const eachVal of value) {
-        const pairs = flatMapExpandedShorthands([key, eachVal], options);
+        const pairs = flatMapExpandedShorthands(
+          [key, eachVal],
+          optionsForFallbacks,
+        );
         for (const [property, val] of pairs) {
           if (Array.isArray(val)) {
             if (equivalentPairs[property] == null) {
