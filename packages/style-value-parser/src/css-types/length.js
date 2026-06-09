@@ -68,8 +68,13 @@ export class Length {
   ];
 
   static get parser(): TokenParser<Length> {
+    // CSS unit matching is ASCII case-insensitive ('10PX' is '10px'); the
+    // stored unit is normalized to lowercase so toString is canonical.
     const united = TokenParser.tokens.Dimension.map(
-      (token): $ReadOnly<[number, string]> => [token[4].value, token[4].unit],
+      (token): $ReadOnly<[number, string]> => [
+        token[4].value,
+        token[4].unit.toLowerCase(),
+      ],
     )
       .where(
         (
