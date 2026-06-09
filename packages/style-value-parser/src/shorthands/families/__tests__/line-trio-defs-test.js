@@ -179,9 +179,6 @@ describe('border def (line-trio family)', () => {
     });
 
     it('matches keywords case-insensitively but emits them verbatim', () => {
-      // Named colors are the one case-SENSITIVE slot: Color.parser's
-      // NamedColor list matches verbatim idents only ('Red' refuses), a
-      // pre-existing css-types trait this family inherits.
       expect(run('1Px SOLID red', { output: 'minimal' })).toEqual({
         type: 'ok',
         important: false,
@@ -191,10 +188,15 @@ describe('border def (line-trio family)', () => {
           { property: 'borderColor', value: 'red', origin: 'explicit' },
         ],
       });
-      expectParseError(
-        run('1px solid Red', { output: 'minimal' }),
-        /Unexpected component/,
-      );
+      expect(run('1px solid Red', { output: 'minimal' })).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'borderWidth', value: '1px', origin: 'explicit' },
+          { property: 'borderStyle', value: 'solid', origin: 'explicit' },
+          { property: 'borderColor', value: 'Red', origin: 'explicit' },
+        ],
+      });
     });
   });
 

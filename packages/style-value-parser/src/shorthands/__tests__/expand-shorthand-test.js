@@ -961,6 +961,20 @@ describe('expandShorthand', () => {
       });
     });
 
+    it('matches named colors case-insensitively and emits them verbatim', () => {
+      expect(
+        expandShorthand('border', '1px solid RED', { output: 'minimal' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'borderWidth', value: '1px', origin: 'explicit' },
+          { property: 'borderStyle', value: 'solid', origin: 'explicit' },
+          { property: 'borderColor', value: 'RED', origin: 'explicit' },
+        ],
+      });
+    });
+
     it('fills the one open slot with the one var() by elimination', () => {
       expect(
         expandShorthand('border', '1px solid var(--c)', { output: 'minimal' }),
