@@ -141,12 +141,30 @@ describe('grid-row and grid-column defs', () => {
       expectParseError(run('span-2 / 2', { output: 'spec' }));
     });
 
-    it("requires 'span' to combine with a following integer or name", () => {
+    it("requires 'span' to combine with an integer or name, in any order", () => {
+      // A lone span, or span with only auto, is still refused.
       expectParseError(run('span / 2', { output: 'spec' }), /span/);
-      expectParseError(run('2 span / 3', { output: 'spec' }), /span/);
+      expectParseError(run('span auto / 3', { output: 'spec' }), /span/);
+      // The integer or name may lead or trail the span (the spec's && is
+      // order-free and browsers accept both); WPT marks 'grid-column: 5
+      // span' valid.
+      expect(run('span 2 / 3', { output: 'spec' }).type).toEqual('ok');
+      expect(run('2 span / 3', { output: 'spec' }).type).toEqual('ok');
       expect(run('span foo / 3', { output: 'spec' }).type).toEqual('ok');
+      expect(run('foo span / 3', { output: 'spec' }).type).toEqual('ok');
       // A var() may substitute the integer or name a span needs.
       expect(run('span var(--n) / 3', { output: 'spec' }).type).toEqual('ok');
+    });
+
+    it('relocates a trailing span verbatim (WPT: grid-column 5 span)', () => {
+      expect(runWith(gridColumnDef, '5 span', { output: 'spec' })).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'gridColumnStart', value: '5 span', origin: 'explicit' },
+          { property: 'gridColumnEnd', value: 'auto', origin: 'defaulted' },
+        ],
+      });
     });
   });
 
@@ -379,6 +397,26 @@ describe('grid-area def', () => {
           { property: 'gridColumnStart', value: '2', origin: 'explicit' },
           { property: 'gridRowEnd', value: '3', origin: 'explicit' },
           { property: 'gridColumnEnd', value: '4', origin: 'explicit' },
+        ],
+      });
+    });
+
+    it('relocates trailing-span groups verbatim (WPT shorthand vector)', () => {
+      // WPT: 'grid-area: +90 -a- / 2 i span' sets grid-column-start to
+      // 'span 2 i' in the browser; the engine relocates each side
+      // verbatim, and the browser normalizes the order on read-back.
+      expect(run('+90 -a- / 2 i span', { output: 'spec' })).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'gridRowStart', value: '+90 -a-', origin: 'explicit' },
+          {
+            property: 'gridColumnStart',
+            value: '2 i span',
+            origin: 'explicit',
+          },
+          { property: 'gridRowEnd', value: 'auto', origin: 'defaulted' },
+          { property: 'gridColumnEnd', value: 'auto', origin: 'defaulted' },
         ],
       });
     });

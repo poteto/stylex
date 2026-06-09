@@ -80,13 +80,16 @@ function classifyLineComponent(
 
 /**
  * Shallow <grid-line> group validation, deliberately: every component
- * must classify, and a 'span' must combine with a FOLLOWING integer or
- * name (or a var() that could substitute either) in the same group.
- * Deep <grid-line> grammar (span/auto exclusivity, integer-zero
- * refusal, component ordering) is NOT enforced -- verbatim relocation
- * is the job, so the def only refuses components that cannot be part of
- * any grid line. Returns the parse problem, or null when the group is
- * acceptable.
+ * must classify, and a 'span' must combine with an integer or name (or a
+ * var() that could substitute either) somewhere in the same group. The
+ * spec's `span && [ <integer> || <custom-ident> ]` is order-free, so the
+ * integer or name may lead OR trail the span ('2 span' and 'span 2' are
+ * both valid, as browsers accept); only the co-occurrence is required.
+ * Deep <grid-line> grammar (span/auto exclusivity, integer-zero refusal,
+ * component ordering, one-span-per-line) is NOT enforced -- verbatim
+ * relocation is the job, so the def only refuses components that cannot
+ * be part of any grid line. Returns the parse problem, or null when the
+ * group is acceptable.
  */
 function lineGroupProblem(
   walk: ComponentWalk,
@@ -95,20 +98,21 @@ function lineGroupProblem(
   if (group.length === 0) {
     return 'Expected a grid line on each side of the slash';
   }
+  let hasSpan = false;
+  let hasIntegerOrName = false;
   for (let index = 0; index < group.length; index++) {
     const kind = classifyLineComponent(walk, group[index]);
     if (kind == null) {
       return `Unexpected component: ${walk.sliceOf(group[index])}`;
     }
     if (kind === 'span') {
-      const next =
-        index + 1 < group.length
-          ? classifyLineComponent(walk, group[index + 1])
-          : null;
-      if (next !== 'integer' && next !== 'ident' && next !== 'var') {
-        return "Expected an integer or line name after 'span'";
-      }
+      hasSpan = true;
+    } else if (kind === 'integer' || kind === 'ident' || kind === 'var') {
+      hasIntegerOrName = true;
     }
+  }
+  if (hasSpan && !hasIntegerOrName) {
+    return "Expected an integer or line name with 'span'";
   }
   return null;
 }
