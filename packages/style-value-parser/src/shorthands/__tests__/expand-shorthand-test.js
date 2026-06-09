@@ -1254,6 +1254,335 @@ describe('expandShorthand', () => {
     });
   });
 
+  describe('background boundary vectors', () => {
+    it('projects a full layer per output mode', () => {
+      expect(
+        expandShorthand(
+          'background',
+          'red url(a.png) no-repeat center / cover',
+          {
+            output: 'spec',
+          },
+        ),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'backgroundColor', value: 'red', origin: 'explicit' },
+          {
+            property: 'backgroundImage',
+            value: 'url(a.png)',
+            origin: 'explicit',
+          },
+          {
+            property: 'backgroundRepeat',
+            value: 'no-repeat',
+            origin: 'explicit',
+          },
+          {
+            property: 'backgroundAttachment',
+            value: 'scroll',
+            origin: 'defaulted',
+          },
+          {
+            property: 'backgroundPosition',
+            value: 'center',
+            origin: 'explicit',
+          },
+          { property: 'backgroundSize', value: 'cover', origin: 'explicit' },
+        ],
+      });
+      expect(
+        expandShorthand(
+          'background',
+          'red url(a.png) no-repeat center / cover',
+          {
+            output: 'minimal',
+          },
+        ),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'backgroundColor', value: 'red', origin: 'explicit' },
+          {
+            property: 'backgroundImage',
+            value: 'url(a.png)',
+            origin: 'explicit',
+          },
+          {
+            property: 'backgroundRepeat',
+            value: 'no-repeat',
+            origin: 'explicit',
+          },
+          {
+            property: 'backgroundPosition',
+            value: 'center',
+            origin: 'explicit',
+          },
+          { property: 'backgroundSize', value: 'cover', origin: 'explicit' },
+        ],
+      });
+    });
+
+    it('refuses comma-separated layers as multiple-layers', () => {
+      expect(
+        expandShorthand('background', 'url(a), url(b)', { output: 'minimal' }),
+      ).toEqual({
+        type: 'cannot-expand',
+        reason: { kind: 'multiple-layers' },
+      });
+      expect(
+        expandShorthand('background', 'url(a), url(b)', { output: 'spec' }),
+      ).toEqual({
+        type: 'cannot-expand',
+        reason: { kind: 'multiple-layers' },
+      });
+    });
+
+    it('refuses box keywords as unsupported-feature', () => {
+      expect(
+        expandShorthand('background', 'content-box red', { output: 'minimal' }),
+      ).toEqual({
+        type: 'cannot-expand',
+        reason: {
+          kind: 'unsupported-feature',
+          feature: 'background-box-values',
+        },
+      });
+    });
+
+    it("no-ops a single-component 'background: red' in minimal output", () => {
+      expect(
+        expandShorthand('background', 'red', { output: 'minimal' }),
+      ).toEqual({ type: 'no-op' });
+    });
+  });
+
+  describe('animation boundary vectors', () => {
+    it('projects a six-component layer per output mode', () => {
+      expect(
+        expandShorthand(
+          'animation',
+          '2s ease-in 0.5s infinite alternate slidein',
+          {
+            output: 'spec',
+          },
+        ),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'animationDuration', value: '2s', origin: 'explicit' },
+          {
+            property: 'animationTimingFunction',
+            value: 'ease-in',
+            origin: 'explicit',
+          },
+          { property: 'animationDelay', value: '0.5s', origin: 'explicit' },
+          {
+            property: 'animationIterationCount',
+            value: 'infinite',
+            origin: 'explicit',
+          },
+          {
+            property: 'animationDirection',
+            value: 'alternate',
+            origin: 'explicit',
+          },
+          {
+            property: 'animationFillMode',
+            value: 'none',
+            origin: 'defaulted',
+          },
+          {
+            property: 'animationPlayState',
+            value: 'running',
+            origin: 'defaulted',
+          },
+          { property: 'animationName', value: 'slidein', origin: 'explicit' },
+        ],
+      });
+      expect(
+        expandShorthand(
+          'animation',
+          '2s ease-in 0.5s infinite alternate slidein',
+          {
+            output: 'minimal',
+          },
+        ),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'animationDuration', value: '2s', origin: 'explicit' },
+          {
+            property: 'animationTimingFunction',
+            value: 'ease-in',
+            origin: 'explicit',
+          },
+          { property: 'animationDelay', value: '0.5s', origin: 'explicit' },
+          {
+            property: 'animationIterationCount',
+            value: 'infinite',
+            origin: 'explicit',
+          },
+          {
+            property: 'animationDirection',
+            value: 'alternate',
+            origin: 'explicit',
+          },
+          { property: 'animationName', value: 'slidein', origin: 'explicit' },
+        ],
+      });
+    });
+
+    it("sends a lone 'none' to the name end to end in spec output", () => {
+      const result = expandShorthand('animation', 'none', { output: 'spec' });
+      expect(result.type).toEqual('ok');
+      if (result.type === 'ok') {
+        expect(result.assignments[5]).toEqual({
+          property: 'animationFillMode',
+          value: 'none',
+          origin: 'defaulted',
+        });
+        expect(result.assignments[7]).toEqual({
+          property: 'animationName',
+          value: 'none',
+          origin: 'explicit',
+        });
+      }
+      // In minimal output the single component fast-paths to a no-op.
+      expect(
+        expandShorthand('animation', 'none', { output: 'minimal' }),
+      ).toEqual({ type: 'no-op' });
+    });
+
+    it('refuses a third time component as a parse error', () => {
+      const result = expandShorthand('animation', '1s 2s 3s', {
+        output: 'minimal',
+      });
+      expect(result.type).toEqual('cannot-expand');
+      if (result.type === 'cannot-expand') {
+        expect(result.reason).toEqual({
+          kind: 'parse-error',
+          message: 'Too many time components: 3s',
+        });
+      }
+    });
+  });
+
+  describe('grid boundary vectors', () => {
+    it("splits 'gridRow: span 2 / 3' in minimal output", () => {
+      expect(
+        expandShorthand('gridRow', 'span 2 / 3', { output: 'minimal' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'gridRowStart', value: 'span 2', origin: 'explicit' },
+          { property: 'gridRowEnd', value: '3', origin: 'explicit' },
+        ],
+      });
+    });
+
+    it("expands 'gridArea: header' to four longhands in both modes", () => {
+      const expected = {
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'gridRowStart', value: 'header', origin: 'explicit' },
+          {
+            property: 'gridColumnStart',
+            value: 'header',
+            origin: 'replicated',
+          },
+          { property: 'gridRowEnd', value: 'header', origin: 'replicated' },
+          {
+            property: 'gridColumnEnd',
+            value: 'header',
+            origin: 'replicated',
+          },
+        ],
+      };
+      expect(
+        expandShorthand('gridArea', 'header', { output: 'minimal' }),
+      ).toEqual(expected);
+      expect(expandShorthand('gridArea', 'header', { output: 'spec' })).toEqual(
+        expected,
+      );
+    });
+
+    it('copies an ident column-start to the omitted column-end', () => {
+      expect(
+        expandShorthand('gridArea', '1 / col2 / 3', { output: 'spec' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'gridRowStart', value: '1', origin: 'explicit' },
+          { property: 'gridColumnStart', value: 'col2', origin: 'explicit' },
+          { property: 'gridRowEnd', value: '3', origin: 'explicit' },
+          { property: 'gridColumnEnd', value: 'col2', origin: 'replicated' },
+        ],
+      });
+    });
+
+    it('splits gridTemplate rows / columns in both modes', () => {
+      const expected = {
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'gridTemplateRows',
+            value: '1fr auto',
+            origin: 'explicit',
+          },
+          {
+            property: 'gridTemplateColumns',
+            value: '200px 1fr',
+            origin: 'explicit',
+          },
+        ],
+      };
+      expect(
+        expandShorthand('gridTemplate', '1fr auto / 200px 1fr', {
+          output: 'spec',
+        }),
+      ).toEqual(expected);
+      expect(
+        expandShorthand('gridTemplate', '1fr auto / 200px 1fr', {
+          output: 'minimal',
+        }),
+      ).toEqual(expected);
+    });
+
+    it('refuses the grid-template areas form as unsupported-feature', () => {
+      expect(
+        expandShorthand('gridTemplate', '"a b" 1fr / auto', { output: 'spec' }),
+      ).toEqual({
+        type: 'cannot-expand',
+        reason: { kind: 'unsupported-feature', feature: 'template-areas' },
+      });
+    });
+
+    it('routes a bare gridRow number through the stringified fallback', () => {
+      // No expandNumber on grid defs: minimal no-ops via the identity
+      // fast path; spec parses the stringified '2' as one integer group.
+      expect(expandShorthand('gridRow', 2, { output: 'minimal' })).toEqual({
+        type: 'no-op',
+      });
+      expect(expandShorthand('gridRow', 2, { output: 'spec' })).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'gridRowStart', value: '2', origin: 'explicit' },
+          { property: 'gridRowEnd', value: 'auto', origin: 'defaulted' },
+        ],
+      });
+    });
+  });
+
   describe('refusals', () => {
     it('refuses values the grammar cannot parse', () => {
       const result = expandShorthand('margin', 'red green', {
