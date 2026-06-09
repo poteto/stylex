@@ -63,6 +63,9 @@ export const PARITY_CORPUS: ReadonlyArray<ParityCase> = [
   mdn('margin', 'auto'),
   mdn('margin', '1px 2px 3px'),
   mdn('padding', '1px 2px 3px 4px !important'),
+  // !important without allowImportant: the old splitter mis-split the
+  // bang into a longhand value; the engine refuses instead.
+  mdn('margin', '10px 12px !important'),
 
   // margin/padding axis pairs
   rule('marginInline', 0),

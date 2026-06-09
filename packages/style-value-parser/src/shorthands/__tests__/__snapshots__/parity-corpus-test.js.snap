@@ -35,6 +35,8 @@ margin: "1px 2px 3px" <mdn> minimal -> ok marginTop="1px"(e) marginRight="2px"(e
 margin: "1px 2px 3px" <mdn> spec -> ok marginTop="1px"(e) marginRight="2px"(e) marginBottom="3px"(e) marginLeft="2px"(r)
 padding: "1px 2px 3px 4px !important" <mdn> minimal -> cannot-expand:important-disallowed
 padding: "1px 2px 3px 4px !important" <mdn> spec -> cannot-expand:important-disallowed
+margin: "10px 12px !important" <mdn> minimal -> cannot-expand:important-disallowed
+margin: "10px 12px !important" <mdn> spec -> cannot-expand:important-disallowed
 marginInline: 0 <rule-fixture> minimal -> no-op
 marginInline: 0 <rule-fixture> spec -> ok marginInlineStart=0(e) marginInlineEnd=0(r)
 marginInline: "15px 15px" <rule-fixture> minimal -> ok marginInline="15px"(e)
