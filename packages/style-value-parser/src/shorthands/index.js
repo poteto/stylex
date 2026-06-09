@@ -183,5 +183,18 @@ export function expandShorthand(
   ) {
     return { type: 'cannot-expand', reason: { kind: 'contains-variable' } };
   }
-  return finish(result, def, options, important);
+  const finished = finish(result, def, options, important);
+  // A minimal collapse can land back on the authored key with the
+  // authored text (the already-canonical slash form): that expansion is
+  // identity, and the no-op variant owns identity.
+  if (
+    output === 'minimal' &&
+    finished.type === 'ok' &&
+    finished.assignments.length === 1 &&
+    finished.assignments[0].property === property &&
+    finished.assignments[0].value === value
+  ) {
+    return { type: 'no-op' };
+  }
+  return finished;
 }

@@ -258,7 +258,7 @@ cornerShape: "squircle" <rule-fixture> minimal -> no-op
 cornerShape: "squircle" <rule-fixture> spec -> ok cornerTopLeftShape="squircle"(e) cornerTopRightShape="squircle"(r) cornerBottomRightShape="squircle"(r) cornerBottomLeftShape="squircle"(r)
 cornerShape: "scoop notch" <rule-fixture> minimal -> ok cornerTopLeftShape="scoop"(e) cornerTopRightShape="notch"(e) cornerBottomRightShape="scoop"(r) cornerBottomLeftShape="notch"(r)
 cornerShape: "scoop notch" <rule-fixture> spec -> ok cornerTopLeftShape="scoop"(e) cornerTopRightShape="notch"(e) cornerBottomRightShape="scoop"(r) cornerBottomLeftShape="notch"(r)
-borderRadius: "10px / 20px" <mdn> minimal -> ok borderRadius="10px / 20px"(e)
+borderRadius: "10px / 20px" <mdn> minimal -> no-op
 borderRadius: "10px / 20px" <mdn> spec -> ok borderTopLeftRadius="10px 20px"(e) borderTopRightRadius="10px 20px"(r) borderBottomRightRadius="10px 20px"(r) borderBottomLeftRadius="10px 20px"(r)
 borderRadius: "10px 20px / 30px 40px" <mdn> minimal -> ok borderTopLeftRadius="10px 30px"(e) borderTopRightRadius="20px 40px"(e) borderBottomRightRadius="10px 30px"(r) borderBottomLeftRadius="20px 40px"(r)
 borderRadius: "10px 20px / 30px 40px" <mdn> spec -> ok borderTopLeftRadius="10px 30px"(e) borderTopRightRadius="20px 40px"(e) borderBottomRightRadius="10px 30px"(r) borderBottomLeftRadius="20px 40px"(r)
