@@ -838,6 +838,211 @@ describe('expandShorthand', () => {
     });
   });
 
+  describe('line-trio boundary vectors', () => {
+    it('projects border per output mode', () => {
+      expect(
+        expandShorthand('border', '1px solid red', { output: 'spec' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'borderWidth', value: '1px', origin: 'explicit' },
+          { property: 'borderStyle', value: 'solid', origin: 'explicit' },
+          { property: 'borderColor', value: 'red', origin: 'explicit' },
+        ],
+      });
+      expect(
+        expandShorthand('border', '1px solid red', { output: 'minimal' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'borderWidth', value: '1px', origin: 'explicit' },
+          { property: 'borderStyle', value: 'solid', origin: 'explicit' },
+          { property: 'borderColor', value: 'red', origin: 'explicit' },
+        ],
+      });
+    });
+
+    it('emits only authored slots in minimal output, all three in spec', () => {
+      expect(
+        expandShorthand('border', '1px solid', { output: 'minimal' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'borderWidth', value: '1px', origin: 'explicit' },
+          { property: 'borderStyle', value: 'solid', origin: 'explicit' },
+        ],
+      });
+      expect(
+        expandShorthand('border', '1px solid', { output: 'spec' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'borderWidth', value: '1px', origin: 'explicit' },
+          { property: 'borderStyle', value: 'solid', origin: 'explicit' },
+          {
+            property: 'borderColor',
+            value: 'currentcolor',
+            origin: 'defaulted',
+          },
+        ],
+      });
+    });
+
+    it('classifies components independent of authored order', () => {
+      expect(
+        expandShorthand('border', 'red solid 1px', { output: 'minimal' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'borderWidth', value: '1px', origin: 'explicit' },
+          { property: 'borderStyle', value: 'solid', origin: 'explicit' },
+          { property: 'borderColor', value: 'red', origin: 'explicit' },
+        ],
+      });
+    });
+
+    it('fills the one open slot with the one var() by elimination', () => {
+      expect(
+        expandShorthand('border', '1px solid var(--c)', { output: 'minimal' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'borderWidth', value: '1px', origin: 'explicit' },
+          { property: 'borderStyle', value: 'solid', origin: 'explicit' },
+          { property: 'borderColor', value: 'var(--c)', origin: 'explicit' },
+        ],
+      });
+    });
+
+    it('reclassifies unplaceable var() refusals as contains-variable', () => {
+      expect(
+        expandShorthand('border', 'var(--a) var(--b) solid', {
+          output: 'minimal',
+        }),
+      ).toEqual({
+        type: 'cannot-expand',
+        reason: { kind: 'contains-variable' },
+      });
+      // A lone var() is one component, but border escapes the
+      // single-component fast path and cannot place it (three open
+      // slots), unlike positional grammars where it would no-op.
+      expect(
+        expandShorthand('border', 'var(--x)', { output: 'minimal' }),
+      ).toEqual({
+        type: 'cannot-expand',
+        reason: { kind: 'contains-variable' },
+      });
+    });
+
+    it('expands a single-component border even in minimal output', () => {
+      // End-to-end proof of the def-gated fast-path escape: 'solid' is one
+      // component, yet its minimal form lives on borderStyle.
+      expect(expandShorthand('border', 'solid', { output: 'minimal' })).toEqual(
+        {
+          type: 'ok',
+          important: false,
+          assignments: [
+            { property: 'borderStyle', value: 'solid', origin: 'explicit' },
+          ],
+        },
+      );
+    });
+
+    it('still no-ops a minimal css-wide keyword on an escaping def', () => {
+      expect(
+        expandShorthand('border', 'inherit', { output: 'minimal' }),
+      ).toEqual({ type: 'no-op' });
+      expect(expandShorthand('border', 'inherit', { output: 'spec' })).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'borderWidth', value: 'inherit', origin: 'replicated' },
+          { property: 'borderStyle', value: 'inherit', origin: 'replicated' },
+          { property: 'borderColor', value: 'inherit', origin: 'replicated' },
+        ],
+      });
+    });
+
+    it('refuses duplicate slots as parse errors', () => {
+      const duplicateStyle = expandShorthand('border', 'solid dotted', {
+        output: 'minimal',
+      });
+      expect(duplicateStyle.type).toEqual('cannot-expand');
+      if (duplicateStyle.type === 'cannot-expand') {
+        expect(duplicateStyle.reason).toEqual({
+          kind: 'parse-error',
+          message: 'Duplicate style component: dotted',
+        });
+      }
+      const duplicateWidth = expandShorthand('border', '1px 2px solid', {
+        output: 'minimal',
+      });
+      expect(duplicateWidth.type).toEqual('cannot-expand');
+      if (duplicateWidth.type === 'cannot-expand') {
+        expect(duplicateWidth.reason).toEqual({
+          kind: 'parse-error',
+          message: 'Duplicate width component: 2px',
+        });
+      }
+    });
+
+    it('refuses a bare number through the stringified fallback', () => {
+      // border has no expandNumber: a bare number is not a valid border
+      // value (the old splitter refused it too), so the stringified
+      // grammar route must refuse rather than invent a width.
+      const result = expandShorthand('border', 5, { output: 'minimal' });
+      expect(result.type).toEqual('cannot-expand');
+      if (result.type === 'cannot-expand') {
+        expect(result.reason.kind).toEqual('parse-error');
+      }
+    });
+
+    it('expands border sides onto their side-specific longhands', () => {
+      expect(
+        expandShorthand('borderTop', '2px dashed', { output: 'minimal' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'borderTopWidth', value: '2px', origin: 'explicit' },
+          { property: 'borderTopStyle', value: 'dashed', origin: 'explicit' },
+        ],
+      });
+    });
+
+    it("sends a lone outline 'auto' to the style slot", () => {
+      expect(expandShorthand('outline', 'auto', { output: 'minimal' })).toEqual(
+        {
+          type: 'ok',
+          important: false,
+          assignments: [
+            { property: 'outlineStyle', value: 'auto', origin: 'explicit' },
+          ],
+        },
+      );
+    });
+
+    it('fills all three outline slots around an auto style', () => {
+      expect(
+        expandShorthand('outline', '1px auto red', { output: 'minimal' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'outlineWidth', value: '1px', origin: 'explicit' },
+          { property: 'outlineStyle', value: 'auto', origin: 'explicit' },
+          { property: 'outlineColor', value: 'red', origin: 'explicit' },
+        ],
+      });
+    });
+  });
+
   describe('refusals', () => {
     it('refuses values the grammar cannot parse', () => {
       const result = expandShorthand('margin', 'red green', {
