@@ -10,9 +10,9 @@
   "license": "MIT",
   "scripts": {
     "prebuild": "gen-types -i src/ -o lib/",
-    "build": "babel src/ --out-dir lib/",
+    "build": "rollup --config ./rollup.config.mjs",
     "prebuild-haste": "gen-types -i src/ -o lib/",
-    "build-haste": "rollup --config ./rollup.config.mjs",
+    "build-haste": "cross-env HASTE=true rollup --config ./rollup.config.mjs",
     "test": "jest --detectOpenHandles --coverage"
   },
   "dependencies": {
