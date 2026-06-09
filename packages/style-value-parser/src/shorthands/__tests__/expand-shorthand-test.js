@@ -1112,6 +1112,144 @@ describe('expandShorthand', () => {
     });
   });
 
+  describe('flex boundary vectors', () => {
+    it("expands 'flex: auto' in spec output and no-ops it in minimal", () => {
+      expect(expandShorthand('flex', 'auto', { output: 'spec' })).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'flexGrow', value: '1', origin: 'replicated' },
+          { property: 'flexShrink', value: '1', origin: 'replicated' },
+          { property: 'flexBasis', value: 'auto', origin: 'replicated' },
+        ],
+      });
+      expect(expandShorthand('flex', 'auto', { output: 'minimal' })).toEqual({
+        type: 'no-op',
+      });
+    });
+
+    it('emits the full trio for a 3-value flex in minimal output', () => {
+      expect(expandShorthand('flex', '2 1 0%', { output: 'minimal' })).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'flexGrow', value: '2', origin: 'explicit' },
+          { property: 'flexShrink', value: '1', origin: 'explicit' },
+          { property: 'flexBasis', value: '0%', origin: 'explicit' },
+        ],
+      });
+    });
+
+    it('expands a flex number in spec output and no-ops it in minimal', () => {
+      expect(expandShorthand('flex', 1, { output: 'spec' })).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'flexGrow', value: 1, origin: 'explicit' },
+          { property: 'flexShrink', value: '1', origin: 'defaulted' },
+          { property: 'flexBasis', value: '0%', origin: 'defaulted' },
+        ],
+      });
+      expect(expandShorthand('flex', 1, { output: 'minimal' })).toEqual({
+        type: 'no-op',
+      });
+    });
+
+    it("refuses 'flex: 1 var(--b)' as contains-variable (old splitter split it)", () => {
+      // Knowing divergence: the old splitter accepted var() as a flex
+      // basis and emitted flexBasis: var(--b). A var() substitutes an
+      // unknowable number of components, so the engine refuses with the
+      // typed contains-variable reason instead.
+      expect(
+        expandShorthand('flex', '1 var(--b)', { output: 'minimal' }),
+      ).toEqual({
+        type: 'cannot-expand',
+        reason: { kind: 'contains-variable' },
+      });
+    });
+  });
+
+  describe('font boundary vectors', () => {
+    it('projects the full font form per output mode', () => {
+      expect(
+        expandShorthand('font', 'italic bold 12px/30px serif', {
+          output: 'spec',
+        }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'fontStyle', value: 'italic', origin: 'explicit' },
+          { property: 'fontVariant', value: 'normal', origin: 'defaulted' },
+          { property: 'fontWeight', value: 'bold', origin: 'explicit' },
+          { property: 'fontSize', value: '12px', origin: 'explicit' },
+          { property: 'lineHeight', value: '30px', origin: 'explicit' },
+          { property: 'fontFamily', value: 'serif', origin: 'explicit' },
+        ],
+      });
+      expect(
+        expandShorthand('font', 'italic bold 12px/30px serif', {
+          output: 'minimal',
+        }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'fontStyle', value: 'italic', origin: 'explicit' },
+          { property: 'fontWeight', value: 'bold', origin: 'explicit' },
+          { property: 'fontSize', value: '12px', origin: 'explicit' },
+          { property: 'lineHeight', value: '30px', origin: 'explicit' },
+          { property: 'fontFamily', value: 'serif', origin: 'explicit' },
+        ],
+      });
+    });
+
+    it('keeps a quoted family with a comma run byte-for-byte', () => {
+      expect(
+        expandShorthand('font', '12px "Helvetica Neue", serif', {
+          output: 'minimal',
+        }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'fontSize', value: '12px', origin: 'explicit' },
+          {
+            property: 'fontFamily',
+            value: '"Helvetica Neue", serif',
+            origin: 'explicit',
+          },
+        ],
+      });
+    });
+
+    it("refuses 'font: menu' in spec output as unsupported-feature", () => {
+      expect(expandShorthand('font', 'menu', { output: 'spec' })).toEqual({
+        type: 'cannot-expand',
+        reason: { kind: 'unsupported-feature', feature: 'system-font' },
+      });
+      // In minimal output the single component fast-paths to a no-op
+      // before the grammar (or the unsupported hook) ever runs.
+      expect(expandShorthand('font', 'menu', { output: 'minimal' })).toEqual({
+        type: 'no-op',
+      });
+    });
+
+    it('splits a mid-run slash into size and line-height', () => {
+      expect(
+        expandShorthand('font', '12px/1.5 serif', { output: 'minimal' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'fontSize', value: '12px', origin: 'explicit' },
+          { property: 'lineHeight', value: '1.5', origin: 'explicit' },
+          { property: 'fontFamily', value: 'serif', origin: 'explicit' },
+        ],
+      });
+    });
+  });
+
   describe('refusals', () => {
     it('refuses values the grammar cannot parse', () => {
       const result = expandShorthand('margin', 'red green', {
