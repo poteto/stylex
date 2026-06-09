@@ -1566,6 +1566,47 @@ describe('expandShorthand', () => {
       });
     });
 
+    it('accepts var() grid-line groups without contains-variable', () => {
+      // Slash groups are positionally unambiguous (like the quad rule), so
+      // the boundary's contains-variable reclassification must not trigger.
+      expect(
+        expandShorthand('gridRow', 'var(--line) / 2', { output: 'minimal' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'gridRowStart',
+            value: 'var(--line)',
+            origin: 'explicit',
+          },
+          { property: 'gridRowEnd', value: '2', origin: 'explicit' },
+        ],
+      });
+      // A lone var() group stays identity in minimal output...
+      expect(
+        expandShorthand('gridRow', 'var(--line)', { output: 'minimal' }),
+      ).toEqual({ type: 'no-op' });
+      expect(
+        expandShorthand('gridArea', 'var(--area)', { output: 'minimal' }),
+      ).toEqual({ type: 'no-op' });
+      // ...and is NOT a custom-ident in spec output: the end fills 'auto'.
+      expect(
+        expandShorthand('gridRow', 'var(--line)', { output: 'spec' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'gridRowStart',
+            value: 'var(--line)',
+            origin: 'explicit',
+          },
+          { property: 'gridRowEnd', value: 'auto', origin: 'defaulted' },
+        ],
+      });
+    });
+
     it('routes a bare gridRow number through the stringified fallback', () => {
       // No expandNumber on grid defs: minimal no-ops via the identity
       // fast path; spec parses the stringified '2' as one integer group.
