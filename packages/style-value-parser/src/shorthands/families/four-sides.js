@@ -33,13 +33,31 @@ export function fourSides<T>(
       bottom: string,
       left: string,
     }>,
-    /** Logical pair used by the minimal-output 2-value condensation. */
+    /** Logical pair used by the minimal-output block/inline condensation. */
     condensed: Readonly<{ block: string, inline: string }>,
     /** Physical-to-logical mapping the boundary applies for preferInline. */
     dialectMap: Readonly<{ +[string]: string }>,
+    /**
+     * When minimal output condenses to the block/inline pair:
+     *  - 'two-values' (default): only the exactly-2-value form pairs; 3-4
+     *    value forms always emit the four physical longhands. Parity with
+     *    the old directional transformer (margin, padding, inset,
+     *    scroll-margin, scroll-padding).
+     *  - 'expanded-quad': pair whenever the TRBL-filled quad has
+     *    top==bottom and right==left, including 3-4 value forms. Parity
+     *    with the old border-width/style/color splitter.
+     */
+    pairOn?: 'two-values' | 'expanded-quad',
+    /**
+     * False disables the bare-number fast path for shorthands without a
+     * meaningful numeric form (border-style, border-color); a numeric
+     * input then takes the stringified-grammar route at the boundary.
+     */
+    acceptsNumber?: boolean,
   }>,
 ): ShorthandDef {
   const { sides, condensed } = config;
+  const pairOn = config.pairOn ?? 'two-values';
 
   const component = TokenParser.sourced(config.component);
   const parse: TokenParser<ReadonlyArray<Sourced<T>>> = TokenParser.sequence(
@@ -83,15 +101,14 @@ export function fourSides<T>(
   };
 
   /**
-   * Minimal-output condensation, reproducing the directional transformer
-   * the eslint autofix uses:
+   * Minimal-output condensation, reproducing the old splitters:
    *   - one value: identity, no-op
    *   - all values identical (multivalue): collapse onto the shorthand's
    *     own key, so the consumer rewrites 'margin: 10px 10px' to
    *     'margin: 10px'
-   *   - two values: block/inline pair
-   *   - three/four values: the four physical longhands (left fills from
-   *     right on the 3-value form)
+   *   - block/inline pair per `pairOn` (see the config doc above)
+   *   - otherwise the four physical longhands (bottom fills from top,
+   *     left from right)
    * The identical-collapse compares VERBATIM slices (so '10px 10PX' is not
    * collapsed), matching the old splitter's printed-node comparison.
    */
@@ -107,13 +124,16 @@ export function fourSides<T>(
     if (new Set(raws).size === 1) {
       return [{ property: key, value: raws[0], origin: 'explicit' }];
     }
-    if (raws.length === 2) {
+    const [top, right, bottom = top, left = right] = raws;
+    if (
+      raws.length === 2 ||
+      (pairOn === 'expanded-quad' && top === bottom && right === left)
+    ) {
       return [
-        { property: condensed.block, value: raws[0], origin: 'explicit' },
-        { property: condensed.inline, value: raws[1], origin: 'explicit' },
+        { property: condensed.block, value: top, origin: 'explicit' },
+        { property: condensed.inline, value: right, origin: 'explicit' },
       ];
     }
-    const [top, right, bottom, left = right] = raws;
     return [
       { property: sides.top, value: top, origin: 'explicit' },
       { property: sides.right, value: right, origin: 'explicit' },
@@ -141,6 +161,6 @@ export function fourSides<T>(
     parse,
     expand,
     condense,
-    expandNumber,
+    expandNumber: config.acceptsNumber === false ? undefined : expandNumber,
   });
 }
