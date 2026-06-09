@@ -113,16 +113,19 @@ describe('four-sides family (via the margin def)', () => {
       expect(run('10px', { output: 'minimal' })).toEqual({ type: 'no-op' });
     });
 
-    it('treats all-identical values as a no-op, regardless of count', () => {
-      expect(run('10px 10px', { output: 'minimal' })).toEqual({
-        type: 'no-op',
-      });
-      expect(run('10px 10px 10px', { output: 'minimal' })).toEqual({
-        type: 'no-op',
-      });
-      expect(run('10px 10px 10px 10px', { output: 'minimal' })).toEqual({
-        type: 'no-op',
-      });
+    it('collapses all-identical multivalue input to the shorthand key', () => {
+      const collapsed = {
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'margin', value: '10px', origin: 'explicit' },
+        ],
+      };
+      expect(run('10px 10px', { output: 'minimal' })).toEqual(collapsed);
+      expect(run('10px 10px 10px', { output: 'minimal' })).toEqual(collapsed);
+      expect(run('10px 10px 10px 10px', { output: 'minimal' })).toEqual(
+        collapsed,
+      );
     });
 
     it('compares values verbatim, so differing case is not collapsed', () => {

@@ -80,16 +80,23 @@ export function defineShorthand<T, K: string>(
     /**
      * Optional minimal-output override where the smallest representation
      * uses intermediate stylex keys the plain origin-filter cannot produce
-     * (marginBlock/marginInline pairing; grid-area's single custom-ident).
-     * Returning null signals that expansion would be identity (no-op).
+     * (marginBlock/marginInline pairing; grid-area's single custom-ident;
+     * the all-identical collapse onto the shorthand's own key, received
+     * here as `key`). Returning null signals that expansion would be
+     * identity (no-op).
      */
-    condense?: (parsed: T, options: EmitOptions) => ?ReadonlyArray<Declaration>,
+    condense?: (
+      parsed: T,
+      options: EmitOptions,
+      key: string,
+    ) => ?ReadonlyArray<Declaration>,
     /** Spec-output cells for a single numeric component. */
     expandNumber?: (value: number) => Readonly<{ [_k in K]: Cell }>,
   }>,
 ): ShorthandDef {
   const { canonical, longhands, parse, expand, condense, expandNumber } =
     config;
+  const key = camelize(canonical);
 
   const project = (
     cells: Readonly<{ [_k in K]: Cell }>,
@@ -131,7 +138,7 @@ export function defineShorthand<T, K: string>(
     }
     const assignments =
       condense != null
-        ? condense(parsed, options)
+        ? condense(parsed, options, key)
         : project(expand(parsed)).filter((d) => d.origin !== 'defaulted');
     if (assignments == null) {
       return { type: 'no-op' };
@@ -155,7 +162,7 @@ export function defineShorthand<T, K: string>(
 
   return {
     canonical,
-    key: camelize(canonical),
+    key,
     aliases: config.aliases ?? [],
     longhands,
     dialectMap: config.dialectMap ?? {},
