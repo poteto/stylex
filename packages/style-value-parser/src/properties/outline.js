@@ -26,8 +26,8 @@ const autoKeyword: TokenParser<'auto'> = TokenParser.tokens.Ident.map(
  * 'auto' fills STYLE while style is open and color otherwise, because
  * 'outline: auto' means the UA focus-ring style. The old splitter sent
  * every unrecognized keyword -- including a lone 'auto' -- to color via
- * its fallthrough; that difference is a deliberate divergence to
- * enumerate when the splitter swap lands. (The style slot also keeps
+ * its fallthrough; that difference is a deliberate divergence. (The
+ * style slot also keeps
  * line-style's 'hidden', which outline-style technically excludes,
  * matching the old splitter's keyword set.)
  */

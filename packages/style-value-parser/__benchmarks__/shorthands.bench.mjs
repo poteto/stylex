@@ -158,8 +158,7 @@ async function main() {
     console.log('');
     console.log(
       `Geometric mean vs old: minimal ${geometricMean(minimalRatios).toFixed(2)}x, ` +
-        `spec ${geometricMean(specRatios).toFixed(2)}x ` +
-        '(acceptance gate: >= 0.50x).',
+        `spec ${geometricMean(specRatios).toFixed(2)}x.`,
     );
   }
 }
