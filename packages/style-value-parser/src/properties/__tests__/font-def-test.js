@@ -312,12 +312,86 @@ describe('font def', () => {
     it('only treats a SOLE system keyword as a system font', () => {
       expectParseError(run('menu serif', { output: 'spec' }));
     });
+  });
 
-    it("refuses 'oblique <angle>' as a typed unsupported-feature", () => {
-      expectUnsupported(
-        run('oblique 45deg 12px serif', { output: 'spec' }),
-        'oblique-angle',
-      );
+  describe("the 'oblique <angle>' style", () => {
+    it('joins the pair into one fontStyle value in both modes', () => {
+      expect(run('oblique 45deg 12px serif', { output: 'spec' })).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'fontStyle',
+            value: 'oblique 45deg',
+            origin: 'explicit',
+          },
+          { property: 'fontVariant', value: 'normal', origin: 'defaulted' },
+          { property: 'fontWeight', value: 'normal', origin: 'defaulted' },
+          { property: 'fontSize', value: '12px', origin: 'explicit' },
+          { property: 'lineHeight', value: 'normal', origin: 'defaulted' },
+          { property: 'fontFamily', value: 'serif', origin: 'explicit' },
+        ],
+      });
+      expect(run('oblique 45deg 12px serif', { output: 'minimal' })).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'fontStyle',
+            value: 'oblique 45deg',
+            origin: 'explicit',
+          },
+          { property: 'fontSize', value: '12px', origin: 'explicit' },
+          { property: 'fontFamily', value: 'serif', origin: 'explicit' },
+        ],
+      });
+    });
+
+    it('combines with the other prefix slots', () => {
+      expect(
+        run('oblique 30deg small-caps bold 12px serif', { output: 'minimal' }),
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          {
+            property: 'fontStyle',
+            value: 'oblique 30deg',
+            origin: 'explicit',
+          },
+          {
+            property: 'fontVariant',
+            value: 'small-caps',
+            origin: 'explicit',
+          },
+          { property: 'fontWeight', value: 'bold', origin: 'explicit' },
+          { property: 'fontSize', value: '12px', origin: 'explicit' },
+          { property: 'fontFamily', value: 'serif', origin: 'explicit' },
+        ],
+      });
+    });
+
+    it('does not validate the angle range', () => {
+      // Range enforcement (font-style caps the slant at +/-90deg) is the
+      // longhand grammar's job, not this relocation layer's.
+      const result = run('oblique 120deg 12px serif', { output: 'minimal' });
+      expect(result.type).toEqual('ok');
+      if (result.type === 'ok') {
+        expect(result.assignments[0]).toEqual({
+          property: 'fontStyle',
+          value: 'oblique 120deg',
+          origin: 'explicit',
+        });
+      }
+      const negative = run('oblique -30deg 12px serif', { output: 'minimal' });
+      expect(negative.type).toEqual('ok');
+      if (negative.type === 'ok') {
+        expect(negative.assignments[0]).toEqual({
+          property: 'fontStyle',
+          value: 'oblique -30deg',
+          origin: 'explicit',
+        });
+      }
     });
 
     it("accepts plain 'oblique' as a style", () => {

@@ -88,10 +88,10 @@ export function defineShorthand<T, K: string>(
     expand: (parsed: T) => Readonly<{ [_k in K]: Cell }>,
     /**
      * Typed non-parse refusal for values the grammar recognizes but the
-     * engine cannot expand (font's system keywords, oblique <angle>).
-     * Checked after a successful parse and before any expansion; a
-     * non-null feature name becomes a cannot-expand result with reason
-     * unsupported-feature.
+     * engine cannot expand (font's system keywords, background's box
+     * keywords). Checked after a successful parse and before any
+     * expansion; a non-null feature name becomes a cannot-expand result
+     * with reason unsupported-feature.
      */
     unsupported?: (parsed: T) => ?string,
     /**

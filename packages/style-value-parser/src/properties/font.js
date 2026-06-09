@@ -18,16 +18,14 @@ import { defineShorthand } from '../shorthands/define';
 import { identKeyword, walkComponents } from '../shorthands/families/slots';
 
 /**
- * One parse, tagged by form. 'system' (a sole system-font keyword) and
- * 'oblique-angle' are recognized but refused through the def's
- * unsupported hook: system fonts resolve from UA settings at use time
- * and 'oblique <angle>' has no single-longhand home, so neither can be
+ * One parse, tagged by form. 'system' (a sole system-font keyword) is
+ * recognized but refused through the def's unsupported hook: system
+ * fonts resolve from UA settings at use time, so they cannot be
  * expanded at compile time. 'value' keeps null for omitted slots so
  * expansion can tell explicit slots from filled-in defaults.
  */
 type FontParsed =
   | Readonly<{ form: 'system' }>
-  | Readonly<{ form: 'oblique-angle' }>
   | Readonly<{
       form: 'value',
       style: string | null,
@@ -149,12 +147,18 @@ const parse: TokenParser<FontParsed> = new TokenParser(
       const styleMatch =
         filled.style == null ? matchRange(sourcedStyle, component) : null;
       if (styleMatch != null) {
-        if (
-          styleMatch.value === 'oblique' &&
-          index + 1 < components.length &&
-          matchRange(sourcedAngle, components[index + 1]) != null
-        ) {
-          return done({ form: 'oblique-angle' });
+        if (styleMatch.value === 'oblique' && index + 1 < components.length) {
+          // 'oblique <angle>' is ONE font-style value: a greedy pair
+          // lookahead consumes both components and fontStyle carries the
+          // joined verbatim slices. The angle's range (font-style caps
+          // the slant at +/-90deg) is NOT enforced -- range validation
+          // is the longhand grammar's job, not this relocation layer's.
+          const angleMatch = matchRange(sourcedAngle, components[index + 1]);
+          if (angleMatch != null) {
+            filled.style = `${styleMatch.raw} ${angleMatch.raw}`;
+            index += 2;
+            continue;
+          }
         }
         filled.style = styleMatch.raw;
         index++;
@@ -278,8 +282,8 @@ const expand = (
   parsed: FontParsed,
 ): Readonly<{ [_k in FontLonghand]: Cell }> => {
   if (parsed.form !== 'value') {
-    // Unreachable from CSS input: run() routes these forms through the
-    // unsupported hook before any expansion.
+    // Unreachable from CSS input: run() routes the system form through
+    // the unsupported hook before any expansion.
     throw new Error(`Cannot expand unsupported font form: ${parsed.form}`);
   }
   return {
@@ -304,10 +308,5 @@ export const fontDef: ShorthandDef = defineShorthand({
   longhands: FONT_LONGHANDS,
   parse,
   expand,
-  unsupported: (parsed) =>
-    parsed.form === 'system'
-      ? 'system-font'
-      : parsed.form === 'oblique-angle'
-        ? 'oblique-angle'
-        : null,
+  unsupported: (parsed) => (parsed.form === 'system' ? 'system-font' : null),
 });
