@@ -363,10 +363,11 @@ export default class StateManager {
 
     const styleResolution: StyleXStateOptions['styleResolution'] =
       z.logAndDefault(
-        z.unionOf3(
+        z.unionOf4(
           z.literal('application-order'),
           z.literal('property-specificity'),
           z.literal('legacy-expand-shorthands'),
+          z.literal('spec-expand-shorthands'),
         ),
         options.styleResolution ?? defaultOptions.styleResolution,
         'property-specificity',
