@@ -10,12 +10,15 @@
 import type { ShorthandDef } from '../shorthands/define';
 
 import { TokenParser } from '../token-parser';
-import { Color } from '../css-types/color';
 import { varFunction } from '../shorthands/css-wide';
 import { fourSides } from '../shorthands/families/four-sides';
+import { colorSlot } from './border';
 
+// The shared color slot classifies <color-function> names the typed
+// Color parser does not model (modern space-separated syntax, color());
+// the quad is positional, so var() is one component here.
 const borderColorComponent: TokenParser<unknown> = TokenParser.oneOf(
-  Color.parser,
+  colorSlot,
   varFunction,
 );
 

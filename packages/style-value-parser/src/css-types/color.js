@@ -30,6 +30,26 @@ export class Color {
   }
 }
 
+/**
+ * The <color-function> NAMES, for callers that classify a function as
+ * color-valued by name alone (shorthand slot disambiguation) without
+ * requiring the typed parsers above to model every argument syntax.
+ * Spec color functions only -- a name here must never be valid in a
+ * non-color slot.
+ */
+export const colorFunctionNames: ReadonlyArray<string> = [
+  'rgb',
+  'rgba',
+  'hsl',
+  'hsla',
+  'hwb',
+  'lab',
+  'lch',
+  'oklab',
+  'oklch',
+  'color',
+];
+
 export class NamedColor extends Color {
   +value: string;
   constructor(value: string) {

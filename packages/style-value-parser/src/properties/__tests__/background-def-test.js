@@ -268,6 +268,28 @@ describe('background def', () => {
         });
       }
     });
+
+    it('classifies modern color functions to the color slot by name', () => {
+      for (const color of [
+        'oklch(0.6 0.1 240)',
+        'oklab(0.4 0.1 0.2)',
+        'hwb(120 20% 30%)',
+        'color(display-p3 1 0.5 0)',
+      ]) {
+        expect(run(`${color} no-repeat`, { output: 'minimal' })).toEqual({
+          type: 'ok',
+          important: false,
+          assignments: [
+            { property: 'backgroundColor', value: color, origin: 'explicit' },
+            {
+              property: 'backgroundRepeat',
+              value: 'no-repeat',
+              origin: 'explicit',
+            },
+          ],
+        });
+      }
+    });
   });
 
   describe('position slot', () => {

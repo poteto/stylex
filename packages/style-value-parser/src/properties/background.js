@@ -11,7 +11,6 @@ import type { ShorthandDef } from '../shorthands/define';
 import type { Cell } from '../shorthands/types';
 
 import { TokenParser } from '../token-parser';
-import { Color } from '../css-types/color';
 import { lengthPercentage } from '../css-types/length-percentage';
 import { mathFunction } from '../css-types/math-function';
 import { hasTopLevelComma, varFunction } from '../shorthands/css-wide';
@@ -21,6 +20,7 @@ import {
   identKeyword,
   walkComponents,
 } from '../shorthands/families/slots';
+import { colorSlot } from './border';
 
 /**
  * One parse, tagged by form. 'multiple-layers' (a top-level comma) and
@@ -99,7 +99,7 @@ const boxComponent: TokenParser<string> = identKeyword([
 const sourcedImage = TokenParser.sourced(imageComponent);
 const sourcedRepeat = TokenParser.sourced(repeatComponent);
 const sourcedAttachment = TokenParser.sourced(attachmentComponent);
-const sourcedColor = TokenParser.sourced(Color.parser);
+const sourcedColor = TokenParser.sourced(colorSlot);
 const sourcedPosition = TokenParser.sourced(positionComponent);
 const sourcedSize = TokenParser.sourced(sizeComponent);
 const sourcedBox = TokenParser.sourced(boxComponent);
