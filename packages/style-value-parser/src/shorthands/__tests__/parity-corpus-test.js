@@ -42,7 +42,7 @@ const run = (entry: ParityCase, output: 'minimal' | 'spec'): ExpandResult =>
   });
 
 describe('parity corpus', () => {
-  it('contains no duplicate cases and carries both source tags', () => {
+  it('contains no duplicate cases and carries all source tags', () => {
     const keys = PARITY_CORPUS.map(
       (entry) =>
         `${entry.property}\u0000${String(entry.value)}\u0000` +
@@ -50,7 +50,7 @@ describe('parity corpus', () => {
     );
     expect(new Set(keys).size).toEqual(keys.length);
     const sources = new Set(PARITY_CORPUS.map((entry) => entry.source));
-    expect(sources).toEqual(new Set(['rule-fixture', 'mdn']));
+    expect(sources).toEqual(new Set(['rule-fixture', 'mdn', 'wpt']));
   });
 
   describe.each(MODES)('%s output', (output) => {

@@ -29,7 +29,7 @@ export type ParityCase = Readonly<{
   value: string | number,
   allowImportant?: boolean,
   preferInline?: boolean,
-  source: 'rule-fixture' | 'mdn',
+  source: 'rule-fixture' | 'mdn' | 'wpt',
 }>;
 
 const rule = (
@@ -43,6 +43,12 @@ const mdn = (
   value: string | number,
   options?: Readonly<{ allowImportant?: boolean, preferInline?: boolean }>,
 ): ParityCase => ({ property, value, ...options, source: 'mdn' });
+
+const wpt = (
+  property: string,
+  value: string | number,
+  options?: Readonly<{ allowImportant?: boolean, preferInline?: boolean }>,
+): ParityCase => ({ property, value, ...options, source: 'wpt' });
 
 export const PARITY_CORPUS: ReadonlyArray<ParityCase> = [
   // margin / padding quads (directional transformer territory)
@@ -62,7 +68,9 @@ export const PARITY_CORPUS: ReadonlyArray<ParityCase> = [
   mdn('margin', 'var(--a) 10px'),
   mdn('margin', 'auto'),
   mdn('margin', '1px 2px 3px'),
-  mdn('margin', 'round(2.5px) 10px'),
+  // round() with a dimension needs its step argument; the one-argument
+  // form is invalid CSS and browsers reject it.
+  mdn('margin', 'round(2.5px, 1px) 10px'),
   mdn('padding', '1px 2px 3px 4px !important'),
   // !important without allowImportant: the old splitter mis-split the
   // bang into a longhand value; the engine refuses instead.
@@ -131,6 +139,9 @@ export const PARITY_CORPUS: ReadonlyArray<ParityCase> = [
     'borderWidth',
     'var(--vertical-border-width, 10) var(--horizontal-border-width, 15)',
   ),
+  // Invalid CSS (line-width takes no percentage), ported as-is from the
+  // rule fixtures: math arguments are deliberately unvalidated, so the
+  // relocated longhands stay exactly as dead as the shorthand was.
   rule('borderWidth', 'calc(100% - 20px) calc(90% - 20px)'),
   rule('borderStyle', 'solid'),
   rule('borderStyle', 'solid dashed dotted double'),
@@ -322,4 +333,13 @@ export const PARITY_CORPUS: ReadonlyArray<ParityCase> = [
   rule('borderStart', '1px solid red'),
   rule('gridColumnGap', '10px'),
   rule('gridRowStart', 1),
+
+  // web-platform-tests parsing vectors (pinned forms the WPT conformance
+  // pass surfaced; the harvest script re-runs the full suite on demand)
+  wpt('background', 'url(a.png) space round'),
+  wpt('background', 'border-area'),
+  wpt('cornerShape', 'superellipse(infinity) round'),
+  wpt('cornerShape', 'superellipse(calc(0.5 * 4))'),
+  wpt('gridColumn', '2 span / 3'),
+  wpt('gridRow', 'foo span / 3'),
 ];
