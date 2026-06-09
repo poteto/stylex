@@ -43,6 +43,37 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
       })
     `,
     },
+    // border: single value passes through
+    {
+      code: `
+      import * as stylex from '@stylexjs/stylex';
+      const styles = stylex.create({
+        main: {
+          border: 'none',
+        },
+      })
+    `,
+    },
+    {
+      code: `
+      import * as stylex from '@stylexjs/stylex';
+      const styles = stylex.create({
+        main: {
+          border: 'solid',
+        },
+      })
+    `,
+    },
+    {
+      code: `
+      import * as stylex from '@stylexjs/stylex';
+      const styles = stylex.create({
+        main: {
+          border: 0,
+        },
+      })
+    `,
+    },
     {
       code: `
       import * as stylex from '@stylexjs/stylex';
@@ -2663,80 +2694,6 @@ eslintTester.run('stylex-valid-shorthands', rule.default, {
         {
           message:
             'Property shorthands using multiple values like "border: 2px dashed blue" are not supported in StyleX. Separate into individual properties.',
-        },
-      ],
-    },
-    // border: single keyword/number values autofix to the one longhand
-    // they set
-    {
-      code: `
-      import * as stylex from '@stylexjs/stylex';
-      const styles = stylex.create({
-        main: {
-          border: 'none',
-        },
-      })
-    `,
-      output: `
-      import * as stylex from '@stylexjs/stylex';
-      const styles = stylex.create({
-        main: {
-          borderStyle: 'none',
-        },
-      })
-    `,
-      errors: [
-        {
-          message:
-            'Property shorthands using multiple values like "border: none" are not supported in StyleX. Separate into individual properties.',
-        },
-      ],
-    },
-    {
-      code: `
-      import * as stylex from '@stylexjs/stylex';
-      const styles = stylex.create({
-        main: {
-          border: 'solid',
-        },
-      })
-    `,
-      output: `
-      import * as stylex from '@stylexjs/stylex';
-      const styles = stylex.create({
-        main: {
-          borderStyle: 'solid',
-        },
-      })
-    `,
-      errors: [
-        {
-          message:
-            'Property shorthands using multiple values like "border: solid" are not supported in StyleX. Separate into individual properties.',
-        },
-      ],
-    },
-    {
-      code: `
-      import * as stylex from '@stylexjs/stylex';
-      const styles = stylex.create({
-        main: {
-          border: 0,
-        },
-      })
-    `,
-      output: `
-      import * as stylex from '@stylexjs/stylex';
-      const styles = stylex.create({
-        main: {
-          borderWidth: '0',
-        },
-      })
-    `,
-      errors: [
-        {
-          message:
-            'Property shorthands using multiple values like "border: 0" are not supported in StyleX. Separate into individual properties.',
         },
       ],
     },
