@@ -27,6 +27,12 @@ import { cornerShapeDef } from '../properties/corner-shape';
 import { flexDef } from '../properties/flex';
 import { fontDef } from '../properties/font';
 import { gapDef } from '../properties/gap';
+import {
+  gridAreaDef,
+  gridColumnDef,
+  gridRowDef,
+} from '../properties/grid-lines';
+import { gridTemplateDef } from '../properties/grid-template';
 import { insetBlockDef, insetDef, insetInlineDef } from '../properties/inset';
 import {
   marginBlockDef,
@@ -65,6 +71,10 @@ export const registry: Readonly<{ +[string]: ShorthandDef }> = Object.freeze({
   flex: flexDef,
   font: fontDef,
   gap: gapDef,
+  gridArea: gridAreaDef,
+  gridColumn: gridColumnDef,
+  gridRow: gridRowDef,
+  gridTemplate: gridTemplateDef,
   inset: insetDef,
   insetBlock: insetBlockDef,
   insetInline: insetInlineDef,

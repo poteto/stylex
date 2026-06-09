@@ -106,6 +106,26 @@ export function walkComponents(input: TokenList): ComponentWalk {
 }
 
 /**
+ * The walk's components split into groups on top-level slash components;
+ * the slashes themselves belong to no group. Empty groups (leading,
+ * trailing, or doubled slashes) are preserved so grammars can refuse
+ * them. A slashless walk is one group.
+ */
+export function splitOnSlashes(
+  walk: ComponentWalk,
+): ReadonlyArray<ReadonlyArray<ComponentRange>> {
+  const groups: Array<Array<ComponentRange>> = [[]];
+  for (const component of walk.components) {
+    if (walk.isSlash(component)) {
+      groups.push([]);
+    } else {
+      groups[groups.length - 1].push(component);
+    }
+  }
+  return groups;
+}
+
+/**
  * One keyword out of `keywords`, ASCII case-insensitive. The parsed value
  * is the lowercased keyword for grammar-level decisions; emitted slices
  * stay verbatim (via TokenParser.sourced).
