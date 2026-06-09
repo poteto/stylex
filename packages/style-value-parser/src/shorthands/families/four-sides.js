@@ -85,20 +85,27 @@ export function fourSides<T>(
   /**
    * Minimal-output condensation, reproducing the directional transformer
    * the eslint autofix uses:
-   *   - one value, or all values identical: identity, no-op
+   *   - one value: identity, no-op
+   *   - all values identical (multivalue): collapse onto the shorthand's
+   *     own key, so the consumer rewrites 'margin: 10px 10px' to
+   *     'margin: 10px'
    *   - two values: block/inline pair
    *   - three/four values: the four physical longhands (left fills from
    *     right on the 3-value form)
-   * Identity compares VERBATIM slices (so '10px 10PX' is not collapsed),
-   * matching the old splitter's printed-node comparison.
+   * The identical-collapse compares VERBATIM slices (so '10px 10PX' is not
+   * collapsed), matching the old splitter's printed-node comparison.
    */
   const condense = (
     values: ReadonlyArray<Sourced<T>>,
     _options: EmitOptions,
+    key: string,
   ): ?ReadonlyArray<Declaration> => {
     const raws = values.map((v) => v.raw);
-    if (raws.length === 1 || new Set(raws).size === 1) {
+    if (raws.length === 1) {
       return null;
+    }
+    if (new Set(raws).size === 1) {
+      return [{ property: key, value: raws[0], origin: 'explicit' }];
     }
     if (raws.length === 2) {
       return [

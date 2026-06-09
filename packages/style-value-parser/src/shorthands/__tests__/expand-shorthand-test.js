@@ -137,10 +137,16 @@ describe('expandShorthand', () => {
       });
     });
 
-    it('treats all-identical values as a no-op, like the old splitter collapse', () => {
+    it('collapses all-identical multivalue input to the shorthand itself', () => {
       expect(
         expandShorthand('margin', '10px 10px 10px 10px', { output: 'minimal' }),
-      ).toEqual({ type: 'no-op' });
+      ).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'margin', value: '10px', origin: 'explicit' },
+        ],
+      });
     });
   });
 
