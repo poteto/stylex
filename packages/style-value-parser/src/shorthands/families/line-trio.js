@@ -46,11 +46,13 @@ type LineTrio = SlotRecord<string | null>;
  * minimal output is the plain origin-filter -- present components only,
  * no collapse concept and no block/inline pairing for trios.
  *
- * singleComponentIsIdentity is false: a one-component value like
- * 'border: solid' minimally lives on a DIFFERENT key (borderStyle), so
- * the boundary's single-component fast path must not swallow it. (The
- * old splitter required all three slots and reported single components
- * CANNOT_FIX; expanding them is a knowing improvement.)
+ * singleComponentIsIdentity keeps the default (true): a one-component
+ * value like 'border: solid' nominally lives on a DIFFERENT key
+ * (borderStyle), but the old splitter's single-token early-return
+ * accepted such values silently, so the boundary's fast path must keep
+ * treating them as identity in minimal output. The grammar still
+ * classifies lone components when it runs: spec output (which never
+ * consults the fast path) expands them with the omitted-slot defaults.
  */
 export function lineTrio(
   config: Readonly<{
@@ -157,6 +159,5 @@ export function lineTrio(
     longhands: [longhands.width, longhands.style, longhands.color],
     parse,
     expand,
-    singleComponentIsIdentity: false,
   });
 }

@@ -47,17 +47,10 @@ describe('expandShorthand', () => {
 
     it('gates the single-component fast path per def', () => {
       // Escapees are defs whose one-component values still need the
-      // grammar in minimal output: line trios ('border: solid' lives on
-      // borderStyle) and grid-area ('header' lives on four line keys).
-      const escapees = new Set([
-        'border',
-        'borderTop',
-        'borderRight',
-        'borderBottom',
-        'borderLeft',
-        'gridArea',
-        'outline',
-      ]);
+      // grammar in minimal output. Only grid-area qualifies ('header'
+      // lives on four line keys); line trios stay on the fast path so
+      // 'border: solid' is identity, as the old splitter treated it.
+      const escapees = new Set(['gridArea']);
       for (const key of Object.keys(registry)) {
         expect(registry[key].singleComponentIsIdentity).toBe(
           !escapees.has(key),
@@ -994,32 +987,54 @@ describe('expandShorthand', () => {
         type: 'cannot-expand',
         reason: { kind: 'contains-variable' },
       });
-      // A lone var() is one component, but border escapes the
-      // single-component fast path and cannot place it (three open
-      // slots), unlike positional grammars where it would no-op.
+      // A lone var() is one component, so minimal output no-ops on the
+      // fast path before the grammar (which could not place it across
+      // three open slots) ever runs. Spec output still refuses it.
       expect(
         expandShorthand('border', 'var(--x)', { output: 'minimal' }),
-      ).toEqual({
-        type: 'cannot-expand',
-        reason: { kind: 'contains-variable' },
-      });
-    });
-
-    it('expands a single-component border even in minimal output', () => {
-      // End-to-end proof of the def-gated fast-path escape: 'solid' is one
-      // component, yet its minimal form lives on borderStyle.
-      expect(expandShorthand('border', 'solid', { output: 'minimal' })).toEqual(
+      ).toEqual({ type: 'no-op' });
+      expect(expandShorthand('border', 'var(--x)', { output: 'spec' })).toEqual(
         {
-          type: 'ok',
-          important: false,
-          assignments: [
-            { property: 'borderStyle', value: 'solid', origin: 'explicit' },
-          ],
+          type: 'cannot-expand',
+          reason: { kind: 'contains-variable' },
         },
       );
     });
 
-    it('still no-ops a minimal css-wide keyword on an escaping def', () => {
+    it('no-ops a single-component border in minimal output', () => {
+      // The old splitter's single-token early-return accepted these
+      // silently; the fast path preserves that as identity.
+      expect(expandShorthand('border', 'solid', { output: 'minimal' })).toEqual(
+        { type: 'no-op' },
+      );
+      expect(expandShorthand('border', 'none', { output: 'minimal' })).toEqual({
+        type: 'no-op',
+      });
+      expect(
+        expandShorthand('outline', 'dashed', { output: 'minimal' }),
+      ).toEqual({ type: 'no-op' });
+    });
+
+    it('still expands a single-component border in spec output', () => {
+      // Spec output never consults the minimal fast path: a lone
+      // component reaches the grammar and fans out with the omitted-slot
+      // defaults (the compiler's spec-expand mode relies on this).
+      expect(expandShorthand('border', 'none', { output: 'spec' })).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'borderWidth', value: 'medium', origin: 'defaulted' },
+          { property: 'borderStyle', value: 'none', origin: 'explicit' },
+          {
+            property: 'borderColor',
+            value: 'currentcolor',
+            origin: 'defaulted',
+          },
+        ],
+      });
+    });
+
+    it('no-ops a minimal css-wide keyword and replicates it in spec', () => {
       expect(
         expandShorthand('border', 'inherit', { output: 'minimal' }),
       ).toEqual({ type: 'no-op' });
@@ -1057,15 +1072,22 @@ describe('expandShorthand', () => {
       }
     });
 
-    it('refuses a bare number through the stringified fallback', () => {
+    it('refuses a bare number through the stringified fallback in spec', () => {
       // border has no expandNumber: a bare number is not a valid border
-      // value (the old splitter refused it too), so the stringified
-      // grammar route must refuse rather than invent a width.
-      const result = expandShorthand('border', 5, { output: 'minimal' });
+      // value, so the stringified grammar route must refuse rather than
+      // invent a width. In minimal output the single component no-ops on
+      // the fast path before the grammar runs ('border: 0' stays put).
+      const result = expandShorthand('border', 5, { output: 'spec' });
       expect(result.type).toEqual('cannot-expand');
       if (result.type === 'cannot-expand') {
         expect(result.reason.kind).toEqual('parse-error');
       }
+      expect(expandShorthand('border', 5, { output: 'minimal' })).toEqual({
+        type: 'no-op',
+      });
+      expect(expandShorthand('border', 0, { output: 'minimal' })).toEqual({
+        type: 'no-op',
+      });
     });
 
     it('expands border sides onto their side-specific longhands', () => {
@@ -1081,16 +1103,21 @@ describe('expandShorthand', () => {
       });
     });
 
-    it("sends a lone outline 'auto' to the style slot", () => {
+    it("sends a lone outline 'auto' to the style slot in spec output", () => {
+      // Minimal output no-ops the single component; spec output shows
+      // the style-over-color tie-break for the ambiguous keyword.
       expect(expandShorthand('outline', 'auto', { output: 'minimal' })).toEqual(
-        {
-          type: 'ok',
-          important: false,
-          assignments: [
-            { property: 'outlineStyle', value: 'auto', origin: 'explicit' },
-          ],
-        },
+        { type: 'no-op' },
       );
+      expect(expandShorthand('outline', 'auto', { output: 'spec' })).toEqual({
+        type: 'ok',
+        important: false,
+        assignments: [
+          { property: 'outlineWidth', value: 'medium', origin: 'defaulted' },
+          { property: 'outlineStyle', value: 'auto', origin: 'explicit' },
+          { property: 'outlineColor', value: 'auto', origin: 'defaulted' },
+        ],
+      });
     });
 
     it('fills all three outline slots around an auto style', () => {

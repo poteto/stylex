@@ -57,11 +57,11 @@ export type ShorthandDef = Readonly<{
   runNumber: ?(value: number, options: EmitOptions) => ExpandResult,
   /**
    * Minimal-mode fast-path gate. True (the default) means a
-   * single-component value already IS its own minimal form, so the
-   * boundary may no-op before any grammar runs (quads, pairs, corners).
-   * Slot-elimination grammars set false: 'border: solid' is one component
-   * but its minimal form is a different key (borderStyle), so it must
-   * reach def.run even in minimal output.
+   * single-component value is treated as already minimal, so the
+   * boundary may no-op before any grammar runs (quads, pairs, corners,
+   * line trios). grid-area sets false: 'grid-area: header' is one
+   * component but its minimal form lives on four different keys, so it
+   * must reach def.run even in minimal output.
    */
   singleComponentIsIdentity: boolean,
 }>;

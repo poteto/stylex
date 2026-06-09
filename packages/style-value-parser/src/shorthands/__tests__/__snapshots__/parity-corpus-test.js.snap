@@ -206,11 +206,11 @@ borderWidth: "medium" <mdn> minimal -> no-op
 borderWidth: "medium" <mdn> spec -> ok borderTopWidth="medium"(e) borderRightWidth="medium"(r) borderBottomWidth="medium"(r) borderLeftWidth="medium"(r)
 borderStyle: "none" <mdn> minimal -> no-op
 borderStyle: "none" <mdn> spec -> ok borderTopStyle="none"(e) borderRightStyle="none"(r) borderBottomStyle="none"(r) borderLeftStyle="none"(r)
-border: "none" <rule-fixture> minimal -> ok borderStyle="none"(e)
+border: "none" <rule-fixture> minimal -> no-op
 border: "none" <rule-fixture> spec -> ok borderWidth="medium"(d) borderStyle="none"(e) borderColor="currentcolor"(d)
-border: "solid" <rule-fixture> minimal -> ok borderStyle="solid"(e)
+border: "solid" <rule-fixture> minimal -> no-op
 border: "solid" <rule-fixture> spec -> ok borderWidth="medium"(d) borderStyle="solid"(e) borderColor="currentcolor"(d)
-border: 0 <rule-fixture> minimal -> ok borderWidth="0"(e)
+border: 0 <rule-fixture> minimal -> no-op
 border: 0 <rule-fixture> spec -> ok borderWidth="0"(e) borderStyle="none"(d) borderColor="currentcolor"(d)
 border: "1px solid" <rule-fixture> minimal -> ok borderWidth="1px"(e) borderStyle="solid"(e)
 border: "1px solid" <rule-fixture> spec -> ok borderWidth="1px"(e) borderStyle="solid"(e) borderColor="currentcolor"(d)
@@ -240,7 +240,7 @@ border: "1px solid var(--c)" <mdn> minimal -> ok borderWidth="1px"(e) borderStyl
 border: "1px solid var(--c)" <mdn> spec -> ok borderWidth="1px"(e) borderStyle="solid"(e) borderColor="var(--c)"(e)
 border: "var(--a) var(--b) solid" <mdn> minimal -> cannot-expand:contains-variable
 border: "var(--a) var(--b) solid" <mdn> spec -> cannot-expand:contains-variable
-outline: "dashed" <mdn> minimal -> ok outlineStyle="dashed"(e)
+outline: "dashed" <mdn> minimal -> no-op
 outline: "dashed" <mdn> spec -> ok outlineWidth="medium"(d) outlineStyle="dashed"(e) outlineColor="auto"(d)
 outline: "1px solid var(--focus-ring)" <mdn> minimal -> ok outlineWidth="1px"(e) outlineStyle="solid"(e) outlineColor="var(--focus-ring)"(e)
 outline: "1px solid var(--focus-ring)" <mdn> spec -> ok outlineWidth="1px"(e) outlineStyle="solid"(e) outlineColor="var(--focus-ring)"(e)

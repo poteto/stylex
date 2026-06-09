@@ -59,8 +59,10 @@ describe('border def (line-trio family)', () => {
       expect(borderDef.runNumber).toBe(null);
     });
 
-    it('escapes the minimal-mode single-component fast path', () => {
-      expect(borderDef.singleComponentIsIdentity).toBe(false);
+    it('keeps the minimal-mode single-component fast path', () => {
+      // The old splitter accepted single-component border values
+      // silently, so the boundary no-ops them in minimal output.
+      expect(borderDef.singleComponentIsIdentity).toBe(true);
     });
   });
 
@@ -256,6 +258,10 @@ describe('border def (line-trio family)', () => {
 
   describe('minimal output: present components only', () => {
     it('emits a single authored component on its own longhand', () => {
+      // def.run-level capability: the BOUNDARY fast-paths one-component
+      // values to no-op in minimal output (singleComponentIsIdentity),
+      // but the grammar itself still classifies a lone component -- spec
+      // output depends on it.
       expect(run('solid', { output: 'minimal' })).toEqual({
         type: 'ok',
         important: false,
@@ -401,7 +407,7 @@ describe('border side defs (line-trio family)', () => {
       // sides; kept for parity.
       expect(def.dialectMap).toEqual({});
       expect(def.runNumber).toBe(null);
-      expect(def.singleComponentIsIdentity).toBe(false);
+      expect(def.singleComponentIsIdentity).toBe(true);
     }
   });
 
@@ -443,7 +449,7 @@ describe('outline def (line-trio family)', () => {
     ]);
     expect(outlineDef.dialectMap).toEqual({});
     expect(outlineDef.runNumber).toBe(null);
-    expect(outlineDef.singleComponentIsIdentity).toBe(false);
+    expect(outlineDef.singleComponentIsIdentity).toBe(true);
   });
 
   it("defaults width to 'medium', style to 'none', and color to 'auto'", () => {
