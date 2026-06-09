@@ -67,8 +67,14 @@ This rule helps to sort the StyleX property keys according to
 
 This ESLint rule enforces the use of individual longhand CSS properties in place
 of multivalue shorthands when using `create` for reasons of consistency
-and performance. The rule provides an autofix to replace the shorthand with the
-equivalent longhand properties.
+and performance. The autofix is backed by the `style-value-parser` shorthand
+engine: values are parsed with the CSS spec grammars and the replacement
+properties follow spec longhand order. Values the parser cannot soundly split
+(multi-layer `background` or `animation` values, `var()` in ambiguous
+positions, and similar) are reported without a fix, as is `!important` unless
+`allowImportant` is enabled. `cornerShape` expands to the physical
+`corner*Shape` keys by default, and to the logical keys when `preferInline` is
+enabled.
 
 #### Disallowed: `margin`, `padding` with multiple values
 
